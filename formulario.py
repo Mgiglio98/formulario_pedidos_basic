@@ -3,6 +3,9 @@ from datetime import date
 from openpyxl import load_workbook
 import pandas as pd
 import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # --- Inicializações de sessão ---
 if "insumos" not in st.session_state:
@@ -29,22 +32,58 @@ def registrar_historico(numero, obra, data):
         if not ((df_hist["numero"] == registro["numero"]) & (df_hist["obra"] == registro["obra"])).any():
             df_hist = pd.concat([df_hist, pd.DataFrame([registro])], ignore_index=True)
             df_hist.to_csv(historico_path, index=False, encoding="utf-8")
-            st.success(f"📌 Pedido {numero} adicionado ao histórico.")
         else:
-            st.warning(f"ℹ️ Pedido {numero} já está no histórico.")
+            pass  # Já registrado, não faz nada
     else:
         df_hist = pd.DataFrame([registro])
         df_hist.to_csv(historico_path, index=False, encoding="utf-8")
-        st.success(f"📌 Histórico criado com o pedido {numero}.")
 
+# --- Função para enviar e-mail ---
+def enviar_email_pedido(numero, obra, data, solicitante, executivo, insumos):
+    smtp_server = "smtp.office365.com"
+    smtp_port = 587
+    smtp_user = "matheus.almeida@osborne.com.br"
+    smtp_password = "mnmhshjjvmyqnddr"
+
+    msg = MIMEMultipart()
+    msg["From"] = smtp_user
+    msg["To"] = smtp_user
+    msg["Subject"] = f"Novo pedido recebido: {numero}"
+
+    corpo = f"""
+✅ Novo pedido recebido!
+
+Número do Pedido: {numero}
+Obra: {obra}
+Data: {data.strftime("%d/%m/%Y")}
+Solicitante: {solicitante}
+Executivo: {executivo}
+
+Insumos:
+"""
+
+    for i, insumo in enumerate(insumos, 1):
+        corpo += f"\n{i}. {insumo['descricao']} — {insumo['quantidade']} {insumo['unidade']}"
+
+    msg.attach(MIMEText(corpo, "plain"))
+
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        print("📨 E-mail enviado com sucesso!")
+    except Exception as e:
+        print(f"Erro ao enviar e-mail: {e}")
+
+# --- Carrega dados ---
 def carregar_dados():
     df_empreend = pd.read_excel("Empreendimentos.xlsx")
     df_insumos = pd.read_excel("Insumos.xlsx")
 
-    # 🔧 Remover linhas onde "Descrição" está vazia ou nula
     df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
 
-    # Adiciona linha vazia no início
     df_empreend.loc[-1] = ["", "", "", ""]
     df_empreend.index = df_empreend.index + 1
     df_empreend = df_empreend.sort_index()
@@ -54,7 +93,7 @@ def carregar_dados():
 
     return df_empreend, df_insumos
 
-# --- Carrega dados ---
+# --- Dados ---
 df_empreend, df_insumos = carregar_dados()
 
 # --- Logo e título ---
@@ -115,7 +154,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.complemento = ""
         st.session_state.resetar_insumo = False
 
-    # Adiciona o placeholder no topo da lista de insumos
     df_insumos_lista = pd.concat([
         pd.DataFrame([{"Código": "", "Descrição": "--- SELECIONE ---", "Unidade": ""}]),
         df_insumos
@@ -133,7 +171,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         codigo = ""
         unidade = ""
 
-    # Campo de entrada manual só é ativado se nenhum insumo da base foi selecionado
     st.write("Ou preencha manualmente se não estiver listado:")
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
 
@@ -199,7 +236,6 @@ if st.button("📤 Enviar Pedido"):
         wb = load_workbook(caminho_modelo)
         ws = wb["Pedido"]
 
-        # 🔄 Atualizado conforme solicitado
         ws["F2"] = st.session_state.pedido_numero
         ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
         ws["C4"] = st.session_state.solicitante
@@ -227,43 +263,22 @@ if st.button("📤 Enviar Pedido"):
         st.success("✅ Pedido gerado com sucesso!")
         st.download_button("📥 Baixar Excel", data=excel_bytes, file_name=nome_saida)
 
-        st.info("Para gerar um PDF, abra o arquivo no Excel e use a opção 'Salvar como PDF'.")
-
         numero = st.session_state.pedido_numero
         obra = st.session_state.obra_selecionada
         data_pedido = st.session_state.data_pedido
-        
+
         registrar_historico(numero, obra, data_pedido)
+
+        enviar_email_pedido(
+            numero,
+            obra,
+            data_pedido,
+            st.session_state.solicitante,
+            st.session_state.executivo,
+            st.session_state.insumos
+        )
+
         resetar_formulario()
 
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
-
-# --- Histórico de pedidos ---
-if st.checkbox("📖 Ver histórico de pedidos"):
-    historico_path = "historico_pedidos.csv"
-    if os.path.exists(historico_path):
-        df = pd.read_csv(historico_path, dtype={"numero": str, "obra": str, "data": str})
-    
-        if "data" in df.columns:
-            try:
-                df["data"] = pd.to_datetime(df["data"], errors="coerce")
-                df = df[df["data"].notna()]
-            except Exception as e:
-                st.error(f"Erro ao processar datas: {e}")
-                st.stop()
-        else:
-            st.error("A coluna 'data' não foi encontrada no histórico.")
-            st.stop()
-
-        obra_filtro = st.selectbox("Filtrar por obra", ["Todas"] + sorted(df["obra"].dropna().unique()))
-        mes_filtro = st.selectbox("Filtrar por mês", ["Todos"] + sorted(df["data"].dt.strftime("%Y-%m").unique()))
-
-        if obra_filtro != "Todas":
-            df = df[df["obra"] == obra_filtro]
-        if mes_filtro != "Todos":
-            df = df[df["data"].dt.strftime("%Y-%m") == mes_filtro]
-
-        st.table(df[["numero", "obra", "data"]])
-    else:
-        st.info("Nenhum pedido registrado ainda.")
