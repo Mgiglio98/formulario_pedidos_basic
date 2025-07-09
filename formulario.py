@@ -44,6 +44,11 @@ def registrar_historico(numero, obra, data):
 
 # --- Função para enviar e-mail ---
 def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    from email.mime.application import MIMEApplication
+    import smtplib
+
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
@@ -57,13 +62,8 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
-    from email.mime.base import MIMEBase
-    from email import encoders
-
-    # Cria a parte com o tipo correto
-    part = MIMEBase("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    part.set_payload(arquivo_bytes)
-    encoders.encode_base64(part)
+    # Usa MIMEApplication, que cuida do header inteiro sozinho
+    part = MIMEApplication(arquivo_bytes, Name=nome_arquivo)
     part.add_header("Content-Disposition", f'attachment; filename="{nome_arquivo}"')
     msg.attach(part)
 
