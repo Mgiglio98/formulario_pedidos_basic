@@ -54,11 +54,9 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     msg["To"] = smtp_user
     msg["Subject"] = f"Novo pedido recebido: {numero}"
 
-    # Corpo simplificado
     corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
-    # Anexa o arquivo Excel
     from email.mime.base import MIMEBase
     from email import encoders
 
@@ -265,12 +263,12 @@ if st.button("📤 Enviar Pedido"):
 
         registrar_historico(numero, obra, data_pedido)
 
+        # Envia e-mail com o mesmo arquivo
         enviar_email_pedido(
             numero,
             st.session_state.excel_bytes,
             st.session_state.nome_arquivo
         )
-
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
 
