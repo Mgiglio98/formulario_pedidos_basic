@@ -133,8 +133,8 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         obra_selecionada = st.selectbox("Obra", df_empreend["NOME"].unique(), index=0, key="obra_selecionada")
     with col2:
         data_pedido = st.date_input("Data", value=st.session_state.get("data_pedido", date.today()), key="data_pedido")
-        # Mostra no app já no formato brasileiro
-        st.text(f"Data selecionada: {st.session_state.data_pedido.strftime('%d/%m/%Y')}")
+        # Mostra data formatada
+        st.markdown(f"**Data selecionada:** {st.session_state.data_pedido.strftime('%d/%m/%Y')}")
         executivo = st.text_input("Executivo", key="executivo")
 
     if obra_selecionada:
@@ -154,7 +154,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.session_state.resetar_insumo:
         st.session_state.descricao = ""
         st.session_state.descricao_livre = ""
-        st.rerun()
         st.session_state.codigo = ""
         st.session_state.unidade = ""
         st.session_state.quantidade = 0.0
