@@ -279,6 +279,7 @@ if st.button("📤 Enviar Pedido"):
         )
 
         resetar_formulario()
+        st.rerun()
 
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
