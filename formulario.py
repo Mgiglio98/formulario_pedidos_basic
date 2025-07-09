@@ -217,7 +217,7 @@ if st.session_state.insumos:
 cols_envio = st.columns([2, 1, 2])  # 2 partes vazias, 1 central
 # --- Finalização do Pedido ---
 with cols_envio[1]:
-    if st.button("📤 Enviar Pedido"):
+    if st.button("📤 Enviar Pedido", use_container_width=True):
         campos_obrigatorios = [
             st.session_state.pedido_numero,
             st.session_state.data_pedido,
