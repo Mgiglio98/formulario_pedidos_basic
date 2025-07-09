@@ -107,7 +107,7 @@ with col2:
 
 st.markdown("""
     <div style='text-align: center;'>
-        <h2 style='color: #000000;'>Sistema de Pedidos de Materiais</h2>
+        <h2 style='color: #000000;'>Pedido de Materiais Básicos</h2>
         <p style='font-size: 14px; color: #555;'>Preencha os campos com atenção. Evite abreviações desnecessárias.<br>
         </p>
     </div>
@@ -133,6 +133,8 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         obra_selecionada = st.selectbox("Obra", df_empreend["NOME"].unique(), index=0, key="obra_selecionada")
     with col2:
         data_pedido = st.date_input("Data", value=st.session_state.get("data_pedido", date.today()), key="data_pedido")
+        # Mostra no app já no formato brasileiro
+        st.text(f"Data selecionada: {st.session_state.data_pedido.strftime('%d/%m/%Y')}")
         executivo = st.text_input("Executivo", key="executivo")
 
     if obra_selecionada:
@@ -151,6 +153,7 @@ st.divider()
 with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.session_state.resetar_insumo:
         st.session_state.descricao = ""
+        st.session_state.descricao_livre = ""
         st.session_state.codigo = ""
         st.session_state.unidade = ""
         st.session_state.quantidade = 0.0
@@ -159,12 +162,13 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     # Ordena a lista de insumos
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
-
     lista_opcoes = df_insumos_lista["Descrição"].tolist()
 
     descricao = st.selectbox("Descrição do insumo (Digite em MAIÚSCULO)", lista_opcoes, key="descricao")
 
-    if descricao:
+    usando_base = bool(descricao)
+
+    if usando_base:
         dados_insumo = df_insumos_lista[df_insumos_lista["Descrição"] == descricao].iloc[0]
         codigo = dados_insumo["Código"]
         unidade = dados_insumo["Unidade"]
@@ -172,17 +176,23 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         codigo = ""
         unidade = ""
 
-    st.text_input("Código do insumo", value=codigo, key="codigo", disabled=True)
-    unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=True)
+    # Campo manual para descrição livre
+    st.write("Ou preencha manualmente se não estiver listado:")
+    descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
 
-    quantidade = st.number_input("Quantidade", min_value=0.0, format="%.2f", key="quantidade")
+    st.text_input("Código do insumo", value=codigo, key="codigo", disabled=True)
+    unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=usando_base)
+
+    quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
     complemento = st.text_area("Complemento", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
-        if descricao and quantidade > 0:
+        descricao_final = descricao if usando_base else descricao_livre
+
+        if descricao_final and quantidade > 0 and (usando_base or unidade.strip()):
             novo_insumo = {
-                "descricao": descricao,
-                "codigo": codigo,
+                "descricao": descricao_final,
+                "codigo": codigo if usando_base else "",
                 "unidade": unidade,
                 "quantidade": quantidade,
                 "complemento": complemento,
@@ -192,7 +202,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             resetar_campos_insumo()
             st.rerun()
         else:
-            st.warning("⚠️ Selecione um insumo válido e informe a quantidade.")
+            st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
