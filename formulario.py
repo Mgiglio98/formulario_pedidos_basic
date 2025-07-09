@@ -258,6 +258,13 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             ws[f"F{linha}"] = insumo["complemento"]
             linha += 1
 
+        # Após preencher, deletar linhas extras
+        ultima_linha_util = linha - 1
+        total_linhas_modelo = 92  # ajuste aqui conforme teu arquivo
+
+        if ultima_linha_util < total_linhas_modelo:
+        ws.delete_rows(ultima_linha_util + 1, total_linhas_modelo - ultima_linha_util)
+
         nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
         wb.save(nome_saida)
 
