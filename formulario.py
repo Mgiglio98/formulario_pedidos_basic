@@ -60,7 +60,7 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     from email.mime.base import MIMEBase
     from email import encoders
 
-    part = MIMEBase('application', 'octet-stream')
+    part = MIMEBase('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     part.set_payload(arquivo_bytes)
     encoders.encode_base64(part)
     part.add_header('Content-Disposition', f'attachment; filename="{nome_arquivo}"')
