@@ -57,10 +57,14 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
-    from email.mime.application import MIMEApplication
+    from email.mime.base import MIMEBase
+    from email import encoders
 
-    part = MIMEApplication(arquivo_bytes, Name=nome_arquivo)
-    part.add_header('Content-Disposition', f'attachment; filename="{nome_arquivo}"')
+    # Cria a parte com o tipo correto
+    part = MIMEBase("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    part.set_payload(arquivo_bytes)
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", f'attachment; filename="{nome_arquivo}"')
     msg.attach(part)
 
     try:
