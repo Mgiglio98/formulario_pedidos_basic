@@ -62,8 +62,8 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
-    # Usa MIMEApplication, que cuida do header inteiro sozinho
-    part = MIMEApplication(arquivo_bytes, Name=nome_arquivo)
+    # Sem Name, apenas MIMEApplication
+    part = MIMEApplication(arquivo_bytes)
     part.add_header("Content-Disposition", f'attachment; filename="{nome_arquivo}"')
     msg.attach(part)
 
