@@ -259,7 +259,6 @@ if st.button("📤 Enviar Pedido"):
         # Salva no estado
         st.session_state.excel_bytes = excel_bytes
         st.session_state.nome_arquivo = nome_saida
-        st.rerun()
 
         st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
 
