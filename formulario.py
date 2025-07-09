@@ -214,89 +214,83 @@ if st.session_state.insumos:
                 st.session_state.insumos.pop(i)
                 st.rerun()
 
-cols_envio = st.columns([2, 1, 2])  # 2 partes vazias, 1 central
 # --- Finalização do Pedido ---
-with cols_envio[1]:
-    if st.button("📤 Enviar Pedido", use_container_width=True):
-        campos_obrigatorios = [
-            st.session_state.pedido_numero,
-            st.session_state.data_pedido,
-            st.session_state.solicitante,
-            st.session_state.executivo,
-            st.session_state.obra_selecionada,
-            st.session_state.cnpj,
-            st.session_state.endereco,
-            st.session_state.cep
-        ]
-    
-        if not all(campos_obrigatorios):
-            st.warning("⚠️ Preencha todos os campos obrigatórios antes de enviar o pedido.")
-            st.stop()
-    
-        if not st.session_state.insumos:
-            st.warning("⚠️ Adicione pelo menos um insumo antes de enviar o pedido.")
-            st.stop()
-    
-        try:
-            caminho_modelo = "Modelo_Pedido.xlsx"
-            wb = load_workbook(caminho_modelo)
-            ws = wb["Pedido"]
-    
-            ws["F2"] = st.session_state.pedido_numero
-            ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
-            ws["C4"] = st.session_state.solicitante
-            ws["C5"] = st.session_state.executivo
-            ws["C7"] = st.session_state.obra_selecionada
-            ws["C8"] = st.session_state.cnpj
-            ws["C9"] = st.session_state.endereco
-            ws["C10"] = st.session_state.cep
-    
-            linha = 13
-            for insumo in st.session_state.insumos:
-                ws[f"B{linha}"] = insumo["codigo"]
-                ws[f"C{linha}"] = insumo["descricao"]
-                ws[f"D{linha}"] = insumo["unidade"]
-                ws[f"E{linha}"] = insumo["quantidade"]
-                ws[f"F{linha}"] = insumo["complemento"]
-                linha += 1
-    
-            nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
-            wb.save(nome_saida)
-    
-            with open(nome_saida, "rb") as f:
-                excel_bytes = f.read()
-    
-            # Salva no estado
-            st.session_state.excel_bytes = excel_bytes
-            st.session_state.nome_arquivo = nome_saida
+if st.button("📤 Enviar Pedido", use_container_width=True):
+    campos_obrigatorios = [
+        st.session_state.pedido_numero,
+        st.session_state.data_pedido,
+        st.session_state.solicitante,
+        st.session_state.executivo,
+        st.session_state.obra_selecionada,
+        st.session_state.cnpj,
+        st.session_state.endereco,
+        st.session_state.cep
+    ]
 
-            cols_sucesso = st.columns([2, 1, 2])
-            with cols_sucesso[1]:
-                st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
-    
-            numero = st.session_state.pedido_numero
-            obra = st.session_state.obra_selecionada
-            data_pedido = st.session_state.data_pedido
-    
-            registrar_historico(numero, obra, data_pedido)
-    
-            # Gera assunto com o nome desejado
-            assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
-            
-            # Envia e-mail com o mesmo arquivo
-            enviar_email_pedido(
-                assunto_email,
-                st.session_state.excel_bytes
-            )
-        except Exception as e:
-            st.error(f"Erro ao gerar pedido: {e}")
+    if not all(campos_obrigatorios):
+        st.warning("⚠️ Preencha todos os campos obrigatórios antes de enviar o pedido.")
+        st.stop()
+
+    if not st.session_state.insumos:
+        st.warning("⚠️ Adicione pelo menos um insumo antes de enviar o pedido.")
+        st.stop()
+
+    try:
+        caminho_modelo = "Modelo_Pedido.xlsx"
+        wb = load_workbook(caminho_modelo)
+        ws = wb["Pedido"]
+
+        ws["F2"] = st.session_state.pedido_numero
+        ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
+        ws["C4"] = st.session_state.solicitante
+        ws["C5"] = st.session_state.executivo
+        ws["C7"] = st.session_state.obra_selecionada
+        ws["C8"] = st.session_state.cnpj
+        ws["C9"] = st.session_state.endereco
+        ws["C10"] = st.session_state.cep
+
+        linha = 13
+        for insumo in st.session_state.insumos:
+            ws[f"B{linha}"] = insumo["codigo"]
+            ws[f"C{linha}"] = insumo["descricao"]
+            ws[f"D{linha}"] = insumo["unidade"]
+            ws[f"E{linha}"] = insumo["quantidade"]
+            ws[f"F{linha}"] = insumo["complemento"]
+            linha += 1
+
+        nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
+        wb.save(nome_saida)
+
+        with open(nome_saida, "rb") as f:
+            excel_bytes = f.read()
+
+        # Salva no estado
+        st.session_state.excel_bytes = excel_bytes
+        st.session_state.nome_arquivo = nome_saida
+
+        st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
+
+        numero = st.session_state.pedido_numero
+        obra = st.session_state.obra_selecionada
+        data_pedido = st.session_state.data_pedido
+
+        registrar_historico(numero, obra, data_pedido)
+
+        # Gera assunto com o nome desejado
+        assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
+        
+        # Envia e-mail com o mesmo arquivo
+        enviar_email_pedido(
+            assunto_email,
+            st.session_state.excel_bytes
+        )
+    except Exception as e:
+        st.error(f"Erro ao gerar pedido: {e}")
 
 # --- Botão de download separado ---
 if st.session_state.excel_bytes:
-    cols_download = st.columns([2, 1, 2])
-    with cols_download[1]:
-        if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo):
-            resetar_formulario()
-            st.session_state.excel_bytes = None
-            st.session_state.nome_arquivo = ""
-            st.rerun()
+    if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo):
+        resetar_formulario()
+        st.session_state.excel_bytes = None
+        st.session_state.nome_arquivo = ""
+        st.rerun()
