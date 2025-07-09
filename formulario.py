@@ -133,8 +133,6 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         obra_selecionada = st.selectbox("Obra", df_empreend["NOME"].unique(), index=0, key="obra_selecionada")
     with col2:
         data_pedido = st.date_input("Data", value=st.session_state.get("data_pedido", date.today()), key="data_pedido")
-        # Mostra data formatada
-        st.markdown(f"**Data selecionada:** {st.session_state.data_pedido.strftime('%d/%m/%Y')}")
         executivo = st.text_input("Executivo", key="executivo")
 
     if obra_selecionada:
