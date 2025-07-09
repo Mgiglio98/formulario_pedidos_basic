@@ -289,7 +289,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
 # --- Botão de download separado ---
 if st.session_state.excel_bytes:
-    if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo):
+    if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo, use_container_width=True):
         resetar_formulario()
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
