@@ -154,7 +154,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.descricao_livre = ""
         st.session_state.codigo = ""
         st.session_state.unidade = ""
-        st.session_state.quantidade = 0.0
+        st.session_state.quantidade = 1  # 👈 Já inicializa com 1
         st.session_state.complemento = ""
         st.session_state.resetar_insumo = False
 
