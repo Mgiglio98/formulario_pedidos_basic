@@ -14,6 +14,10 @@ if "resetar_insumo" not in st.session_state:
     st.session_state.resetar_insumo = False
 if "resetar_pedido" not in st.session_state:
     st.session_state.resetar_pedido = False
+if "excel_bytes" not in st.session_state:
+    st.session_state.excel_bytes = None
+if "nome_arquivo" not in st.session_state:
+    st.session_state.nome_arquivo = ""
 
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
@@ -39,7 +43,7 @@ def registrar_historico(numero, obra, data):
         df_hist.to_csv(historico_path, index=False, encoding="utf-8")
 
 # --- Função para enviar e-mail ---
-def enviar_email_pedido(numero, obra, data, solicitante, executivo, insumos):
+def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
@@ -50,22 +54,19 @@ def enviar_email_pedido(numero, obra, data, solicitante, executivo, insumos):
     msg["To"] = smtp_user
     msg["Subject"] = f"Novo pedido recebido: {numero}"
 
-    corpo = f"""
-✅ Novo pedido recebido!
-
-Número do Pedido: {numero}
-Obra: {obra}
-Data: {data.strftime("%d/%m/%Y")}
-Solicitante: {solicitante}
-Executivo: {executivo}
-
-Insumos:
-"""
-
-    for i, insumo in enumerate(insumos, 1):
-        corpo += f"\n{i}. {insumo['descricao']} — {insumo['quantidade']} {insumo['unidade']}"
-
+    # Corpo simplificado
+    corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
+
+    # Anexa o arquivo Excel
+    from email.mime.base import MIMEBase
+    from email import encoders
+
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(arquivo_bytes)
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', f'attachment; filename="{nome_arquivo}"')
+    msg.attach(part)
 
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
@@ -73,7 +74,7 @@ Insumos:
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
         server.quit()
-        print("📨 E-mail enviado com sucesso!")
+        print("📨 E-mail com anexo enviado com sucesso!")
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
@@ -147,7 +148,6 @@ st.divider()
 with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.session_state.resetar_insumo:
         st.session_state.descricao = "--- SELECIONE ---"
-        st.session_state.descricao_livre = ""
         st.session_state.codigo = ""
         st.session_state.unidade = ""
         st.session_state.quantidade = 0.0
@@ -159,11 +159,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         df_insumos
     ], ignore_index=True)
 
-    descricao = st.selectbox("Descrição do insumo (Digite em Maiúsculo)", df_insumos_lista["Descrição"], key="descricao")
+    descricao = st.selectbox("Descrição do insumo (Digite em MAIÚSCULO)", df_insumos_lista["Descrição"], key="descricao")
 
-    usando_base = descricao != "--- SELECIONE ---"
-
-    if usando_base:
+    if descricao != "--- SELECIONE ---":
         dados_insumo = df_insumos_lista[df_insumos_lista["Descrição"] == descricao].iloc[0]
         codigo = dados_insumo["Código"]
         unidade = dados_insumo["Unidade"]
@@ -171,22 +169,17 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         codigo = ""
         unidade = ""
 
-    st.write("Ou preencha manualmente se não estiver listado:")
-    descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
-
     st.text_input("Código do insumo", value=codigo, key="codigo", disabled=True)
-    unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=usando_base)
+    unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=True)
 
     quantidade = st.number_input("Quantidade", min_value=0.0, format="%.2f", key="quantidade")
     complemento = st.text_area("Complemento", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
-        descricao_final = descricao if usando_base else descricao_livre
-
-        if descricao_final and quantidade > 0 and (usando_base or unidade.strip()):
+        if descricao != "--- SELECIONE ---" and quantidade > 0:
             novo_insumo = {
-                "descricao": descricao_final,
-                "codigo": codigo if usando_base else "",
+                "descricao": descricao,
+                "codigo": codigo,
                 "unidade": unidade,
                 "quantidade": quantidade,
                 "complemento": complemento,
@@ -196,7 +189,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             resetar_campos_insumo()
             st.rerun()
         else:
-            st.warning("Preencha todos os campos obrigatórios do insumo.")
+            st.warning("⚠️ Selecione um insumo válido e informe a quantidade.")
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -260,8 +253,11 @@ if st.button("📤 Enviar Pedido"):
         with open(nome_saida, "rb") as f:
             excel_bytes = f.read()
 
-        st.success("✅ Pedido gerado com sucesso!")
-        st.download_button("📥 Baixar Excel", data=excel_bytes, file_name=nome_saida)
+        # Salva no estado
+        st.session_state.excel_bytes = excel_bytes
+        st.session_state.nome_arquivo = nome_saida
+
+        st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
 
         numero = st.session_state.pedido_numero
         obra = st.session_state.obra_selecionada
@@ -271,15 +267,17 @@ if st.button("📤 Enviar Pedido"):
 
         enviar_email_pedido(
             numero,
-            obra,
-            data_pedido,
-            st.session_state.solicitante,
-            st.session_state.executivo,
-            st.session_state.insumos
+            st.session_state.excel_bytes,
+            st.session_state.nome_arquivo
         )
-
-        resetar_formulario()
-        st.rerun()
 
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
+
+# --- Botão de download separado ---
+if st.session_state.excel_bytes:
+    if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo):
+        resetar_formulario()
+        st.session_state.excel_bytes = None
+        st.session_state.nome_arquivo = ""
+        st.rerun()
