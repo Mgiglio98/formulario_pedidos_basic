@@ -269,7 +269,7 @@ if st.button("📤 Enviar Pedido"):
         registrar_historico(numero, obra, data_pedido)
 
         # Gera assunto com o nome desejado
-        assunto_email = f'pedido_{st.session_state.pedido_numero}_{st.session_state.obra_selecionada}'
+        assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
         
         # Envia e-mail com o mesmo arquivo
         enviar_email_pedido(
