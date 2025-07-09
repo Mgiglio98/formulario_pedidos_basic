@@ -260,7 +260,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
         # Após preencher, deletar linhas extras
         ultima_linha_util = linha - 1
-        total_linhas_modelo = 92  # ajuste aqui conforme teu arquivo
+        total_linhas_modelo = 96  # ajuste aqui conforme teu arquivo
 
         if ultima_linha_util < total_linhas_modelo:
             ws.delete_rows(ultima_linha_util + 1, total_linhas_modelo - ultima_linha_util)
