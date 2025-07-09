@@ -43,7 +43,7 @@ def registrar_historico(numero, obra, data):
         df_hist.to_csv(historico_path, index=False, encoding="utf-8")
 
 # --- Função para enviar e-mail ---
-def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
+def enviar_email_pedido(assunto, arquivo_bytes):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     from email.mime.application import MIMEApplication
@@ -57,14 +57,12 @@ def enviar_email_pedido(numero, arquivo_bytes, nome_arquivo):
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
-    msg["Subject"] = f"Novo pedido recebido: {numero}"
+    msg["Subject"] = assunto
 
     corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
-    # Sem Name, apenas MIMEApplication
     part = MIMEApplication(arquivo_bytes)
-    part.add_header("Content-Disposition", f'attachment; filename="{nome_arquivo}"')
     msg.attach(part)
 
     try:
@@ -264,11 +262,13 @@ if st.button("📤 Enviar Pedido"):
 
         registrar_historico(numero, obra, data_pedido)
 
+        # Gera assunto com o nome desejado
+        assunto_email = f'pedido_{st.session_state.pedido_numero}_{st.session_state.obra_selecionada}'
+        
         # Envia e-mail com o mesmo arquivo
         enviar_email_pedido(
-            numero,
-            st.session_state.excel_bytes,
-            st.session_state.nome_arquivo
+            assunto_email,
+            st.session_state.excel_bytes
         )
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
