@@ -250,7 +250,7 @@ if st.button("📤 Enviar Pedido"):
             ws[f"F{linha}"] = insumo["complemento"]
             linha += 1
 
-        nome_saida = f"pedido_{st.session_state.pedido_numero or 'sem_numero'}_{st.session_state.obra_selecionada}.xlsx"
+        nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
         wb.save(nome_saida)
 
         with open(nome_saida, "rb") as f:
