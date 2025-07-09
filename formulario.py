@@ -150,21 +150,21 @@ st.divider()
 # --- Adição de Insumos ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.session_state.resetar_insumo:
-        st.session_state.descricao = "--- SELECIONE ---"
+        st.session_state.descricao = ""
         st.session_state.codigo = ""
         st.session_state.unidade = ""
         st.session_state.quantidade = 0.0
         st.session_state.complemento = ""
         st.session_state.resetar_insumo = False
 
-    df_insumos_lista = pd.concat([
-        pd.DataFrame([{"Código": "", "Descrição": "--- SELECIONE ---", "Unidade": ""}]),
-        df_insumos
-    ], ignore_index=True)
+    # Ordena a lista de insumos
+    df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
 
-    descricao = st.selectbox("Descrição do insumo (Digite em MAIÚSCULO)", df_insumos_lista["Descrição"], key="descricao")
+    lista_opcoes = df_insumos_lista["Descrição"].tolist()
 
-    if descricao != "--- SELECIONE ---":
+    descricao = st.selectbox("Descrição do insumo (Digite em MAIÚSCULO)", lista_opcoes, key="descricao")
+
+    if descricao:
         dados_insumo = df_insumos_lista[df_insumos_lista["Descrição"] == descricao].iloc[0]
         codigo = dados_insumo["Código"]
         unidade = dados_insumo["Unidade"]
@@ -179,7 +179,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     complemento = st.text_area("Complemento", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
-        if descricao != "--- SELECIONE ---" and quantidade > 0:
+        if descricao and quantidade > 0:
             novo_insumo = {
                 "descricao": descricao,
                 "codigo": codigo,
