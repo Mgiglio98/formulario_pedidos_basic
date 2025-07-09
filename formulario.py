@@ -154,6 +154,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.session_state.resetar_insumo:
         st.session_state.descricao = ""
         st.session_state.descricao_livre = ""
+        st.rerun()
         st.session_state.codigo = ""
         st.session_state.unidade = ""
         st.session_state.quantidade = 0.0
