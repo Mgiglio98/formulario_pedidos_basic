@@ -73,9 +73,9 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
             especificos.append(f"{item['descricao']} — {qtd}")
 
     corpo = "✅ Novo pedido recebido!\n\n"
-    corpo += "📄 **Materiais Básicos:**\n"
+    corpo += "📄 Materiais Básicos:\n"
     corpo += "\n".join(basicos) if basicos else "Nenhum\n"
-    corpo += "\n\n🛠️ **Materiais Específicos:**\n"
+    corpo += "\n\n🛠️ Materiais Específicos:\n"
     corpo += "\n".join(especificos) if especificos else "Nenhum"
 
     msg = MIMEMultipart()
@@ -291,7 +291,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
         # Após preencher, deletar linhas extras
         ultima_linha_util = linha - 1
-        total_linhas_modelo = 96  # ajuste aqui conforme teu arquivo
+        total_linhas_modelo = 112  # ajuste aqui conforme teu arquivo
 
         if ultima_linha_util < total_linhas_modelo:
             ws.delete_rows(ultima_linha_util + 1, total_linhas_modelo - ultima_linha_util)
