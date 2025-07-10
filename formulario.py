@@ -43,7 +43,7 @@ def registrar_historico(numero, obra, data):
         df_hist.to_csv(historico_path, index=False, encoding="utf-8")
 
 # --- Função para enviar e-mail ---
-def enviar_email_pedido(assunto, arquivo_bytes):
+def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     from email.mime.application import MIMEApplication
@@ -54,17 +54,40 @@ def enviar_email_pedido(assunto, arquivo_bytes):
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = "mnmhshjjvmyqnddr"
 
+    # Separa básicos e específicos
+    basicos = []
+    especificos = []
+
+    for item in insumos_adicionados:
+        linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
+        if not linha_df.empty and linha_df.iloc[0]["Basico"]:
+            min_qtd = linha_df.iloc[0]["Min"]
+            max_qtd = linha_df.iloc[0]["Max"]
+            qtd = item["quantidade"]
+
+            if pd.notna(min_qtd) and pd.notna(max_qtd) and min_qtd <= qtd <= max_qtd:
+                basicos.append(f"{item['descricao']} — {qtd}")
+            else:
+                especificos.append(f"{item['descricao']} — {qtd}")
+        else:
+            especificos.append(f"{item['descricao']} — {qtd}")
+
+    corpo = "✅ Novo pedido recebido!\n\n"
+    corpo += "📄 **Materiais Básicos:**\n"
+    corpo += "\n".join(basicos) if basicos else "Nenhum\n"
+    corpo += "\n\n🛠️ **Materiais Específicos:**\n"
+    corpo += "\n".join(especificos) if especificos else "Nenhum"
+
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
     msg["Subject"] = assunto
 
-    corpo = "✅ Novo pedido recebido!"
     msg.attach(MIMEText(corpo, "plain"))
 
     from email.mime.base import MIMEBase
     from email import encoders
-    
+
     part = MIMEBase('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     part.set_payload(arquivo_bytes)
     encoders.encode_base64(part)
@@ -85,6 +108,14 @@ def enviar_email_pedido(assunto, arquivo_bytes):
 def carregar_dados():
     df_empreend = pd.read_excel("Empreendimentos.xlsx")
     df_insumos = pd.read_excel("Insumos.xlsx")
+
+    # Marca os 15 primeiros como "Basico" (sem contar cabeçalho)
+    df_insumos["Basico"] = False
+    df_insumos.loc[:14, "Basico"] = True  # 15 primeiras linhas
+
+    # Carrega min e max (colunas D e E)
+    df_insumos["Min"] = pd.to_numeric(df_insumos.iloc[:, 3], errors="coerce")
+    df_insumos["Max"] = pd.to_numeric(df_insumos.iloc[:, 4], errors="coerce")
 
     df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
 
@@ -289,7 +320,9 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         # Envia e-mail com o mesmo arquivo
         enviar_email_pedido(
             assunto_email,
-            st.session_state.excel_bytes
+            st.session_state.excel_bytes,
+            st.session_state.insumos,
+            df_insumos
         )
     except Exception as e:
         st.error(f"Erro ao gerar pedido: {e}")
