@@ -28,20 +28,6 @@ def resetar_formulario():
     resetar_campos_insumo()
     st.session_state.insumos = []
 
-def registrar_historico(numero, obra, data):
-    historico_path = "historico_pedidos.csv"
-    registro = {"numero": str(numero).strip(), "obra": str(obra).strip(), "data": data.strftime("%Y-%m-%d")}
-    if os.path.exists(historico_path):
-        df_hist = pd.read_csv(historico_path, dtype=str)
-        if not ((df_hist["numero"] == registro["numero"]) & (df_hist["obra"] == registro["obra"])).any():
-            df_hist = pd.concat([df_hist, pd.DataFrame([registro])], ignore_index=True)
-            df_hist.to_csv(historico_path, index=False, encoding="utf-8")
-        else:
-            pass  # Já registrado, não faz nada
-    else:
-        df_hist = pd.DataFrame([registro])
-        df_hist.to_csv(historico_path, index=False, encoding="utf-8")
-
 # --- Função para enviar e-mail ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
     from email.mime.multipart import MIMEMultipart
@@ -310,8 +296,6 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         numero = st.session_state.pedido_numero
         obra = st.session_state.obra_selecionada
         data_pedido = st.session_state.data_pedido
-
-        registrar_historico(numero, obra, data_pedido)
 
         # Gera assunto com o nome desejado
         assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
