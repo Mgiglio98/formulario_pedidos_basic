@@ -123,7 +123,11 @@ with col2:
 st.markdown("""
     <div style='text-align: center;'>
         <h2 style='color: #000000;'>Pedido de Materiais</h2>
-        <p style='font-size: 14px; color: #555;'>Preencha os campos com atenção. Evite abreviações desnecessárias.<br>
+        <p style='font-size: 14px; color: #555;'>
+            Preencha os campos com atenção. Evite abreviações desnecessárias.<br>
+            Verifique se todos os dados estão corretos antes de enviar.<br>
+            Ao finalizar, o pedido será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
+            Você poderá baixar a planilha gerada após o envio, para registro ou controle.
         </p>
     </div>
 """, unsafe_allow_html=True)
@@ -190,14 +194,14 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         unidade = ""
 
     # Campo manual para descrição livre
-    st.write("Ou preencha manualmente se não estiver listado:")
+    st.write("Ou preencha manualmente o Nome e Unidade se não estiver listado:")
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
 
     st.text_input("Código do insumo", value=codigo, key="codigo", disabled=True)
     unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=usando_base)
 
     quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
-    complemento = st.text_area("Complemento", key="complemento")
+    complemento = st.text_area("Complemento, se necessário", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = descricao if usando_base else descricao_livre
