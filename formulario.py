@@ -124,8 +124,7 @@ st.markdown("""
     <div style='text-align: center;'>
         <h2 style='color: #000000;'>Pedido de Materiais</h2>
         <p style='font-size: 14px; color: #555;'>
-            Preencha os campos com atenção. Evite abreviações desnecessárias.<br>
-            Verifique se todos os dados estão corretos antes de enviar.<br>
+            Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
             Ao finalizar, o pedido será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
             Você poderá baixar a planilha gerada após o envio, para registro ou controle.
         </p>
