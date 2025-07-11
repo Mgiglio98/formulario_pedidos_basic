@@ -52,7 +52,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
-    smtp_password = "mnmhshjjvmyqnddr"
+    smtp_password = st.secrets["SMTP_PASSWORD"]
 
     # Separa básicos e específicos
     basicos = []
