@@ -109,13 +109,11 @@ def carregar_dados():
     df_empreend = pd.read_excel("Empreendimentos.xlsx")
     df_insumos = pd.read_excel("Insumos.xlsx")
 
-    # Marca os 15 primeiros como "Basico" (sem contar cabeçalho)
-    df_insumos["Basico"] = False
-    df_insumos.loc[:14, "Basico"] = True  # 15 primeiras linhas
-
     # Carrega min e max (colunas D e E)
     df_insumos["Min"] = pd.to_numeric(df_insumos.iloc[:, 3], errors="coerce")
     df_insumos["Max"] = pd.to_numeric(df_insumos.iloc[:, 4], errors="coerce")
+
+    df_insumos["Basico"] = df_insumos["Min"].notna() & df_insumos["Max"].notna()
 
     df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
 
