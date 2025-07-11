@@ -250,6 +250,9 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.warning("⚠️ Adicione pelo menos um insumo antes de enviar o pedido.")
         st.stop()
 
+    erro = None
+    ok = False
+    
     with st.spinner("Enviando pedido e gerando arquivo... Aguarde!"):
         try:
             caminho_modelo = "Modelo_Pedido.xlsx"
@@ -289,12 +292,6 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             st.session_state.excel_bytes = excel_bytes
             st.session_state.nome_arquivo = nome_saida
     
-            st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
-    
-            numero = st.session_state.pedido_numero
-            obra = st.session_state.obra_selecionada
-            data_pedido = st.session_state.data_pedido
-    
             # Gera assunto com o nome desejado
             assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
             
@@ -305,9 +302,18 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 st.session_state.insumos,
                 df_insumos
             )
-        except Exception as e:
-            st.error(f"Erro ao gerar pedido: {e}")
 
+            ok = True
+            
+        except Exception as e:
+            erro = str(e)
+
+    # ✅ Fora do spinner
+    if ok:
+        st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
+    elif erro:
+        st.error(f"Erro ao gerar pedido: {erro}")
+    
 # --- Botão de download separado ---
 if st.session_state.excel_bytes:
     if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo, use_container_width=True):
