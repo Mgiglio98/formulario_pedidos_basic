@@ -251,64 +251,64 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.stop()
 
     with st.spinner("Enviando pedido e gerando arquivo... Aguarde!"):
-    try:
-        caminho_modelo = "Modelo_Pedido.xlsx"
-        wb = load_workbook(caminho_modelo)
-        ws = wb["Pedido"]
-
-        ws["F2"] = st.session_state.pedido_numero
-        ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
-        ws["C4"] = st.session_state.solicitante
-        ws["C5"] = st.session_state.executivo
-        ws["C7"] = st.session_state.obra_selecionada
-        ws["C8"] = st.session_state.cnpj
-        ws["C9"] = st.session_state.endereco
-        ws["C10"] = st.session_state.cep
-
-        linha = 13
-        for insumo in st.session_state.insumos:
-            ws[f"B{linha}"] = insumo["codigo"]
-            ws[f"C{linha}"] = insumo["descricao"]
-            ws[f"D{linha}"] = insumo["unidade"]
-            ws[f"E{linha}"] = insumo["quantidade"]
-            ws[f"F{linha}"] = insumo["complemento"]
-            linha += 1
-
-        # Após preencher, deletar linhas extras
-        ultima_linha_util = linha - 1
-        total_linhas_modelo = 112  # ajuste aqui conforme teu arquivo
-
-        if ultima_linha_util < total_linhas_modelo:
-            ws.delete_rows(ultima_linha_util + 1, total_linhas_modelo - ultima_linha_util)
-
-        nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
-        wb.save(nome_saida)
-
-        with open(nome_saida, "rb") as f:
-            excel_bytes = f.read()
-
-        # Salva no estado
-        st.session_state.excel_bytes = excel_bytes
-        st.session_state.nome_arquivo = nome_saida
-
-        st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
-
-        numero = st.session_state.pedido_numero
-        obra = st.session_state.obra_selecionada
-        data_pedido = st.session_state.data_pedido
-
-        # Gera assunto com o nome desejado
-        assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
-        
-        # Envia e-mail com o mesmo arquivo
-        enviar_email_pedido(
-            assunto_email,
-            st.session_state.excel_bytes,
-            st.session_state.insumos,
-            df_insumos
-        )
-    except Exception as e:
-        st.error(f"Erro ao gerar pedido: {e}")
+        try:
+            caminho_modelo = "Modelo_Pedido.xlsx"
+            wb = load_workbook(caminho_modelo)
+            ws = wb["Pedido"]
+    
+            ws["F2"] = st.session_state.pedido_numero
+            ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
+            ws["C4"] = st.session_state.solicitante
+            ws["C5"] = st.session_state.executivo
+            ws["C7"] = st.session_state.obra_selecionada
+            ws["C8"] = st.session_state.cnpj
+            ws["C9"] = st.session_state.endereco
+            ws["C10"] = st.session_state.cep
+    
+            linha = 13
+            for insumo in st.session_state.insumos:
+                ws[f"B{linha}"] = insumo["codigo"]
+                ws[f"C{linha}"] = insumo["descricao"]
+                ws[f"D{linha}"] = insumo["unidade"]
+                ws[f"E{linha}"] = insumo["quantidade"]
+                ws[f"F{linha}"] = insumo["complemento"]
+                linha += 1
+    
+            # Após preencher, deletar linhas extras
+            ultima_linha_util = linha - 1
+            total_linhas_modelo = 112  # ajuste aqui conforme teu arquivo
+    
+            if ultima_linha_util < total_linhas_modelo:
+                ws.delete_rows(ultima_linha_util + 1, total_linhas_modelo - ultima_linha_util)
+    
+            nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
+            wb.save(nome_saida)
+    
+            with open(nome_saida, "rb") as f:
+                excel_bytes = f.read()
+    
+            # Salva no estado
+            st.session_state.excel_bytes = excel_bytes
+            st.session_state.nome_arquivo = nome_saida
+    
+            st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
+    
+            numero = st.session_state.pedido_numero
+            obra = st.session_state.obra_selecionada
+            data_pedido = st.session_state.data_pedido
+    
+            # Gera assunto com o nome desejado
+            assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
+            
+            # Envia e-mail com o mesmo arquivo
+            enviar_email_pedido(
+                assunto_email,
+                st.session_state.excel_bytes,
+                st.session_state.insumos,
+                df_insumos
+            )
+        except Exception as e:
+            st.error(f"Erro ao gerar pedido: {e}")
 
 # --- Botão de download separado ---
 if st.session_state.excel_bytes:
