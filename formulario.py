@@ -59,11 +59,11 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     especificos = []
 
     for item in insumos_adicionados:
+        qtd = item["quantidade"]  # Define antes de tudo
         linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
         if not linha_df.empty and linha_df.iloc[0]["Basico"]:
             min_qtd = linha_df.iloc[0]["Min"]
             max_qtd = linha_df.iloc[0]["Max"]
-            qtd = item["quantidade"]
 
             if pd.notna(min_qtd) and pd.notna(max_qtd) and min_qtd <= qtd <= max_qtd:
                 basicos.append(f"{item['descricao']} — {qtd}")
