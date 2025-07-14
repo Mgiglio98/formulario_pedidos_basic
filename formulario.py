@@ -285,16 +285,30 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
             ws.print_area = f"A1:F{ultima_linha_util}"
     
+            # Caminho fixo definido
+            caminho_final = r"C:\Users\Matheus\Desktop\Fila_Pedidos"
             nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
+            
+            # Cria a pasta se não existir
+            os.makedirs(caminho_final, exist_ok=True)
+            
+            # Caminho completo
+            caminho_completo = os.path.join(caminho_final, nome_saida)
+            
+            # Salva na pasta definida
+            wb.save(caminho_completo)
+            
+            # Também salva uma cópia temporária local (opcional)
             wb.save(nome_saida)
-    
-            with open(nome_saida, "rb") as f:
+            
+            # Lê os bytes
+            with open(caminho_completo, "rb") as f:
                 excel_bytes = f.read()
-    
-            # Salva no estado
+            
+            # Atualiza session_state
             st.session_state.excel_bytes = excel_bytes
             st.session_state.nome_arquivo = nome_saida
-    
+
             # Gera assunto com o nome desejado
             assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
             
