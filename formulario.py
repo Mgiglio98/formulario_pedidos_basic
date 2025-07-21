@@ -282,25 +282,23 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
             ws.print_area = f"A1:F{ultima_linha_util}"
     
-            # Caminho fixo definido
-            caminho_final = r"C:\Users\Matheus\Desktop\Fila_Pedidos"
+            from io import BytesIO
+
+            # Caminho do nome final
             nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
             
-            # Cria a pasta se não existir
+            # Cria pasta, se quiser salvar também no disco (opcional)
+            caminho_final = r"C:\Users\Matheus\Desktop\Fila_Pedidos"
             os.makedirs(caminho_final, exist_ok=True)
-            
-            # Caminho completo
             caminho_completo = os.path.join(caminho_final, nome_saida)
-            
-            # Salva na pasta definida
             wb.save(caminho_completo)
             
-            # Também salva uma cópia temporária local (opcional)
-            wb.save(nome_saida)
-            
-            # Lê os bytes
-            with open(caminho_completo, "rb") as f:
-                excel_bytes = f.read()
+            # Salva diretamente em memória para evitar conflito de arquivos
+            buffer = BytesIO()
+            wb.save(buffer)
+            buffer.seek(0)
+            excel_bytes = buffer.read()
+            buffer.close()
             
             # Atualiza session_state
             st.session_state.excel_bytes = excel_bytes
