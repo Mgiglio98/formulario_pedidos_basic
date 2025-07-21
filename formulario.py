@@ -45,7 +45,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     especificos = []
 
     for item in insumos_adicionados:
-        qtd = item["quantidade"]  # Define antes de tudo
+        qtd = item["quantidade"]
         linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
         if not linha_df.empty and linha_df.iloc[0]["Basico"]:
             min_qtd = linha_df.iloc[0]["Min"]
@@ -64,22 +64,19 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     corpo += "\n\n🛠️ Materiais Específicos:\n"
     corpo += "\n".join(especificos) if especificos else "Nenhum"
 
+    # Monta o e-mail
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
     msg["Subject"] = assunto
-
     msg.attach(MIMEText(corpo, "plain"))
 
-    from email.mime.base import MIMEBase
-    from email import encoders
+    # Anexa o arquivo corretamente
+    anexo = MIMEApplication(arquivo_bytes, _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    anexo.add_header('Content-Disposition', 'attachment', filename="Pedido.xlsx")
+    msg.attach(anexo)
 
-    part = MIMEBase('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    part.set_payload(arquivo_bytes)
-    encoders.encode_base64(part)
-    part.add_header('Content-Disposition', 'attachment')
-    msg.attach(part)
-
+    # Envia
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()
