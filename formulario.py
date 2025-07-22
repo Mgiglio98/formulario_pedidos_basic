@@ -203,6 +203,14 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         descricao_final = descricao if usando_base else descricao_livre
 
         if descricao_final and quantidade > 0 and (usando_base or unidade.strip()):
+            #if usando_base:
+                #linha_insumo = df_insumos[df_insumos["Descrição"] == descricao_final].iloc[0]
+                #min_qtd = linha_insumo.get("Min")
+
+                #if pd.notna(min_qtd) and quantidade < min_qtd:
+                    #st.error(f"⚠️ Quantidade mínima para esse item é {int(min_qtd)}. Solicite no mínimo esse valor.")
+                    #st.stop()
+                
             novo_insumo = {
                 "descricao": descricao_final,
                 "codigo": codigo if usando_base else "",
