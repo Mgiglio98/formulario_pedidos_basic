@@ -69,10 +69,10 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     # Monta corpo do e-mail
     corpo = "✅ Novo pedido recebido!\n\n"
     corpo += "📄 Materiais Básicos:\n"
-    corpo += "\n".join(basicos) if basicos else "Nenhum\n"
+    corpo += "\n".join(basicos) if basicos else "Nenhum"
 
     corpo += "\n\n🛠️ Materiais Específicos:\n"
-    corpo += "\n".join(especificos) if especificos else "Nenhum\n"
+    corpo += "\n".join(especificos) if especificos else "Nenhum"
 
     corpo += "\n\n📌 Insumos sem código cadastrado:\n"
     corpo += "\n".join(sem_codigo) if sem_codigo else "Nenhum"
@@ -347,5 +347,6 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
 
