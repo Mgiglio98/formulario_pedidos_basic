@@ -50,7 +50,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
         descricao = item["descricao"]
         codigo = item.get("codigo", "")
 
-        if not codigo:  # Se o insumo não tem código, entra na lista de sem código
+        if not codigo or str(codigo).strip() == "":
             sem_codigo.append(f"{descricao} — {qtd}")
             continue
 
@@ -347,4 +347,5 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
