@@ -54,17 +54,16 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
             sem_codigo.append(f"{descricao} — {qtd}")
             continue
 
-        linha_df = df_insumos[df_insumos["Descrição"] == descricao]
+        linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
         if not linha_df.empty and linha_df.iloc[0]["Basico"]:
-            min_qtd = linha_df.iloc[0]["Min"]
             max_qtd = linha_df.iloc[0]["Max"]
-
-            if pd.notna(min_qtd) and pd.notna(max_qtd) and min_qtd <= qtd <= max_qtd:
-                basicos.append(f"{descricao} — {qtd}")
+        
+            if pd.notna(max_qtd) and qtd <= max_qtd:
+                basicos.append(f"{item['descricao']} — {qtd}")
             else:
-                especificos.append(f"{descricao} — {qtd}")
+                especificos.append(f"{item['descricao']} — {qtd}")
         else:
-            especificos.append(f"{descricao} — {qtd}")
+            especificos.append(f"{item['descricao']} — {qtd}")
 
     # Monta corpo do e-mail
     corpo = "✅ Novo pedido recebido!\n\n"
@@ -347,6 +346,7 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
 
 
