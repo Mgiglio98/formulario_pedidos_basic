@@ -40,29 +40,42 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
-    # Separa básicos e específicos
+    # Separa os tipos de insumos
     basicos = []
     especificos = []
+    sem_codigo = []
 
     for item in insumos_adicionados:
         qtd = item["quantidade"]
-        linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
+        descricao = item["descricao"]
+        codigo = item.get("codigo", "")
+
+        if not codigo:  # Se o insumo não tem código, entra na lista de sem código
+            sem_codigo.append(f"{descricao} — {qtd}")
+            continue
+
+        linha_df = df_insumos[df_insumos["Descrição"] == descricao]
         if not linha_df.empty and linha_df.iloc[0]["Basico"]:
             min_qtd = linha_df.iloc[0]["Min"]
             max_qtd = linha_df.iloc[0]["Max"]
 
             if pd.notna(min_qtd) and pd.notna(max_qtd) and min_qtd <= qtd <= max_qtd:
-                basicos.append(f"{item['descricao']} — {qtd}")
+                basicos.append(f"{descricao} — {qtd}")
             else:
-                especificos.append(f"{item['descricao']} — {qtd}")
+                especificos.append(f"{descricao} — {qtd}")
         else:
-            especificos.append(f"{item['descricao']} — {qtd}")
+            especificos.append(f"{descricao} — {qtd}")
 
+    # Monta corpo do e-mail
     corpo = "✅ Novo pedido recebido!\n\n"
     corpo += "📄 Materiais Básicos:\n"
     corpo += "\n".join(basicos) if basicos else "Nenhum\n"
+
     corpo += "\n\n🛠️ Materiais Específicos:\n"
-    corpo += "\n".join(especificos) if especificos else "Nenhum"
+    corpo += "\n".join(especificos) if especificos else "Nenhum\n"
+
+    corpo += "\n\n📌 Insumos sem código cadastrado:\n"
+    corpo += "\n".join(sem_codigo) if sem_codigo else "Nenhum"
 
     # Monta o e-mail
     msg = MIMEMultipart()
@@ -71,12 +84,12 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     msg["Subject"] = assunto
     msg.attach(MIMEText(corpo, "plain"))
 
-    # Anexa o arquivo corretamente
+    # Anexa o arquivo
     anexo = MIMEApplication(arquivo_bytes, _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     anexo.add_header('Content-Disposition', 'attachment', filename="Pedido.xlsx")
     msg.attach(anexo)
 
-    # Envia
+    # Envia o e-mail
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()
@@ -334,3 +347,4 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
