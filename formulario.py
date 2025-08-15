@@ -158,15 +158,15 @@ with st.expander("📋 Dados do Pedido", expanded=True):
     with col1:
         pedido_numero = st.text_input("Pedido Nº", key="pedido_numero")
         solicitante = st.text_input("Solicitante", key="solicitante")
-        obra_selecionada = st.selectbox("Obra", df_empreend["NOME"].unique(), index=0, key="obra_selecionada")
+        obra_selecionada = st.selectbox("Obra", df_empreend["EMPREENDIMENTO"].unique(), index=0, key="obra_selecionada")
     with col2:
         data_pedido = st.date_input("Data", value=st.session_state.get("data_pedido", date.today()), key="data_pedido")
         executivo = st.text_input("Executivo", key="executivo")
 
     if obra_selecionada:
-        dados_obra = df_empreend[df_empreend["NOME"] == obra_selecionada].iloc[0]
-        st.session_state.cnpj = dados_obra["EMPRD_CNPJFAT"]
-        st.session_state.endereco = dados_obra["ENDEREÇO"]
+        dados_obra = df_empreend[df_empreend["EMPREENDIMENTO"] == obra_selecionada].iloc[0]
+        st.session_state.cnpj = dados_obra["CNPJ"]
+        st.session_state.endereco = dados_obra["ENDERECO"]
         st.session_state.cep = dados_obra["CEP"]
 
     st.text_input("CNPJ/CPF", value=st.session_state.get("cnpj", ""), disabled=True)
@@ -347,4 +347,5 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
