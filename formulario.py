@@ -102,6 +102,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
 # --- Carrega dados ---
 def carregar_dados():
     df_empreend = pd.read_excel("Empreendimentos.xlsx")
+    df_empreend.columns = df_empreend.columns.str.strip().str.upper()
     df_insumos = pd.read_excel("Insumos.xlsx")
 
     # Carrega min e max (colunas D e E)
@@ -166,7 +167,7 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         dados_obra = df_empreend[df_empreend["NOME"] == obra_selecionada].iloc[0]
         st.session_state.cnpj = dados_obra["EMPRD_CNPJFAT"]
         st.session_state.endereco = dados_obra["ENDEREÇO"]
-        st.session_state.cep = dados_obra["Cep"]
+        st.session_state.cep = dados_obra["CEP"]
 
     st.text_input("CNPJ/CPF", value=st.session_state.get("cnpj", ""), disabled=True)
     st.text_input("Endereço", value=st.session_state.get("endereco", ""), disabled=True)
@@ -346,3 +347,4 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
