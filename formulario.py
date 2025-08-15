@@ -112,7 +112,7 @@ def carregar_dados():
 
     df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
 
-    df_empreend.loc[-1] = ["", "", "", ""]
+    df_empreend.loc[-1] = [""] * df_empreend.shape[1]
     df_empreend.index = df_empreend.index + 1
     df_empreend = df_empreend.sort_index()
 
@@ -346,7 +346,3 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
-
-
-
-
