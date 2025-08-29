@@ -3,9 +3,10 @@ from datetime import date
 from openpyxl import load_workbook
 import pandas as pd
 import os
-import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+import smtplib
 
 # --- Inicializações de sessão ---
 if "insumos" not in st.session_state:
@@ -30,11 +31,6 @@ def resetar_formulario():
 
 # --- Função para enviar e-mail ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.application import MIMEApplication
-    import smtplib
-
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
@@ -347,5 +343,3 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
-
-
