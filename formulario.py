@@ -8,6 +8,16 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 
+# --- 🔄 Mantém a sessão viva (ping a cada 2 minutos) ---
+st.components.v1.html(
+    """
+    <script>
+      setInterval(() => { fetch(window.location.pathname + '_stcore/health'); }, 120000);
+    </script>
+    """,
+    height=0,
+)
+
 # --- Inicializações de sessão ---
 if "insumos" not in st.session_state:
     st.session_state.insumos = []
@@ -343,3 +353,4 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
