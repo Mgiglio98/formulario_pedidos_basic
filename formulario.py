@@ -7,14 +7,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
-from streamlit.runtime.legacy_caching import caching  # nada a ver com ping; só exemplo de import
-from streamlit import runtime
 
-try:
-    from streamlit import st
-    st.autorefresh(interval=120_000, key="keepalive")  # em versões mais novas: st.autorefresh
-except Exception:
-    pass
+st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
+
+# Ajuste só do espaço superior
+st.markdown("""
+<style>
+[data-testid="stAppViewContainer"] .main .block-container{
+    padding-top: 0.5rem;   /* ajuste fino do “respiro” */
+    padding-bottom: 2rem;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # --- 🔄 Mantém a sessão viva (ping a cada 2 minutos) ---
 st.components.v1.html(
@@ -362,8 +366,12 @@ if st.session_state.excel_bytes:
         st.session_state.nome_arquivo = ""
         st.rerun()
 
-
-
-
-
-
+# --- 🔄 Keep-alive (mover para o fim do arquivo) ---
+st.components.v1.html(
+    """
+    <script>
+      setInterval(() => { fetch(window.location.pathname + '_stcore/health'); }, 120000);
+    </script>
+    """,
+    height=0,
+)
