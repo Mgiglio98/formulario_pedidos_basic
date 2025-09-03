@@ -16,7 +16,7 @@ st.markdown("""
 <style>
 /* reduz só o espaço do conteúdo principal */
 [data-testid="stAppViewContainer"] .main .block-container {
-    padding-top: 0.75rem;   /* ajuste fino aqui: 0.5rem, 0.25rem, etc */
+    padding-top: 0.25rem;   /* ajuste fino aqui: 0.5rem, 0.25rem, etc */
     padding-bottom: 2rem;
 }
 
@@ -374,6 +374,7 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
 
 
