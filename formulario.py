@@ -20,16 +20,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 🔄 Mantém a sessão viva (ping a cada 2 minutos) ---
-st.components.v1.html(
-    """
-    <script>
-      setInterval(() => { fetch(window.location.pathname + '_stcore/health'); }, 120000);
-    </script>
-    """,
-    height=0,
-)
-
 # --- Inicializações de sessão ---
 if "insumos" not in st.session_state:
     st.session_state.insumos = []
@@ -375,3 +365,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
