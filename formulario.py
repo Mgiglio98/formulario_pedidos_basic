@@ -2,7 +2,6 @@ import streamlit as st
 from datetime import date
 from openpyxl import load_workbook
 import pandas as pd
-import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
@@ -365,4 +364,5 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
