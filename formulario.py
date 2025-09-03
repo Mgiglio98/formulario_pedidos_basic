@@ -217,7 +217,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     unidade = st.text_input("Unidade", value=unidade, key="unidade", disabled=usando_base)
 
     quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
-    complemento = st.text_area("Complemento, se necessário", key="complemento")
+    complemento = st.text_area("Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = descricao if usando_base else descricao_livre
@@ -364,5 +364,6 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
