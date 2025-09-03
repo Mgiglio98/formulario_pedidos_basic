@@ -8,21 +8,6 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 
-# --- Configuração inicial da página e estilo ---
-st.set_page_config(page_title="Pedido de Materiais", page_icon="📦", layout="wide", initial_sidebar_state="collapsed")
-
-st.markdown("""
-<style>
-[data-testid="stAppViewContainer"] .main .block-container { padding-top: 1rem; padding-bottom: 2rem; }
-[data-testid="stHeader"] { height: 0px; }
-header { visibility: hidden; }
-h1, h2, p { margin-top: 0; }
-h2 { margin-bottom: .35rem; }
-.stImage img { margin-top: 0 !important; display: block; }
-[data-testid="stAppViewContainer"] .main { max-width: 980px; margin: 0 auto; }
-</style>
-""", unsafe_allow_html=True)
-
 # --- 🔄 Mantém a sessão viva (ping a cada 2 minutos) ---
 st.components.v1.html(
     """
@@ -368,5 +353,6 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
 
