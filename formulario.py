@@ -8,6 +8,27 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 
+# Mantém layout centrado e não mexe nos controles do topo
+st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem layout="wide"
+
+# Só reduz o padding superior do conteúdo e tira margens extras do título/logo
+st.markdown("""
+<style>
+/* reduz só o espaço do conteúdo principal */
+[data-testid="stAppViewContainer"] .main .block-container {
+    padding-top: 0.75rem;   /* ajuste fino aqui: 0.5rem, 0.25rem, etc */
+    padding-bottom: 2rem;
+}
+
+/* evita margens grandes no seu título/descrição */
+.block-container h1, .block-container h2, .block-container p { margin-top: 0; }
+.stImage { margin-top: 0 !important; }        /* não deixa a logo empurrar pra baixo */
+
+/* (opcional) limita a largura sem usar wide */
+[data-testid="stAppViewContainer"] .main { max-width: 980px; margin: 0 auto; }
+</style>
+""", unsafe_allow_html=True)
+
 # --- 🔄 Mantém a sessão viva (ping a cada 2 minutos) ---
 st.components.v1.html(
     """
@@ -353,6 +374,7 @@ if st.session_state.excel_bytes:
         st.session_state.excel_bytes = None
         st.session_state.nome_arquivo = ""
         st.rerun()
+
 
 
 
