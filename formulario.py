@@ -233,8 +233,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 
             novo_insumo = {
                 "descricao": descricao_final,
-                "codigo": codigo if usando_base else "",
-                "unidade": unidade,
+                "codigo": st.session_state.codigo if usando_base else "",
+                "unidade": st.session_state.unidade,
                 "quantidade": quantidade,
                 "complemento": complemento,
             }
@@ -364,6 +364,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
