@@ -213,14 +213,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     # Código sempre só exibe
     st.text_input("Código do insumo", key="codigo", disabled=True)
     
-    # Unidade depende da forma de preenchimento
-    if usando_base:
-        st.text_input("Unidade", key="unidade", disabled=True)
-    else:
-        st.text_input("Unidade", key="unidade", disabled=False)
-
-    st.text_input("Código do insumo", key="codigo", disabled=True)
-    unidade = st.text_input("Unidade", key="unidade", disabled=usando_base)
+    # Unidade → apenas um widget, alternando o disabled
+    st.text_input("Unidade", key="unidade", disabled=usando_base)
 
     quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
     complemento = st.text_area("Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)", key="complemento")
@@ -370,6 +364,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
