@@ -222,7 +222,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.button("➕ Adicionar insumo"):
         descricao_final = descricao if usando_base else descricao_livre
 
-        if descricao_final and quantidade > 0 and (usando_base or unidade.strip()):
+        if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             if usando_base:
                 linha_insumo = df_insumos[df_insumos["Descrição"] == descricao_final].iloc[0]
                 #min_qtd = linha_insumo.get("Min")
@@ -364,6 +364,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
