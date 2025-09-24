@@ -201,17 +201,23 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     usando_base = bool(descricao)
 
-    if usando_base:
+    if usando_base and descricao:
         dados_insumo = df_insumos_lista[df_insumos_lista["Descrição"] == descricao].iloc[0]
         st.session_state.codigo = dados_insumo["Código"]
         st.session_state.unidade = dados_insumo["Unidade"]
-    else:
-        st.session_state.codigo = ""
-        st.session_state.unidade = ""
-
+    
     # Campo manual para descrição livre
     st.write("Ou preencha manualmente o Nome e Unidade se não estiver listado:")
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
+    
+    # Código sempre só exibe
+    st.text_input("Código do insumo", key="codigo", disabled=True)
+    
+    # Unidade depende da forma de preenchimento
+    if usando_base:
+        st.text_input("Unidade", key="unidade", disabled=True)
+    else:
+        st.text_input("Unidade", key="unidade", disabled=False)
 
     st.text_input("Código do insumo", key="codigo", disabled=True)
     unidade = st.text_input("Unidade", key="unidade", disabled=usando_base)
@@ -364,6 +370,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
