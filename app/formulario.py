@@ -300,7 +300,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     
     with st.spinner("Enviando pedido e gerando arquivo... Aguarde!"):
         try:
-            caminho_modelo = "Modelo_Pedido.xlsx"
+            caminho_modelo = CAMINHO_DATA / "Modelo_Pedido.xlsx"
             wb = load_workbook(caminho_modelo)
             ws = wb["Pedido"]
     
@@ -381,6 +381,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
