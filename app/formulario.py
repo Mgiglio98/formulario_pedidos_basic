@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
+from PIL import Image
 
 # --- CONFIGURAÇÃO DO APP ---
 st.set_page_config(
@@ -152,7 +153,15 @@ df_empreend, df_insumos = carregar_dados()
 # --- LOGO E TÍTULO ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image(str(CAMINHO_ASSETS / "logo.png"), width=300)
+    logo_path = CAMINHO_ASSETS / "logo.png"
+    if logo_path.exists():
+        try:
+            image = Image.open(logo_path)
+            st.image(image, width=300)
+        except Exception as e:
+            st.warning(f"⚠️ Erro ao abrir o logo: {e}")
+    else:
+        st.warning("⚠️ Logo não encontrado. Verifique a pasta /assets.")
 
 st.markdown("""
     <div style='text-align: center;'>
@@ -381,6 +390,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
