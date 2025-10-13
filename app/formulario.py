@@ -2,18 +2,35 @@ import streamlit as st
 from datetime import date
 from openpyxl import load_workbook
 import pandas as pd
+from pathlib import Path
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 
-st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
+# --- CONFIGURAÇÃO DO APP ---
+st.set_page_config(
+    page_title="Pedido de Materiais",
+    page_icon="📦",
+    layout="centered"  # ou 'wide' se quiser expandido
+)
 
-# Ajuste só do espaço superior
+# --- CAMINHOS BASE ---
+BASE_DIR = Path(__file__).resolve().parent.parent   # volta da /app para a raiz
+CAMINHO_DATA = BASE_DIR / "data"
+CAMINHO_ASSETS = BASE_DIR / "assets"
+
+# --- CSS OPCIONAL (se quiser criar depois em assets/style.css) ---
+css_path = CAMINHO_ASSETS / "style.css"
+if css_path.exists():
+    with open(css_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# --- AJUSTE DE ESPAÇAMENTO PADRÃO ---
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] .main .block-container{
-    padding-top: 0.5rem;   /* ajuste fino do “respiro” */
+    padding-top: 0.5rem;
     padding-bottom: 2rem;
 }
 </style>
@@ -107,19 +124,19 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
         print(f"Erro ao enviar e-mail: {e}")
 
 # --- Carrega dados ---
+@st.cache_data
 def carregar_dados():
-    df_empreend = pd.read_excel("Empreendimentos.xlsx")
+    df_empreend = pd.read_excel(CAMINHO_DATA / "Empreendimentos.xlsx")
     df_empreend.columns = df_empreend.columns.str.strip().str.upper()
-    df_insumos = pd.read_excel("Insumos.xlsx")
 
-    # Carrega min e max (colunas D e E)
+    df_insumos = pd.read_excel(CAMINHO_DATA / "Insumos.xlsx")
+
+    # Converte colunas min/max e define básicos
     df_insumos["Min"] = pd.to_numeric(df_insumos.iloc[:, 3], errors="coerce")
     df_insumos["Max"] = pd.to_numeric(df_insumos.iloc[:, 4], errors="coerce")
-
     df_insumos["Basico"] = df_insumos["Min"].notna() & df_insumos["Max"].notna()
 
     df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
-
     df_empreend.loc[-1] = [""] * df_empreend.shape[1]
     df_empreend.index = df_empreend.index + 1
     df_empreend = df_empreend.sort_index()
@@ -129,13 +146,13 @@ def carregar_dados():
 
     return df_empreend, df_insumos
 
-# --- Dados ---
+# --- CARREGAMENTO DOS DADOS ---
 df_empreend, df_insumos = carregar_dados()
 
-# --- Logo e título ---
+# --- LOGO E TÍTULO ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    st.image("logo.png", width=300)
+    st.image(str(CAMINHO_ASSETS / "logo.png"), width=300)
 
 st.markdown("""
     <div style='text-align: center;'>
@@ -364,6 +381,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
