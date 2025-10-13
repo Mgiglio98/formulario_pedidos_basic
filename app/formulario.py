@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 # --- CAMINHOS BASE ---
-BASE_DIR = Path(__file__).resolve().parent.parent   # volta da /app para a raiz
+BASE_DIR = Path(__file__).resolve().parent   # volta da /app para a raiz
 CAMINHO_DATA = BASE_DIR / "data"
 CAMINHO_ASSETS = BASE_DIR / "assets"
 
@@ -390,6 +390,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
