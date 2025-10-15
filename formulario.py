@@ -214,14 +214,20 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     # Identifica a linha selecionada com base na opção exibida
     dados_insumo = df_insumos_lista[df_insumos_lista["opcao_exibicao"] == descricao_exibicao].iloc[0]
     
-    # Atualiza session_state com código e unidade corretos
-    st.session_state.codigo = dados_insumo["Código"]
-    st.session_state.unidade = dados_insumo["Unidade"]
+    # Verifica se o usuário selecionou um insumo válido da base
+    usando_base = bool(dados_insumo["Código"]) and str(dados_insumo["Código"]).strip() != ""
     
-    # Para consistência, guarda a descrição "limpa" (sem o código)
-    st.session_state.descricao = dados_insumo["Descrição"]
-    
-    usando_base = bool(st.session_state.descricao)
+    if usando_base:
+        # Atualiza código e unidade apenas quando há insumo da base
+        st.session_state.codigo = dados_insumo["Código"]
+        st.session_state.unidade = dados_insumo["Unidade"]
+        st.session_state.descricao = dados_insumo["Descrição"]
+    else:
+        # Mantém livre para digitação manual (sem apagar o que o usuário digitou)
+        st.session_state.codigo = ""
+        st.session_state.descricao = ""
+        if "unidade" not in st.session_state or not st.session_state.unidade:
+            st.session_state.unidade = ""
     
     # Campo manual para descrição livre
     st.write("Ou preencha manualmente o Nome e Unidade se não estiver listado:")
@@ -381,4 +387,5 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
