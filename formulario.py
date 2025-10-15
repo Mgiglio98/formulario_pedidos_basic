@@ -33,7 +33,13 @@ if "nome_arquivo" not in st.session_state:
 
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
-    st.session_state.resetar_insumo = True
+    st.session_state.descricao = ""
+    st.session_state.descricao_livre = ""
+    st.session_state.codigo = ""
+    st.session_state.unidade = ""
+    st.session_state.quantidade = 1
+    st.session_state.complemento = ""
+    st.session_state.descricao_exibicao = list(df_insumos["Descrição"])[0] if "df_insumos" in locals() else ""
 
 def resetar_formulario():
     st.session_state.resetar_pedido = True
@@ -184,13 +190,8 @@ st.divider()
 
 # --- Adição de Insumos ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
-    if st.session_state.resetar_insumo:
-        st.session_state.descricao = ""
-        st.session_state.descricao_livre = ""
-        st.session_state.codigo = ""
-        st.session_state.unidade = ""
-        st.session_state.quantidade = 1  # 👈 Já inicializa com 1
-        st.session_state.complemento = ""
+    if st.session_state.get("resetar_insumo", False):
+        resetar_campos_insumo()
         st.session_state.resetar_insumo = False
 
     # --- Lista de insumos com código e unidade ---
@@ -263,7 +264,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             }
             st.session_state.insumos.append(novo_insumo)
             st.success("Insumo adicionado com sucesso!")
-            resetar_campos_insumo()
+            
+            # Marca para limpar campos no próximo rerun
+            st.session_state.resetar_insumo = True
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
@@ -387,5 +390,6 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
