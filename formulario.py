@@ -193,13 +193,35 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.complemento = ""
         st.session_state.resetar_insumo = False
 
-    # Ordena a lista de insumos
+    # --- Lista de insumos com código e unidade ---
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
-    lista_opcoes = df_insumos_lista["Descrição"].tolist()
-
-    descricao = st.selectbox("Descrição do insumo (Digite em MAIÚSCULO)", lista_opcoes, key="descricao")
-
-    usando_base = bool(descricao)
+    
+    # Cria coluna de exibição (Descrição – Código (Unidade))
+    df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
+        lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})"
+        if pd.notna(x["Código"]) and str(x["Código"]).strip() != ""
+        else x["Descrição"],
+        axis=1
+    )
+    
+    # Dropdown que mostra todas as opções
+    descricao_exibicao = st.selectbox(
+        "Descrição do insumo (Digite em MAIÚSCULO)",
+        df_insumos_lista["opcao_exibicao"],
+        key="descricao_exibicao"
+    )
+    
+    # Identifica a linha selecionada com base na opção exibida
+    dados_insumo = df_insumos_lista[df_insumos_lista["opcao_exibicao"] == descricao_exibicao].iloc[0]
+    
+    # Atualiza session_state com código e unidade corretos
+    st.session_state.codigo = dados_insumo["Código"]
+    st.session_state.unidade = dados_insumo["Unidade"]
+    
+    # Para consistência, guarda a descrição "limpa" (sem o código)
+    st.session_state.descricao = dados_insumo["Descrição"]
+    
+    usando_base = bool(st.session_state.descricao)
 
     if usando_base and descricao:
         dados_insumo = df_insumos_lista[df_insumos_lista["Descrição"] == descricao].iloc[0]
@@ -224,7 +246,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             if usando_base:
-                linha_insumo = df_insumos[df_insumos["Descrição"] == descricao_final].iloc[0]
+                linha_insumo = df_insumos[df_insumos["Código"] == st.session_state.codigo].iloc[0]
                 #min_qtd = linha_insumo.get("Min")
 
                 #if pd.notna(min_qtd) and quantidade < min_qtd:
@@ -364,6 +386,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
