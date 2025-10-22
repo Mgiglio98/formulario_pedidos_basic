@@ -201,9 +201,24 @@ st.divider()
 
 # --- Adição de Insumos ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
-    df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
 
-    # Cria coluna de exibição (Descrição – Código (Unidade))
+    # 🔄 Limpeza segura logo no início do ciclo
+    if st.session_state.get("limpar_insumo", False):
+        for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
+            if campo in st.session_state:
+                try:
+                    if campo == "quantidade":
+                        st.session_state[campo] = 1
+                    elif campo == "descricao_exibicao":
+                        st.session_state[campo] = list(df_insumos.sort_values(by="Descrição", ascending=True)["Descrição"])[0]
+                    else:
+                        st.session_state[campo] = ""
+                except Exception:
+                    pass
+        st.session_state.limpar_insumo = False
+
+    # --- Lista de insumos ---
+    df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})"
         if pd.notna(x["Código"]) and str(x["Código"]).strip() != ""
@@ -248,23 +263,11 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "complemento": complemento,
             }
             st.session_state.insumos.append(novo_insumo)
-            st.session_state.limpar_insumo = True
+            st.session_state.limpar_insumo = True  # marca flag para próxima renderização
             st.success("Insumo adicionado com sucesso!")
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
-
-    # ⚙️ Limpa os campos no ciclo pós-rerun (agora no momento certo)
-    if "limpar_insumo" in st.session_state and st.session_state.limpar_insumo:
-        st.session_state.descricao = ""
-        st.session_state.descricao_livre = ""
-        st.session_state.codigo = ""
-        st.session_state.unidade = ""
-        st.session_state.quantidade = 1
-        st.session_state.complemento = ""
-        st.session_state.descricao_exibicao = list(df_insumos_lista["opcao_exibicao"])[0]
-        st.session_state.limpar_insumo = False
-        st.experimental_rerun()
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -403,3 +406,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
