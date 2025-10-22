@@ -402,13 +402,13 @@ if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_fo
         st.session_state.limpando_formulario = True
         st.session_state.pedido_enviado = False
         st.session_state.limpar_pedido = True
-        st.experimental_rerun()
+        st.rerun()
 
 # --- Após rerun, limpa o formulário completamente ---
 if st.session_state.get("limpando_formulario", False):
     resetar_formulario()
     st.session_state.limpando_formulario = False
-    st.experimental_rerun()
+    st.rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
