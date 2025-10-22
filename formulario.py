@@ -379,15 +379,16 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
     # ✅ Fora do spinner
     if ok:
-        st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
-    
-        # Marca flag para limpar cabeçalho e insumos no próximo ciclo
-        st.session_state.limpar_pedido = True
-        st.rerun()
+        st.session_state.pedido_enviado = True  # flag de sucesso
+        st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
     
     elif erro:
         st.error(f"Erro ao gerar pedido: {erro}")
-    
+
+# Exibe mensagem fixa se o pedido foi enviado e ainda não baixado
+if st.session_state.get("pedido_enviado", False) and st.session_state.get("excel_bytes"):
+    st.info("📦 O pedido foi gerado e está pronto para download. Clique abaixo para salvar o Excel:")
+
 # --- Botão de download separado ---
 if st.session_state.get("excel_bytes"):
     if st.download_button(
@@ -396,15 +397,10 @@ if st.session_state.get("excel_bytes"):
         file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
         use_container_width=True
     ):
-        st.session_state.deve_resetar_form = True
         st.success("✅ Pedido baixado com sucesso! O formulário será limpo automaticamente.")
+        st.session_state.limpar_pedido = True
+        st.session_state.pedido_enviado = False
         st.rerun()
-
-# Após rerun, executa a limpeza
-if st.session_state.get("deve_resetar_form", False):
-    resetar_formulario()
-    st.session_state.deve_resetar_form = False
-    st.rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
@@ -415,3 +411,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
