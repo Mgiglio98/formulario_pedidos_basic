@@ -378,12 +378,24 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.error(f"Erro ao gerar pedido: {erro}")
     
 # --- Botão de download separado ---
-if st.session_state.excel_bytes:
-    if st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=st.session_state.nome_arquivo, use_container_width=True):
-        resetar_formulario()
-        st.session_state.excel_bytes = None
-        st.session_state.nome_arquivo = ""
-        st.rerun()
+if st.download_button(
+    "📥 Baixar Excel",
+    data=st.session_state.excel_bytes,
+    file_name=st.session_state.nome_arquivo,
+    use_container_width=True
+):
+    # Apenas marca para resetar no próximo ciclo
+    st.session_state.deve_resetar_form = True
+    st.success("✅ Pedido baixado com sucesso! O formulário será limpo automaticamente.")
+    st.rerun()
+
+# Após rerun, executa a limpeza
+if st.session_state.get("deve_resetar_form", False):
+    resetar_formulario()
+    st.session_state.excel_bytes = None
+    st.session_state.nome_arquivo = ""
+    st.session_state.deve_resetar_form = False
+    st.rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
@@ -394,7 +406,3 @@ st.components.v1.html(
     """,
     height=0,
 )
-
-
-
-
