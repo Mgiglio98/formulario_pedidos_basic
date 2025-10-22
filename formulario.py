@@ -385,10 +385,6 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     elif erro:
         st.error(f"Erro ao gerar pedido: {erro}")
 
-# Exibe mensagem fixa se o pedido foi enviado e ainda não baixado
-if st.session_state.get("pedido_enviado", False) and st.session_state.get("excel_bytes"):
-    st.info("📦 O pedido foi gerado e está pronto para download. Clique abaixo para salvar o Excel:")
-
 # --- Botão de download separado ---
 if st.session_state.get("excel_bytes"):
     if st.download_button(
@@ -402,6 +398,16 @@ if st.session_state.get("excel_bytes"):
         st.session_state.pedido_enviado = False
         st.rerun()
 
+# --- Após rerun, limpa o formulário completamente ---
+if st.session_state.get("limpando_formulario", False):
+    resetar_formulario()  # zera tudo
+    st.session_state.limpando_formulario = False
+    st.session_state.pedido_enviado = False
+    st.session_state.limpar_pedido = False
+    st.session_state.excel_bytes = None
+    st.session_state.nome_arquivo = ""
+    st.experimental_rerun()
+
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
     """
@@ -411,4 +417,3 @@ st.components.v1.html(
     """,
     height=0,
 )
-
