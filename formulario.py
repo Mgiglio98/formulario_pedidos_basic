@@ -201,13 +201,8 @@ st.divider()
 
 # --- Adição de Insumos ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
-    if st.session_state.get("resetar_insumo", False):
-        resetar_campos_insumo()
-        st.session_state.resetar_insumo = False
-
-    # --- Lista de insumos com código e unidade ---
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
-    
+
     # Cria coluna de exibição (Descrição – Código (Unidade))
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})"
@@ -215,48 +210,35 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         else x["Descrição"],
         axis=1
     )
-    
-    # Dropdown que mostra todas as opções
+
     descricao_exibicao = st.selectbox(
         "Descrição do insumo (Digite em MAIÚSCULO)",
         df_insumos_lista["opcao_exibicao"],
         key="descricao_exibicao"
     )
-    
-    # Identifica a linha selecionada com base na opção exibida
+
     dados_insumo = df_insumos_lista[df_insumos_lista["opcao_exibicao"] == descricao_exibicao].iloc[0]
-    
-    # Verifica se o usuário selecionou um insumo válido da base
     usando_base = bool(dados_insumo["Código"]) and str(dados_insumo["Código"]).strip() != ""
-    
+
     if usando_base:
-        # Atualiza código e unidade apenas quando há insumo da base
         st.session_state.codigo = dados_insumo["Código"]
         st.session_state.unidade = dados_insumo["Unidade"]
         st.session_state.descricao = dados_insumo["Descrição"]
     else:
-        # Mantém livre para digitação manual (sem apagar o que o usuário digitou)
         st.session_state.codigo = ""
         st.session_state.descricao = ""
         if "unidade" not in st.session_state or not st.session_state.unidade:
             st.session_state.unidade = ""
-    
-    # Campo manual para descrição livre
+
     st.write("Ou preencha manualmente o Nome e Unidade se não estiver listado:")
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
-    
-    # Código sempre só exibe
     st.text_input("Código do insumo", key="codigo", disabled=True)
-    
-    # Unidade → apenas um widget, alternando o disabled
     st.text_input("Unidade", key="unidade", disabled=usando_base)
-
     quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
     complemento = st.text_area("Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
-    
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             novo_insumo = {
                 "descricao": descricao_final,
@@ -266,26 +248,23 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "complemento": complemento,
             }
             st.session_state.insumos.append(novo_insumo)
-            st.session_state.limpar_insumo = True  # marca flag
+            st.session_state.limpar_insumo = True
             st.success("Insumo adicionado com sucesso!")
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
-    # 🔄 Limpa os campos após rerun (sem gerar loop infinito)
-    if st.session_state.get("limpar_insumo", False):
-        for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
-            if campo in st.session_state:
-                try:
-                    if campo == "quantidade":
-                        st.session_state[campo] = 1
-                    elif campo == "descricao_exibicao":
-                        st.session_state[campo] = list(df_insumos_lista["opcao_exibicao"])[0]
-                    else:
-                        st.session_state[campo] = ""
-                except Exception:
-                    pass
+    # ⚙️ Limpa os campos no ciclo pós-rerun (agora no momento certo)
+    if "limpar_insumo" in st.session_state and st.session_state.limpar_insumo:
+        st.session_state.descricao = ""
+        st.session_state.descricao_livre = ""
+        st.session_state.codigo = ""
+        st.session_state.unidade = ""
+        st.session_state.quantidade = 1
+        st.session_state.complemento = ""
+        st.session_state.descricao_exibicao = list(df_insumos_lista["opcao_exibicao"])[0]
         st.session_state.limpar_insumo = False
+        st.experimental_rerun()
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -424,4 +403,3 @@ st.components.v1.html(
     """,
     height=0,
 )
-
