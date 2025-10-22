@@ -149,6 +149,18 @@ def carregar_dados():
 # --- Dados ---
 df_empreend, df_insumos = carregar_dados()
 
+# 🔄 Limpa os campos do cabeçalho apenas quando um pedido for enviado com sucesso
+if st.session_state.get("limpar_pedido", False):
+    for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
+        if campo in st.session_state:
+            try:
+                st.session_state[campo] = ""
+            except Exception:
+                pass
+    st.session_state.data_pedido = date.today()
+    st.session_state.insumos = []
+    st.session_state.limpar_pedido = False
+
 # --- Logo e título ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
@@ -369,13 +381,10 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     if ok:
         st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
     
-        # Limpa campos do formulário principal
-        for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
-            if campo in st.session_state:
-                st.session_state[campo] = ""
-        st.session_state.data_pedido = date.today()
-        st.session_state.insumos = []
-        
+        # Marca flag para limpar cabeçalho e insumos no próximo ciclo
+        st.session_state.limpar_pedido = True
+        st.rerun()
+    
     elif erro:
         st.error(f"Erro ao gerar pedido: {erro}")
     
@@ -406,4 +415,3 @@ st.components.v1.html(
     """,
     height=0,
 )
-
