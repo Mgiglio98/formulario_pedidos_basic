@@ -256,16 +256,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
-
+    
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
-            if usando_base:
-                linha_insumo = df_insumos[df_insumos["Código"] == st.session_state.codigo].iloc[0]
-                #min_qtd = linha_insumo.get("Min")
-
-                #if pd.notna(min_qtd) and quantidade < min_qtd:
-                    #st.error(f"⚠️ Quantidade mínima para esse item é {int(min_qtd)}. Solicite no mínimo esse valor.")
-                    #st.stop()
-                
             novo_insumo = {
                 "descricao": descricao_final,
                 "codigo": st.session_state.codigo if usando_base else "",
@@ -275,9 +267,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             }
             st.session_state.insumos.append(novo_insumo)
             st.success("Insumo adicionado com sucesso!")
-            
-            # Marca para limpar campos no próximo rerun
-            st.session_state.resetar_insumo = True
+    
+            # Limpa imediatamente os campos de insumo
+            for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
+                if campo in st.session_state:
+                    st.session_state[campo] = "" if campo != "quantidade" else 1
+    
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
@@ -381,6 +376,14 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     # ✅ Fora do spinner
     if ok:
         st.success("✅ Pedido gerado e e-mail enviado com sucesso!")
+    
+        # Limpa campos do formulário principal
+        for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
+            if campo in st.session_state:
+                st.session_state[campo] = ""
+        st.session_state.data_pedido = date.today()
+        st.session_state.insumos = []
+        
     elif erro:
         st.error(f"Erro ao gerar pedido: {erro}")
     
