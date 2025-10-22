@@ -33,13 +33,17 @@ if "nome_arquivo" not in st.session_state:
 
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
-    st.session_state.descricao = ""
-    st.session_state.descricao_livre = ""
-    st.session_state.codigo = ""
-    st.session_state.unidade = ""
-    st.session_state.quantidade = 1
-    st.session_state.complemento = ""
-    st.session_state.descricao_exibicao = list(df_insumos["Descrição"])[0] if "df_insumos" in locals() else ""
+    for campo, valor in {
+        "descricao": "",
+        "descricao_livre": "",
+        "codigo": "",
+        "unidade": "",
+        "quantidade": 1,
+        "complemento": "",
+        "descricao_exibicao": list(df_insumos["Descrição"])[0] if "df_insumos" in locals() else ""
+    }.items():
+        if campo in st.session_state:
+            st.session_state[campo] = valor
 
 def resetar_formulario():
     st.session_state.resetar_pedido = True
@@ -390,6 +394,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
