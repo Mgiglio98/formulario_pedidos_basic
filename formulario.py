@@ -266,16 +266,26 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "complemento": complemento,
             }
             st.session_state.insumos.append(novo_insumo)
+            st.session_state.limpar_insumo = True  # marca flag
             st.success("Insumo adicionado com sucesso!")
-    
-            # Limpa imediatamente os campos de insumo
-            for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
-                if campo in st.session_state:
-                    st.session_state[campo] = "" if campo != "quantidade" else 1
-    
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
+
+    # 🔄 Limpa os campos após rerun (sem gerar loop infinito)
+    if st.session_state.get("limpar_insumo", False):
+        for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
+            if campo in st.session_state:
+                try:
+                    if campo == "quantidade":
+                        st.session_state[campo] = 1
+                    elif campo == "descricao_exibicao":
+                        st.session_state[campo] = list(df_insumos_lista["opcao_exibicao"])[0]
+                    else:
+                        st.session_state[campo] = ""
+                except Exception:
+                    pass
+        st.session_state.limpar_insumo = False
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -414,3 +424,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
