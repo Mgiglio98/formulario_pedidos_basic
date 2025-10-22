@@ -386,26 +386,28 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.error(f"Erro ao gerar pedido: {erro}")
 
 # --- Botão de download separado ---
-if st.session_state.get("excel_bytes"):
-    if st.download_button(
+if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_formulario", False):
+    download_clicked = st.download_button(
         "📥 Baixar Excel",
         data=st.session_state.excel_bytes,
         file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
         use_container_width=True
-    ):
+    )
+
+    if download_clicked:
         st.success("✅ Pedido baixado com sucesso! O formulário será limpo automaticamente.")
-        st.session_state.limpar_pedido = True
+        # Zera imediatamente os dados e oculta o botão
+        st.session_state.excel_bytes = None
+        st.session_state.nome_arquivo = ""
+        st.session_state.limpando_formulario = True
         st.session_state.pedido_enviado = False
-        st.rerun()
+        st.session_state.limpar_pedido = True
+        st.experimental_rerun()
 
 # --- Após rerun, limpa o formulário completamente ---
 if st.session_state.get("limpando_formulario", False):
-    resetar_formulario()  # zera tudo
+    resetar_formulario()
     st.session_state.limpando_formulario = False
-    st.session_state.pedido_enviado = False
-    st.session_state.limpar_pedido = False
-    st.session_state.excel_bytes = None
-    st.session_state.nome_arquivo = ""
     st.experimental_rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
