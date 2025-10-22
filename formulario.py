@@ -33,23 +33,30 @@ if "nome_arquivo" not in st.session_state:
 
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
-    for campo, valor in {
-        "descricao": "",
-        "descricao_livre": "",
-        "codigo": "",
-        "unidade": "",
-        "quantidade": 1,
-        "complemento": "",
-        "descricao_exibicao": list(df_insumos["Descrição"])[0] if "df_insumos" in locals() else ""
-    }.items():
+    # Limpa apenas chaves se elas ainda existirem
+    for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
         if campo in st.session_state:
-            st.session_state[campo] = valor
+            try:
+                del st.session_state[campo]
+            except Exception:
+                pass  # ignora caso já tenha sido removido
 
 def resetar_formulario():
-    st.session_state.resetar_pedido = True
+    # Marca para resetar campos de insumos
     resetar_campos_insumo()
-    st.session_state.insumos = []
 
+    # Limpa outras chaves da sessão
+    for campo in ["insumos", "excel_bytes", "nome_arquivo", "pedido_numero", "data_pedido", "solicitante",
+                  "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
+        if campo in st.session_state:
+            try:
+                del st.session_state[campo]
+            except Exception:
+                pass
+
+    st.session_state.resetar_pedido = False
+    st.session_state.resetar_insumo = False
+    
 # --- Função para enviar e-mail ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
     smtp_server = "smtp.office365.com"
@@ -384,7 +391,6 @@ if st.download_button(
     file_name=st.session_state.nome_arquivo,
     use_container_width=True
 ):
-    # Apenas marca para resetar no próximo ciclo
     st.session_state.deve_resetar_form = True
     st.success("✅ Pedido baixado com sucesso! O formulário será limpo automaticamente.")
     st.rerun()
@@ -392,8 +398,6 @@ if st.download_button(
 # Após rerun, executa a limpeza
 if st.session_state.get("deve_resetar_form", False):
     resetar_formulario()
-    st.session_state.excel_bytes = None
-    st.session_state.nome_arquivo = ""
     st.session_state.deve_resetar_form = False
     st.rerun()
 
@@ -406,3 +410,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
