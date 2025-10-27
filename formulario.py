@@ -449,26 +449,41 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
         # --- Botões aparecem imediatamente ---
         col1, col2 = st.columns(2)
+
         with col1:
-            st.download_button(
+            if st.download_button(
                 "📥 Baixar Excel",
                 data=st.session_state.excel_bytes,
                 file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
                 use_container_width=True
-            )
-
-        with col2:
-            if st.button("🔄 Novo Pedido", use_container_width=True):
-                # limpa tudo
+            ):
+                # limpa tudo após baixar
+                st.session_state.insumos = []
                 for campo in [
                     "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-                    "nome_arquivo", "pedido_enviado"
+                    "cnpj", "endereco", "cep", "data_pedido"
                 ]:
                     if campo in st.session_state:
-                        del st.session_state[campo]
+                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+                st.session_state.excel_bytes = None
+                st.session_state.nome_arquivo = ""
+                st.session_state.pedido_enviado = False
+                st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
+        
+        with col2:
+            if st.button("🔄 Novo Pedido", use_container_width=True):
+                # limpa tudo manualmente
                 st.session_state.insumos = []
-                st.success("🧹 Formulário limpo e pronto para um novo pedido!")
+                for campo in [
+                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+                    "cnpj", "endereco", "cep", "data_pedido"
+                ]:
+                    if campo in st.session_state:
+                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+                st.session_state.excel_bytes = None
+                st.session_state.nome_arquivo = ""
+                st.session_state.pedido_enviado = False
+                st.success("🧹 Formulário limpo e pronto para novo pedido!")
 
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
