@@ -200,11 +200,3 @@ if st.session_state.get("excel_bytes"):
         st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=f"Pedido_{st.session_state.pedido_numero}.xlsx")
     with col2:
         if st.button("🔄 Novo Pedido"): limpar_formulario(); st.rerun()
-
-
-
-
-
-
-
-
