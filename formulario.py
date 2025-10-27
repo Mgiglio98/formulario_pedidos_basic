@@ -298,9 +298,9 @@ if st.session_state.insumos:
         }
         .linha-insumo {
             border-bottom: 1px solid #e6e6e6;
-            padding-top: 2px;
-            padding-bottom: 2px;
+            padding: 4px 0px 2px 0px;  /* antes era 2px,2px – aumentamos o topo */
             font-size: 14px;
+            line-height: 1.4;  /* garante altura uniforme */
         }
         .center {
             text-align: center;
@@ -321,7 +321,7 @@ if st.session_state.insumos:
     """, unsafe_allow_html=True)
 
     # Cabeçalho
-    col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
+    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
@@ -471,6 +471,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
