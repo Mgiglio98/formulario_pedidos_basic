@@ -393,13 +393,13 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 
     erro = None
     ok = False
-    
+
     with st.spinner("Enviando pedido e gerando arquivo... Aguarde!"):
         try:
             caminho_modelo = "Modelo_Pedido.xlsx"
             wb = load_workbook(caminho_modelo)
             ws = wb["Pedido"]
-    
+
             ws["F2"] = st.session_state.pedido_numero
             ws["C3"] = st.session_state.data_pedido.strftime("%d/%m/%Y")
             ws["C4"] = st.session_state.solicitante
@@ -408,7 +408,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             ws["C8"] = st.session_state.cnpj
             ws["C9"] = st.session_state.endereco
             ws["C10"] = st.session_state.cep
-    
+
             linha = 13
             for insumo in st.session_state.insumos:
                 ws[f"B{linha}"] = insumo["codigo"]
@@ -417,58 +417,43 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 ws[f"E{linha}"] = insumo["quantidade"]
                 ws[f"F{linha}"] = insumo["complemento"]
                 linha += 1
-    
-            # Após preencher, deletar linhas extras
+
             ultima_linha_util = linha - 1
-
             ws.print_area = f"A1:F{ultima_linha_util}"
-    
-            from io import BytesIO
 
-            # Nome do arquivo
-            nome_saida = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
-            
-            # Salva o Excel diretamente em memória
+            from io import BytesIO
             buffer = BytesIO()
             wb.save(buffer)
             buffer.seek(0)
-            excel_bytes = buffer.read()
-            
-            # Atualiza session_state com os bytes
-            st.session_state.excel_bytes = excel_bytes
-            st.session_state.nome_arquivo = nome_saida
 
-            # Gera assunto com o nome desejado
-            assunto_email = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}"
-            
-            # Envia e-mail com o mesmo arquivo
+            st.session_state.excel_bytes = buffer.read()
+            st.session_state.nome_arquivo = (
+                f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
+            )
+
             enviar_email_pedido(
-                assunto_email,
+                f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
                 st.session_state.excel_bytes,
                 st.session_state.insumos,
                 df_insumos
             )
 
             ok = True
-            
+
         except Exception as e:
             erro = str(e)
 
-    # ✅ Fora do spinner
     if ok:
-        st.session_state.pedido_enviado = True  # flag de sucesso
+        st.session_state.pedido_enviado = True
         st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
-    
-    elif erro:
-        st.error(f"Erro ao gerar pedido: {erro}")
 
-# --- Exibir botões após envio bem-sucedido ---
+    elif erro:
+        st.error(f"❌ Erro ao gerar pedido: {erro}")
+
+# --- Exibição e controle pós-envio ---
 if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_formulario", False):
 
-    st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
-
     col1, col2 = st.columns(2)
-
     with col1:
         st.download_button(
             "📥 Baixar Excel",
@@ -480,19 +465,25 @@ if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_fo
     with col2:
         if st.button("🔄 Novo Pedido", use_container_width=True):
             st.session_state.limpar_formulario = True
+            st.session_state.excel_bytes = None
             st.rerun()
-    
-    # --- Após o rerun, faz a limpeza completa ---
-    if st.session_state.get("limpar_formulario", False):
-        st.session_state.insumos = []
-        st.session_state.excel_bytes = None
-        st.session_state.nome_arquivo = ""
-        for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
-            st.session_state[campo] = ""
-        st.session_state.data_pedido = date.today()
-        st.session_state.limpar_formulario = False
-        st.success("🧹 Formulário limpo e pronto para um novo pedido!")
-        st.rerun()
+
+# --- Limpeza do formulário pós-rerun ---
+if st.session_state.get("limpar_formulario", False):
+    st.session_state.limpando_formulario = True
+
+    for campo in [
+        "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+        "cnpj", "endereco", "cep", "data_pedido"
+    ]:
+        if campo in st.session_state:
+            del st.session_state[campo]
+
+    st.session_state.insumos = []
+    st.session_state.nome_arquivo = ""
+    st.session_state.limpar_formulario = False
+
+    st.rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
