@@ -291,21 +291,28 @@ if st.session_state.insumos:
             border-bottom: 2px solid #ccc;
             padding-bottom: 4px;
             margin-bottom: 4px;
+            font-size: 15px;
         }
         .linha-insumo {
             border-bottom: 1px solid #e6e6e6;
-            padding-top: 4px;
-            padding-bottom: 4px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            font-size: 14px;
         }
         .center {
             text-align: center;
         }
-        .btn-trash {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            padding-top: 2px;
+        /* Remove estilo padrão do botão Streamlit */
+        div[data-testid="stButton"] button {
+            border: none;
+            background-color: transparent;
+            color: #666;
+            font-size: 18px;
+            padding: 0px;
+        }
+        div[data-testid="stButton"] button:hover {
+            color: #d9534f;
+            transform: scale(1.15);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -331,11 +338,9 @@ if st.session_state.insumos:
         with col3:
             st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
-            st.markdown("<div class='btn-trash linha-insumo'>", unsafe_allow_html=True)
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -463,6 +468,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
