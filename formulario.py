@@ -9,23 +9,6 @@ import smtplib
 
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
 
-# --- Limpeza global do formulário ---
-if st.session_state.get("limpar_formulario", False):
-    for campo in [
-        "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-        "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-        "nome_arquivo", "pedido_enviado"
-    ]:
-        if campo in st.session_state:
-            st.session_state[campo] = "" if campo != "data_pedido" else date.today()
-
-    st.session_state.insumos = []
-    st.session_state.limpar_formulario = False
-
-    if st.session_state.get("exibir_msg_limpeza"):
-        st.success(st.session_state.exibir_msg_limpeza)
-        st.session_state.exibir_msg_limpeza = ""
-
 # Ajuste só do espaço superior
 st.markdown("""
 <style>
@@ -477,32 +460,32 @@ with col1:
         file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
         use_container_width=True
     ):
-        # 🔹 Limpa imediatamente todos os campos do formulário
+        # 🔹 Limpa imediatamente todos os campos do formulário (removendo as chaves)
         for campo in [
             "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-            "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-            "nome_arquivo", "pedido_enviado"
+            "cnpj", "endereco", "cep", "data_pedido",
+            "excel_bytes", "nome_arquivo", "pedido_enviado"
         ]:
             if campo in st.session_state:
-                st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+                del st.session_state[campo]
 
         st.session_state.insumos = []
         st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
 
 with col2:
     if st.button("🔄 Novo Pedido", use_container_width=True):
-        # 🔹 Limpa imediatamente todos os campos também
+        # 🔹 Limpa imediatamente todos os campos (mesma lógica)
         for campo in [
             "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-            "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-            "nome_arquivo", "pedido_enviado"
+            "cnpj", "endereco", "cep", "data_pedido",
+            "excel_bytes", "nome_arquivo", "pedido_enviado"
         ]:
             if campo in st.session_state:
-                st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+                del st.session_state[campo]
 
         st.session_state.insumos = []
         st.success("🧹 Formulário limpo e pronto para novo pedido!")
-
+        
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
     """
