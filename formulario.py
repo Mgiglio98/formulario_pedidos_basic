@@ -295,10 +295,10 @@ if st.session_state.insumos:
             font-size: 15px;
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
-        .tabela-header:first-child {
             justify-content: flex-start;
+        }
+        .tabela-header.center {
+            justify-content: center;  /* centraliza só Qtd */
         }
 
         /* Linhas */
@@ -311,10 +311,11 @@ if st.session_state.insumos:
             align-items: center;
         }
         .center {
+            justify-content: center;
             text-align: center;
         }
 
-        /* Botão 🗑️ sem borda e centralizado */
+        /* Botão 🗑️ */
         div[data-testid="stButton"] button {
             border: none;
             background-color: transparent;
@@ -336,7 +337,7 @@ if st.session_state.insumos:
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
-        st.markdown("<div class='tabela-header'>Qtd</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
     with col3:
         st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
     with col4:
@@ -350,12 +351,12 @@ if st.session_state.insumos:
         with col2:
             st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
         with col3:
-            st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
-
+    
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
     campos_obrigatorios = [
@@ -482,6 +483,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
