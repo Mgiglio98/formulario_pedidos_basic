@@ -31,6 +31,10 @@ if "excel_bytes" not in st.session_state:
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
 
+import streamlit as st
+
+st.write("🎨 Tema carregado:", st.config.get_option("theme.base"))
+
 # --- Rerun agendado após download ---
 if st.session_state.get("rerun_depois_download", False):
     st.session_state.rerun_depois_download = False
@@ -501,3 +505,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
