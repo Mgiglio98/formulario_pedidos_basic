@@ -472,6 +472,8 @@ with col1:
         st.session_state.insumos = []
         st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
 
+        st.rerun()
+
 with col2:
     if st.button("🔄 Novo Pedido", use_container_width=True):
         # 🔹 Limpa imediatamente todos os campos (mesma lógica)
@@ -485,6 +487,8 @@ with col2:
 
         st.session_state.insumos = []
         st.success("🧹 Formulário limpo e pronto para novo pedido!")
+
+        st.rerun()
         
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
