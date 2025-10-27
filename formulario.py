@@ -474,13 +474,31 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
                 use_container_width=True
             ):
-                st.session_state.limpar_formulario = True
-                st.session_state.exibir_msg_limpeza = "🧹 Formulário limpo após download! Pronto para novo pedido."
+                # 🔹 Limpa imediatamente todos os campos do formulário
+                for campo in [
+                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
+                    "nome_arquivo", "pedido_enviado"
+                ]:
+                    if campo in st.session_state:
+                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+        
+                st.session_state.insumos = []
+                st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
         
         with col2:
             if st.button("🔄 Novo Pedido", use_container_width=True):
-                st.session_state.limpar_formulario = True
-                st.session_state.exibir_msg_limpeza = "🧹 Formulário limpo e pronto para novo pedido!"
+                # 🔹 Limpa imediatamente todos os campos também
+                for campo in [
+                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
+                    "nome_arquivo", "pedido_enviado"
+                ]:
+                    if campo in st.session_state:
+                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+        
+                st.session_state.insumos = []
+                st.success("🧹 Formulário limpo e pronto para novo pedido!")
 
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
