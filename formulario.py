@@ -45,8 +45,6 @@ if st.session_state.get("rerun_depois_download", False):
             del st.session_state[campo]
 
     st.session_state.insumos = []
-    st.session_state.limpar_formulario = False
-
     st.rerun()
 
 # --- Garantir que os campos de cabeçalho existam no session_state ---
@@ -469,32 +467,30 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.error(f"❌ Erro ao gerar pedido: {erro}")
 
 # --- Botões após envio ---
-col1, col2 = st.columns(2)
+if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
+    col1, col2 = st.columns(2)
 
-with col1:
-    if st.download_button(
-        "📥 Baixar Excel",
-        data=st.session_state.excel_bytes,
-        file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
-        use_container_width=True
-    ):
-        # 🔹 Marca flags para limpar no próximo ciclo
-        st.session_state.limpar_formulario = True
-        st.session_state.rerun_depois_download = True
+    with col1:
+        if st.download_button(
+            "📥 Baixar Excel",
+            data=st.session_state.excel_bytes,
+            file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
+            use_container_width=True
+        ):
+            # 🔹 Marca flags para limpar no próximo ciclo
+            st.session_state.rerun_depois_download = True
 
-with col2:
-    if st.button("🔄 Novo Pedido", use_container_width=True):
-        # 🔹 Limpa imediatamente todos os campos
-        for campo in [
-            "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-            "cnpj", "endereco", "cep", "data_pedido",
-            "excel_bytes", "nome_arquivo", "pedido_enviado"
-        ]:
-            if campo in st.session_state:
-                del st.session_state[campo]
-
-        st.session_state.insumos = []
-        st.rerun()
+    with col2:
+        if st.button("🔄 Novo Pedido", use_container_width=True):
+            for campo in [
+                "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+                "cnpj", "endereco", "cep", "data_pedido",
+                "excel_bytes", "nome_arquivo", "pedido_enviado"
+            ]:
+                if campo in st.session_state:
+                    del st.session_state[campo]
+            st.session_state.insumos = []
+            st.rerun()
         
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
