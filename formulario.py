@@ -40,7 +40,6 @@ for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "
 if "data_pedido" not in st.session_state:
     st.session_state.data_pedido = date.today()
 
-
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
     # Limpa apenas chaves se elas ainda existirem
@@ -206,7 +205,11 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         solicitante = st.text_input("Solicitante", key="solicitante")
         obra_selecionada = st.selectbox("Obra", df_empreend["EMPREENDIMENTO"].unique(), index=0, key="obra_selecionada")
     with col2:
-        data_pedido = st.date_input("Data", value=st.session_state.get("data_pedido", date.today()), key="data_pedido")
+        data_pedido = st.date_input(
+            "Data",
+            key="data_pedido",
+            value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
+        )
         executivo = st.text_input("Executivo", key="executivo")
 
     if obra_selecionada:
@@ -504,4 +507,5 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
