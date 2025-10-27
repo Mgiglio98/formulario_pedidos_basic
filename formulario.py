@@ -270,7 +270,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
-
+    
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             novo_insumo = {
                 "descricao": descricao_final,
@@ -280,23 +280,22 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "complemento": complemento,
             }
             st.session_state.insumos.append(novo_insumo)
-
-            # 🔹 Limpa os campos de insumo após adicionar
+    
+            # 🔹 Limpa todos os campos de insumo após adicionar
             for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
                 if campo in st.session_state:
                     try:
-                        if campo == "quantidade":
-                            st.session_state[campo] = 1
-                        elif campo == "descricao_exibicao":
-                            st.session_state[campo] = df_insumos_lista["opcao_exibicao"].iloc[0]
-                        else:
-                            st.session_state[campo] = ""
+                        del st.session_state[campo]
                     except Exception:
                         pass
-
+    
+            # 🔹 Recarrega estado padrão da seleção e quantidade
+            st.session_state.quantidade = 1
+            st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
+    
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
-
+    
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
@@ -448,6 +447,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
