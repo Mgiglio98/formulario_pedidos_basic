@@ -307,36 +307,40 @@ if st.session_state.insumos:
         font-weight: 600;
         color: #333;
         border-bottom: 2px solid #ccc;
-        padding: 4px 0;
+        padding: 6px 0;
         font-size: 15px;
         display: flex;
         align-items: center;
     }
     .linha-insumo {
         border-bottom: 1px solid #e6e6e6;
-        padding: 2px 0;
+        padding: 4px 0;
         font-size: 14px;
-        line-height: 1.1;
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
     .center {
         text-align: center;
         width: 100%;
     }
-    .trash {
-        color: #666;
-        font-size: 18px;
-        cursor: pointer;
-        transition: color 0.2s ease;
+    .trash-btn {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #777 !important;
+        font-size: 18px !important;
+        line-height: 1 !important;
     }
-    .trash:hover {
-        color: red;
+    .trash-btn:hover {
+        color: red !important;
+        cursor: pointer;
     }
     </style>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.4])
+    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.3])
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
@@ -344,10 +348,10 @@ if st.session_state.insumos:
     with col3:
         st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
     with col4:
-        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.4])
+        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.3])
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
         with col2:
@@ -355,9 +359,11 @@ if st.session_state.insumos:
         with col3:
             st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
-            if st.button("🗑️", key=f"delete_{i}"):
+            st.markdown("<div style='display:flex;align-items:center;justify-content:center;'>", unsafe_allow_html=True)
+            if st.button("🗑️", key=f"delete_{i}", help="Remover insumo", use_container_width=False):
                 st.session_state.insumos.pop(i)
                 st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
 # --- FINALIZAÇÃO DO PEDIDO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -459,6 +465,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
