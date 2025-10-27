@@ -464,44 +464,44 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.session_state.pedido_enviado = True
         st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
 
-        # --- Botões após envio ---
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.download_button(
-                "📥 Baixar Excel",
-                data=st.session_state.excel_bytes,
-                file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
-                use_container_width=True
-            ):
-                # 🔹 Limpa imediatamente todos os campos do formulário
-                for campo in [
-                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-                    "nome_arquivo", "pedido_enviado"
-                ]:
-                    if campo in st.session_state:
-                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
-        
-                st.session_state.insumos = []
-                st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
-        
-        with col2:
-            if st.button("🔄 Novo Pedido", use_container_width=True):
-                # 🔹 Limpa imediatamente todos os campos também
-                for campo in [
-                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-                    "nome_arquivo", "pedido_enviado"
-                ]:
-                    if campo in st.session_state:
-                        st.session_state[campo] = "" if campo != "data_pedido" else date.today()
-        
-                st.session_state.insumos = []
-                st.success("🧹 Formulário limpo e pronto para novo pedido!")
-
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
+
+# --- Botões após envio ---
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.download_button(
+        "📥 Baixar Excel",
+        data=st.session_state.excel_bytes,
+        file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
+        use_container_width=True
+    ):
+        # 🔹 Limpa imediatamente todos os campos do formulário
+        for campo in [
+            "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+            "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
+            "nome_arquivo", "pedido_enviado"
+        ]:
+            if campo in st.session_state:
+                st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+
+        st.session_state.insumos = []
+        st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
+
+with col2:
+    if st.button("🔄 Novo Pedido", use_container_width=True):
+        # 🔹 Limpa imediatamente todos os campos também
+        for campo in [
+            "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+            "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
+            "nome_arquivo", "pedido_enviado"
+        ]:
+            if campo in st.session_state:
+                st.session_state[campo] = "" if campo != "data_pedido" else date.today()
+
+        st.session_state.insumos = []
+        st.success("🧹 Formulário limpo e pronto para novo pedido!")
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
