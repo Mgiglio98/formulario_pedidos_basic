@@ -99,16 +99,9 @@ def carregar_dados():
 df_empreend, df_insumos = carregar_dados()
 
 # --- LOGO E CABEÇALHO ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.markdown(
-        """
-        <div style='display: flex; justify-content: center;'>
-            <img src='logo.png' width='300'>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+col1, col2, col3 = st.columns([1, 2, 1]) 
+with col2: 
+    st.image("logo.png", width=300)
 st.markdown("""
     <div style='text-align: center;'>
         <h2 style='color: #000000;'>Pedido de Materiais</h2>
