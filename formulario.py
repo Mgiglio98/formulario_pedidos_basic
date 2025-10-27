@@ -137,37 +137,102 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     df_insumos["opcao"] = df_insumos.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if x["Código"] else x["Descrição"], axis=1
     )
-    descricao_exibicao = st.selectbox("Descrição do insumo", df_insumos["opcao"])
+
+    descricao_exibicao = st.selectbox("Descrição do insumo", df_insumos["opcao"], key="descricao_exibicao")
     dados_insumo = df_insumos[df_insumos["opcao"] == descricao_exibicao].iloc[0]
 
     codigo, unidade, descricao = dados_insumo["Código"], dados_insumo["Unidade"], dados_insumo["Descrição"]
-    descricao_livre = st.text_input("Nome do insumo (livre)", disabled=bool(codigo))
-    st.text_input("Código do insumo", value=codigo, disabled=True)
+    descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=bool(codigo))
+    st.text_input("Código do insumo", value=codigo, key="codigo", disabled=True)
     st.text_input("Unidade", value=unidade, key="unidade", disabled=bool(codigo))
-    qtd = st.number_input("Quantidade", min_value=1, step=1, format="%d")
-    compl = st.text_area("Complemento (opcional)")
+    qtd = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
+    compl = st.text_area("Complemento (opcional)", key="complemento")
 
     if st.button("➕ Adicionar insumo"):
         desc_final = descricao if codigo else descricao_livre
         if desc_final:
             st.session_state.insumos.append({
-                "descricao": desc_final, "codigo": codigo or "", "unidade": unidade,
-                "quantidade": qtd, "complemento": compl
+                "descricao": desc_final,
+                "codigo": codigo or "",
+                "unidade": unidade,
+                "quantidade": qtd,
+                "complemento": compl
             })
-            st.success("✅ Insumo adicionado!")
+
+            # Limpa campos após adicionar
+            for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
+                if campo in st.session_state:
+                    del st.session_state[campo]
             st.rerun()
 
-# --- LISTAGEM DE INSUMOS ---
+# --- LISTAGEM DE INSUMOS (tabela visual estilizada) ---
 if st.session_state.insumos:
+    st.markdown("""
+        <style>
+        /* Cabeçalhos */
+        .tabela-header {
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .tabela-header.center { justify-content: center; }
+
+        /* Linhas */
+        .linha-insumo {
+            border-bottom: 1px solid #e6e6e6;
+            padding: 3px 0;
+            font-size: 14px;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+        }
+        .center { justify-content: center; text-align: center; }
+
+        /* Botão 🗑️ */
+        div[data-testid="stButton"] button {
+            border: none;
+            background-color: transparent;
+            color: #666;
+            font-size: 18px;
+            padding: 0;
+            line-height: 1;
+            transform: translateY(-2px);
+        }
+        div[data-testid="stButton"] button:hover {
+            color: #d9534f;
+            transform: scale(1.15) translateY(-2px);
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("#### 🧾 Insumos Adicionados")
+
+    # Cabeçalho da tabela
+    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
+    with col1: st.markdown("<div class='tabela-header'>Descrição</div>", unsafe_allow_html=True)
+    with col2: st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
+    with col3: st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
+    with col4: st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+
+    # Linhas da tabela
     for i, insumo in enumerate(st.session_state.insumos):
-        cols = st.columns([5, 1, 1, 0.5])
-        cols[0].write(insumo["descricao"])
-        cols[1].write(insumo["quantidade"])
-        cols[2].write(insumo["unidade"])
-        if cols[3].button("🗑️", key=f"del_{i}"):
-            st.session_state.insumos.pop(i)
-            st.rerun()
+        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
+        with col1:
+            st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
+        with col3:
+            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+        with col4:
+            if st.button("🗑️", key=f"del_{i}"):
+                st.session_state.insumos.pop(i)
+                st.rerun()
 
 # --- ENVIO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -200,5 +265,4 @@ if st.session_state.get("excel_bytes"):
         st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=f"Pedido_{st.session_state.pedido_numero}.xlsx")
     with col2:
         if st.button("🔄 Novo Pedido"): limpar_formulario(); st.rerun()
-
 
