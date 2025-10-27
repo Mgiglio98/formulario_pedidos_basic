@@ -447,7 +447,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.session_state.pedido_enviado = True
         st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
         # 🔹 força atualização após mostrar mensagem
-        st.rerun()
+        #st.rerun()
 
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
