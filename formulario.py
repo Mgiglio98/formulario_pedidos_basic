@@ -285,37 +285,48 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 if st.session_state.insumos:
     st.markdown("""
         <style>
+        /* Cabeçalhos */
         .tabela-header {
             font-weight: 600;
             color: #333;
             border-bottom: 2px solid #ccc;
-            padding-bottom: 4px;
-            margin-bottom: 4px;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
             font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .tabela-header:last-child {
-            border-bottom: none !important;  /* remove linha da coluna de deletar */
+        .tabela-header:first-child {
+            justify-content: flex-start;
         }
+
+        /* Linhas */
         .linha-insumo {
             border-bottom: 1px solid #e6e6e6;
-            padding: 4px 0px 2px 0px;  /* antes era 2px,2px – aumentamos o topo */
+            padding: 3px 0;
             font-size: 14px;
-            line-height: 1.4;  /* garante altura uniforme */
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
         }
         .center {
             text-align: center;
         }
-        /* botão de deletar limpo */
+
+        /* Botão 🗑️ sem borda e centralizado */
         div[data-testid="stButton"] button {
             border: none;
             background-color: transparent;
             color: #666;
             font-size: 18px;
-            padding: 0px;
+            padding: 0;
+            line-height: 1;
+            transform: translateY(-2px);
         }
         div[data-testid="stButton"] button:hover {
             color: #d9534f;
-            transform: scale(1.15);
+            transform: scale(1.15) translateY(-2px);
         }
         </style>
     """, unsafe_allow_html=True)
@@ -325,15 +336,15 @@ if st.session_state.insumos:
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
-        st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header'>Qtd</div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
     with col4:
-        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)  # sem linha, sem título
+        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
     # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
+        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
         with col2:
@@ -471,6 +482,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
