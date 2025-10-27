@@ -31,6 +31,11 @@ if "excel_bytes" not in st.session_state:
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
 
+# --- Garantir que os campos de cabeçalho existam no session_state ---
+for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep", "data_pedido"]:
+    if campo not in st.session_state:
+        st.session_state[campo] = ""
+
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
     # Limpa apenas chaves se elas ainda existirem
@@ -483,6 +488,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
