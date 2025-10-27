@@ -285,27 +285,26 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 if st.session_state.insumos:
     st.subheader("📦 Insumos adicionados")
 
-    # Cria um DataFrame para exibir
+    # DataFrame compacto sem coluna "Nº"
     df_tabela = pd.DataFrame(st.session_state.insumos)
     df_tabela = df_tabela[["descricao", "quantidade", "unidade"]]
-    df_tabela.columns = ["Insumo", "Quantidade", "Unidade"]
-    df_tabela.index = df_tabela.index + 1
-    df_tabela.index.name = "Nº"
+    df_tabela.columns = ["Insumo", "Qtd", "Unid"]
 
-    # Exibe a tabela
-    st.dataframe(
-        df_tabela,
-        use_container_width=True,
-        hide_index=False,
-    )
-
-    # Botões de exclusão lado a lado com os itens
-    for i in range(len(st.session_state.insumos)):
-        col1, col2 = st.columns([9, 1])
+    # Exibe em colunas lado a lado
+    for i, insumo in enumerate(st.session_state.insumos):
+        col1, col2, col3, col4 = st.columns([6, 1.5, 1, 0.5])
+        with col1:
+            st.markdown(f"**{insumo['descricao']}**")
         with col2:
+            st.markdown(f"{insumo['quantidade']}")
+        with col3:
+            st.markdown(f"{insumo['unidade']}")
+        with col4:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
+
+    st.divider()
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -433,6 +432,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
