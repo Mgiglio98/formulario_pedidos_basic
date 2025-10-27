@@ -9,6 +9,49 @@ import smtplib
 
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
 
+# --- Força modo claro (independente do tema do navegador) ---
+st.markdown("""
+<style>
+/* Força fundo claro global */
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+
+/* Corrige fundo dos containers */
+[data-testid="stHeader"], [data-testid="stSidebar"], [data-testid="stToolbar"] {
+    background-color: #FFFFFF !important;
+}
+
+/* Campos de input */
+div[data-baseweb="input"] input, textarea {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+
+/* Expander e containers */
+[data-testid="stExpander"] {
+    background-color: #F7F7F7 !important;
+}
+
+/* Texto dos títulos */
+h1, h2, h3, h4, h5, h6, p, label, span {
+    color: #000000 !important;
+}
+
+/* Botões */
+div[data-testid="stButton"] button {
+    background-color: #7A64FF !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 6px !important;
+}
+div[data-testid="stButton"] button:hover {
+    background-color: #6750FF !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Ajuste só do espaço superior
 st.markdown("""
 <style>
@@ -30,10 +73,6 @@ if "excel_bytes" not in st.session_state:
     st.session_state.excel_bytes = None
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
-
-import streamlit as st
-
-st.write("🎨 Tema carregado:", st.config.get_option("theme.base"))
 
 # --- Rerun agendado após download ---
 if st.session_state.get("rerun_depois_download", False):
@@ -505,4 +544,5 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
