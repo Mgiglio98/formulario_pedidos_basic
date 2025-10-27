@@ -9,34 +9,37 @@ import smtplib
 
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
 
-# --- Força modo claro (independente do tema do navegador) ---
+# --- Tema visual Osborne (modo claro fixo) ---
 st.markdown("""
 <style>
-/* Força fundo claro global */
+/* Fundo global e texto padrão */
 html, body, [data-testid="stAppViewContainer"] {
     background-color: #FFFFFF !important;
-    color: #000000 !important;
+    color: #222222 !important;
 }
 
-/* Corrige fundo dos containers */
-[data-testid="stHeader"], [data-testid="stSidebar"], [data-testid="stToolbar"] {
+/* Cards, expanders e blocos */
+[data-testid="stExpander"], [data-testid="stForm"], [data-testid="stDataFrameContainer"], 
+[data-testid="stVerticalBlock"] {
+    background-color: #F9F9FB !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Cabeçalho dos expanders */
+[data-testid="stExpander"] > div:first-child {
+    background-color: #EDEAFD !important;
+    color: #2B2B2B !important;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* Campos de texto, número e seleção */
+input, textarea, select, .stTextInput input, .stNumberInput input, .stSelectbox, [data-baseweb="select"] {
     background-color: #FFFFFF !important;
-}
-
-/* Campos de input */
-div[data-baseweb="input"] input, textarea {
-    background-color: #FFFFFF !important;
     color: #000000 !important;
-}
-
-/* Expander e containers */
-[data-testid="stExpander"] {
-    background-color: #F7F7F7 !important;
-}
-
-/* Texto dos títulos */
-h1, h2, h3, h4, h5, h6, p, label, span {
-    color: #000000 !important;
+    border: 1px solid #CCCCCC !important;
+    border-radius: 6px !important;
 }
 
 /* Botões */
@@ -44,10 +47,30 @@ div[data-testid="stButton"] button {
     background-color: #7A64FF !important;
     color: #FFFFFF !important;
     border: none !important;
-    border-radius: 6px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease-in-out;
 }
 div[data-testid="stButton"] button:hover {
-    background-color: #6750FF !important;
+    background-color: #634AFF !important;
+    transform: translateY(-2px);
+}
+
+/* Mensagens de sucesso, aviso e erro */
+.stAlert {
+    border-radius: 8px !important;
+    font-size: 15px !important;
+}
+
+/* Alinhamento central dos textos principais */
+h1, h2, h3, p {
+    text-align: center;
+    color: #1F1F1F !important;
+}
+
+/* Links e ícones */
+a, svg {
+    color: #7A64FF !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -544,5 +567,6 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
