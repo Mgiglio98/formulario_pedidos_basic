@@ -284,10 +284,26 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
     st.subheader("📦 Insumos adicionados")
+
+    # Cria DataFrame visual para exibir como tabela
+    df_tabela = pd.DataFrame(st.session_state.insumos)
+    df_tabela = df_tabela[["descricao", "quantidade", "unidade"]]  # colunas principais
+    df_tabela.columns = ["Insumo", "Quantidade", "Unidade"]
+
+    # Numeração automática
+    df_tabela.index = df_tabela.index + 1
+    df_tabela.index.name = "Nº"
+
+    # Exibe tabela estilizada
+    st.dataframe(
+        df_tabela,
+        use_container_width=True,
+        hide_index=False,
+    )
+
+    # Adiciona opção de remover itens
     for i, insumo in enumerate(st.session_state.insumos):
-        cols = st.columns([6, 1])
-        with cols[0]:
-            st.markdown(f"**{i+1}.** {insumo['descricao']} — {insumo['quantidade']} {insumo['unidade']}")
+        cols = st.columns([10, 1])
         with cols[1]:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
@@ -419,3 +435,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
