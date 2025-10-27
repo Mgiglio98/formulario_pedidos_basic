@@ -289,7 +289,7 @@ if st.session_state.insumos:
             display: grid;
             grid-template-columns: 6fr 1fr 1fr 0.5fr;
             align-items: center;
-            padding: 6px 10px;
+            padding: 8px 10px;
             border-bottom: 1px solid #e6e6e6;
         }
         .insumo-row:hover {
@@ -300,30 +300,39 @@ if st.session_state.insumos:
             grid-template-columns: 6fr 1fr 1fr 0.5fr;
             font-weight: 600;
             color: #444;
-            padding: 4px 10px;
+            padding: 6px 10px;
             border-bottom: 2px solid #d0d0d0;
             margin-bottom: 2px;
         }
-        .insumo-col {
-            padding: 2px 4px;
+        .col-center {
+            text-align: center;
+        }
+        .delete-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 32px;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("<div class='insumo-header'><div>Insumo</div><div>Qtd</div><div>Unid</div><div></div></div>", unsafe_allow_html=True)
+    st.markdown("<div class='insumo-header'><div>Insumo</div><div class='col-center'>Qtd</div><div class='col-center'>Unid</div><div></div></div>", unsafe_allow_html=True)
 
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
-        with col1:
-            st.markdown(f"<div class='insumo-col'>{insumo['descricao']}</div>", unsafe_allow_html=True)
-        with col2:
-            st.markdown(f"<div class='insumo-col' style='text-align:center;'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
-        with col3:
-            st.markdown(f"<div class='insumo-col' style='text-align:center;'>{insumo['unidade']}</div>", unsafe_allow_html=True)
-        with col4:
-            if st.button("🗑️", key=f"delete_{i}"):
-                st.session_state.insumos.pop(i)
-                st.rerun()
+        with st.container():
+            col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
+            with col1:
+                st.markdown(f"<div>{insumo['descricao']}</div>", unsafe_allow_html=True)
+            with col2:
+                st.markdown(f"<div class='col-center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
+            with col3:
+                st.markdown(f"<div class='col-center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+            with col4:
+                st.markdown("<div class='delete-btn'>", unsafe_allow_html=True)
+                if st.button("🗑️", key=f"delete_{i}"):
+                    st.session_state.insumos.pop(i)
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -451,6 +460,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
