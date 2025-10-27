@@ -285,80 +285,24 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 if st.session_state.insumos:
     st.subheader("📦 Insumos adicionados")
 
-    # Monta o HTML da tabela
-    tabela_html = """
-    <style>
-        table.custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 15px;
-            margin-top: 10px;
-        }
-        table.custom-table th, table.custom-table td {
-            border: 1px solid #e0e0e0;
-            padding: 6px 10px;
-            text-align: left;
-        }
-        table.custom-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-            color: #333;
-        }
-        table.custom-table tr:hover {
-            background-color: #f9f9f9;
-        }
-        td.botao {
-            text-align: center;
-            width: 50px;
-        }
-        button.deletar {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 17px;
-        }
-        button.deletar:hover {
-            color: red;
-            transform: scale(1.1);
-        }
-    </style>
+    # Cria um DataFrame para exibir
+    df_tabela = pd.DataFrame(st.session_state.insumos)
+    df_tabela = df_tabela[["descricao", "quantidade", "unidade"]]
+    df_tabela.columns = ["Insumo", "Quantidade", "Unidade"]
+    df_tabela.index = df_tabela.index + 1
+    df_tabela.index.name = "Nº"
 
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>Nº</th>
-                <th>Insumo</th>
-                <th>Quantidade</th>
-                <th>Unidade</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-    """
+    # Exibe a tabela
+    st.dataframe(
+        df_tabela,
+        use_container_width=True,
+        hide_index=False,
+    )
 
-    # Linhas da tabela
-    for i, insumo in enumerate(st.session_state.insumos, start=1):
-        tabela_html += f"""
-            <tr>
-                <td>{i}</td>
-                <td>{insumo['descricao']}</td>
-                <td>{insumo['quantidade']}</td>
-                <td>{insumo['unidade']}</td>
-                <td class='botao'>
-                    🗑️
-                </td>
-            </tr>
-        """
-
-    tabela_html += "</tbody></table>"
-
-    # Renderiza o HTML da tabela
-    st.markdown(tabela_html, unsafe_allow_html=True)
-
-    # Cria botões reais para exclusão (fora da tabela)
-    for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4, col5 = st.columns([0.5, 3, 1, 1, 0.3])
-        with col5:
+    # Botões de exclusão lado a lado com os itens
+    for i in range(len(st.session_state.insumos)):
+        col1, col2 = st.columns([9, 1])
+        with col2:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
@@ -489,6 +433,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
