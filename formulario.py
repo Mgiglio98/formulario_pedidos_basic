@@ -9,58 +9,6 @@ import smtplib
 
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
 
-st.markdown("""
-<style>
-/* Remove tokens escuros e força base clara em todo o app */
-:root, [data-testid="stAppViewContainer"], [data-testid="stVerticalBlock"] {
-    --text-color: #000000 !important;
-    --background-color: #FFFFFF !important;
-    --secondary-background-color: #F9F9FB !important;
-    --primary-color: #7A64FF !important;
-    --secondary-text-color: #1F1F1F !important;
-    --font: "sans-serif" !important;
-}
-
-/* Força fundo branco inclusive nos iframes e componentes internos */
-html, body, [class^="st-"], [data-testid="stAppViewContainer"], iframe, div[data-testid="stMarkdownContainer"] {
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-}
-
-/* Selectbox e expander dark fix */
-div[data-baseweb="select"], div[data-testid="stExpander"] > div:first-child {
-    background-color: #EDEAFD !important;
-    color: #1F1F1F !important;
-}
-
-/* Textos e inputs */
-input, textarea, select, .stTextInput input, .stNumberInput input {
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-    border: 1px solid #C8C8C8 !important;
-    border-radius: 6px !important;
-}
-
-/* Botões padrão */
-div[data-testid="stButton"] button {
-    background-color: #7A64FF !important;
-    color: #FFFFFF !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease-in-out;
-}
-div[data-testid="stButton"] button:hover {
-    background-color: #604FE6 !important;
-}
-
-/* Cabeçalhos */
-h1, h2, h3, h4, h5, h6, p, label, span {
-    color: #1F1F1F !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # Ajuste só do espaço superior
 st.markdown("""
 <style>
@@ -553,7 +501,4 @@ st.components.v1.html(
     """,
     height=0,
 )
-
-
-
 
