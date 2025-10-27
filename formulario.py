@@ -479,15 +479,20 @@ if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_fo
 
     with col2:
         if st.button("🔄 Novo Pedido", use_container_width=True):
-            # limpa todos os campos e insumos
-            st.session_state.insumos = []
-            st.session_state.excel_bytes = None
-            st.session_state.nome_arquivo = ""
-            for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
-                st.session_state[campo] = ""
-            st.session_state.data_pedido = date.today()
-            st.success("🧹 Formulário limpo e pronto para um novo pedido!")
+            st.session_state.limpar_formulario = True
             st.rerun()
+    
+    # --- Após o rerun, faz a limpeza completa ---
+    if st.session_state.get("limpar_formulario", False):
+        st.session_state.insumos = []
+        st.session_state.excel_bytes = None
+        st.session_state.nome_arquivo = ""
+        for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
+            st.session_state[campo] = ""
+        st.session_state.data_pedido = date.today()
+        st.session_state.limpar_formulario = False
+        st.success("🧹 Formulário limpo e pronto para um novo pedido!")
+        st.rerun()
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
