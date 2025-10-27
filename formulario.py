@@ -446,44 +446,32 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     if ok:
         st.session_state.pedido_enviado = True
         st.success("✅ Pedido gerado e e-mail enviado com sucesso! Agora você pode baixar o arquivo Excel abaixo ⬇️")
-        # 🔹 força atualização após mostrar mensagem
-        #st.rerun()
+
+        # --- Botões aparecem imediatamente ---
+        col1, col2 = st.columns(2)
+        with col1:
+            st.download_button(
+                "📥 Baixar Excel",
+                data=st.session_state.excel_bytes,
+                file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
+                use_container_width=True
+            )
+
+        with col2:
+            if st.button("🔄 Novo Pedido", use_container_width=True):
+                # limpa tudo
+                for campo in [
+                    "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+                    "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
+                    "nome_arquivo", "pedido_enviado"
+                ]:
+                    if campo in st.session_state:
+                        del st.session_state[campo]
+                st.session_state.insumos = []
+                st.success("🧹 Formulário limpo e pronto para um novo pedido!")
 
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
-
-# --- Exibir botões após o rerun ---
-if st.session_state.get("excel_bytes") and not st.session_state.get("limpando_formulario", False):
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.download_button(
-            "📥 Baixar Excel",
-            data=st.session_state.excel_bytes,
-            file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
-            use_container_width=True
-        )
-
-    with col2:
-        if st.button("🔄 Novo Pedido", use_container_width=True):
-            st.session_state.limpar_formulario = True
-            st.session_state.excel_bytes = None
-            st.rerun()
-
-# --- Limpeza completa do formulário ---
-if st.session_state.get("limpar_formulario", False):
-    st.session_state.limpando_formulario = True
-    for campo in [
-        "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-        "cnpj", "endereco", "cep", "data_pedido"
-    ]:
-        if campo in st.session_state:
-            del st.session_state[campo]
-    st.session_state.insumos = []
-    st.session_state.nome_arquivo = ""
-    st.session_state.limpar_formulario = False
-    st.rerun()
-
 
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
