@@ -293,6 +293,9 @@ if st.session_state.insumos:
             margin-bottom: 4px;
             font-size: 15px;
         }
+        .tabela-header:last-child {
+            border-bottom: none !important;  /* remove linha da coluna de deletar */
+        }
         .linha-insumo {
             border-bottom: 1px solid #e6e6e6;
             padding-top: 2px;
@@ -302,7 +305,7 @@ if st.session_state.insumos:
         .center {
             text-align: center;
         }
-        /* Remove estilo padrão do botão Streamlit */
+        /* botão de deletar limpo */
         div[data-testid="stButton"] button {
             border: none;
             background-color: transparent;
@@ -320,13 +323,13 @@ if st.session_state.insumos:
     # Cabeçalho
     col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
     with col1:
-        st.markdown("<div class='tabela-header'>Insumo</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
         st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
     with col3:
         st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
     with col4:
-        st.markdown("<div class='tabela-header'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)  # sem linha, sem título
 
     # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
@@ -468,6 +471,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
