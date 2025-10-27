@@ -430,6 +430,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             st.session_state.nome_arquivo = (
                 f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
             )
+            st.rerun()
 
             enviar_email_pedido(
                 f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
