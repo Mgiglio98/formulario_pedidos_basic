@@ -9,40 +9,39 @@ import smtplib
 
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")  # sem wide
 
-# --- Tema visual Osborne (modo claro fixo) ---
 st.markdown("""
 <style>
-/* Fundo global e texto padrão */
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: #FFFFFF !important;
-    color: #222222 !important;
+/* Remove tokens escuros e força base clara em todo o app */
+:root, [data-testid="stAppViewContainer"], [data-testid="stVerticalBlock"] {
+    --text-color: #000000 !important;
+    --background-color: #FFFFFF !important;
+    --secondary-background-color: #F9F9FB !important;
+    --primary-color: #7A64FF !important;
+    --secondary-text-color: #1F1F1F !important;
+    --font: "sans-serif" !important;
 }
 
-/* Cards, expanders e blocos */
-[data-testid="stExpander"], [data-testid="stForm"], [data-testid="stDataFrameContainer"], 
-[data-testid="stVerticalBlock"] {
-    background-color: #F9F9FB !important;
-    border-radius: 10px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-/* Cabeçalho dos expanders */
-[data-testid="stExpander"] > div:first-child {
-    background-color: #EDEAFD !important;
-    color: #2B2B2B !important;
-    font-weight: 600;
-    border-radius: 8px 8px 0 0 !important;
-}
-
-/* Campos de texto, número e seleção */
-input, textarea, select, .stTextInput input, .stNumberInput input, .stSelectbox, [data-baseweb="select"] {
+/* Força fundo branco inclusive nos iframes e componentes internos */
+html, body, [class^="st-"], [data-testid="stAppViewContainer"], iframe, div[data-testid="stMarkdownContainer"] {
     background-color: #FFFFFF !important;
     color: #000000 !important;
-    border: 1px solid #CCCCCC !important;
+}
+
+/* Selectbox e expander dark fix */
+div[data-baseweb="select"], div[data-testid="stExpander"] > div:first-child {
+    background-color: #EDEAFD !important;
+    color: #1F1F1F !important;
+}
+
+/* Textos e inputs */
+input, textarea, select, .stTextInput input, .stNumberInput input {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #C8C8C8 !important;
     border-radius: 6px !important;
 }
 
-/* Botões */
+/* Botões padrão */
 div[data-testid="stButton"] button {
     background-color: #7A64FF !important;
     color: #FFFFFF !important;
@@ -52,25 +51,12 @@ div[data-testid="stButton"] button {
     transition: all 0.2s ease-in-out;
 }
 div[data-testid="stButton"] button:hover {
-    background-color: #634AFF !important;
-    transform: translateY(-2px);
+    background-color: #604FE6 !important;
 }
 
-/* Mensagens de sucesso, aviso e erro */
-.stAlert {
-    border-radius: 8px !important;
-    font-size: 15px !important;
-}
-
-/* Alinhamento central dos textos principais */
-h1, h2, h3, p {
-    text-align: center;
+/* Cabeçalhos */
+h1, h2, h3, h4, h5, h6, p, label, span {
     color: #1F1F1F !important;
-}
-
-/* Links e ícones */
-a, svg {
-    color: #7A64FF !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -567,6 +553,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
