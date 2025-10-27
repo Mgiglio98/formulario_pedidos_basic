@@ -102,16 +102,16 @@ df_empreend, df_insumos = carregar_dados()
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("logo.png", width=300)
-    st.markdown("""
-        <div style='text-align: center;'>
-            <h2 style='color: #000000;'>Pedido de Materiais</h2>
-            <p style='font-size: 14px; color: #555;'>
-                Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
-                Ao finalizar, o pedido será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
-                Você poderá baixar a planilha gerada após o envio, para registro ou controle.
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
+st.markdown("""
+    <div style='text-align: center;'>
+        <h2 style='color: #000000;'>Pedido de Materiais</h2>
+        <p style='font-size: 14px; color: #555;'>
+            Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
+            Ao finalizar, o pedido será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
+            Você poderá baixar a planilha gerada após o envio, para registro ou controle.
+        </p>
+    </div>
+""", unsafe_allow_html=True)
 
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
@@ -200,6 +200,7 @@ if st.session_state.get("excel_bytes"):
         st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=f"Pedido_{st.session_state.pedido_numero}.xlsx")
     with col2:
         if st.button("🔄 Novo Pedido"): limpar_formulario(); st.rerun()
+
 
 
 
