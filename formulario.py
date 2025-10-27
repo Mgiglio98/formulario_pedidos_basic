@@ -32,9 +32,14 @@ if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
 
 # --- Garantir que os campos de cabeçalho existam no session_state ---
-for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep", "data_pedido"]:
+for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
     if campo not in st.session_state:
         st.session_state[campo] = ""
+
+# Campo de data precisa ser do tipo date, não string
+if "data_pedido" not in st.session_state:
+    st.session_state.data_pedido = date.today()
+
 
 # --- Funções auxiliares ---
 def resetar_campos_insumo():
@@ -499,3 +504,4 @@ st.components.v1.html(
     """,
     height=0,
 )
+
