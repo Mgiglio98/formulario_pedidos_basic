@@ -99,6 +99,9 @@ def carregar_dados():
 df_empreend, df_insumos = carregar_dados()
 
 # --- LOGO E CABEÇALHO ---
+col1, col2, col3 = st.columns([1, 2, 1]) 
+with col2: 
+    st.image("logo.png", width=300)
 st.markdown("""
 <div style='text-align:center; margin-top:25px; margin-bottom:20px;'>
     <img src='logo.png' width='280' style='margin-bottom:15px;'>
@@ -197,5 +200,6 @@ if st.session_state.get("excel_bytes"):
         st.download_button("📥 Baixar Excel", data=st.session_state.excel_bytes, file_name=f"Pedido_{st.session_state.pedido_numero}.xlsx")
     with col2:
         if st.button("🔄 Novo Pedido"): limpar_formulario(); st.rerun()
+
 
 
