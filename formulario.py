@@ -285,29 +285,73 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 if st.session_state.insumos:
     st.subheader("📦 Insumos adicionados")
 
-    # Cria DataFrame visual para exibir como tabela
-    df_tabela = pd.DataFrame(st.session_state.insumos)
-    df_tabela = df_tabela[["descricao", "quantidade", "unidade"]]  # colunas principais
-    df_tabela.columns = ["Insumo", "Quantidade", "Unidade"]
+    # Monta o HTML da tabela
+    tabela_html = """
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 6px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        td.botao {
+            text-align: center;
+            width: 40px;
+        }
+    </style>
+    <table>
+        <thead>
+            <tr>
+                <th>Nº</th>
+                <th>Insumo</th>
+                <th>Quantidade</th>
+                <th>Unidade</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+    """
 
-    # Numeração automática
-    df_tabela.index = df_tabela.index + 1
-    df_tabela.index.name = "Nº"
+    for i, insumo in enumerate(st.session_state.insumos, start=1):
+        tabela_html += f"""
+            <tr>
+                <td>{i}</td>
+                <td>{insumo['descricao']}</td>
+                <td>{insumo['quantidade']}</td>
+                <td>{insumo['unidade']}</td>
+                <td class='botao'>
+                    <form action="" method="post">
+                        <button name="delete_{i-1}" style="
+                            background-color: transparent;
+                            border: none;
+                            cursor: pointer;
+                            font-size: 16px;
+                        ">🗑️</button>
+                    </form>
+                </td>
+            </tr>
+        """
 
-    # Exibe tabela estilizada
-    st.dataframe(
-        df_tabela,
-        use_container_width=True,
-        hide_index=False,
-    )
+    tabela_html += "</tbody></table>"
 
-    # Adiciona opção de remover itens
-    for i, insumo in enumerate(st.session_state.insumos):
-        cols = st.columns([10, 1])
-        with cols[1]:
-            if st.button("🗑️", key=f"delete_{i}"):
-                st.session_state.insumos.pop(i)
-                st.rerun()
+    st.markdown(tabela_html, unsafe_allow_html=True)
+
+    # Controle dos botões de exclusão
+    for i in range(len(st.session_state.insumos)):
+        if st.session_state.get(f"delete_{i}", False):
+            st.session_state.insumos.pop(i)
+            st.rerun()
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -435,4 +479,5 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
