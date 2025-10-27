@@ -283,28 +283,47 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
-    st.subheader("📦 Insumos adicionados")
+    st.markdown("""
+        <style>
+        .insumo-row {
+            display: grid;
+            grid-template-columns: 6fr 1fr 1fr 0.5fr;
+            align-items: center;
+            padding: 6px 10px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        .insumo-row:hover {
+            background-color: #f8f9fa;
+        }
+        .insumo-header {
+            display: grid;
+            grid-template-columns: 6fr 1fr 1fr 0.5fr;
+            font-weight: 600;
+            color: #444;
+            padding: 4px 10px;
+            border-bottom: 2px solid #d0d0d0;
+            margin-bottom: 2px;
+        }
+        .insumo-col {
+            padding: 2px 4px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    # DataFrame compacto sem coluna "Nº"
-    df_tabela = pd.DataFrame(st.session_state.insumos)
-    df_tabela = df_tabela[["descricao", "quantidade", "unidade"]]
-    df_tabela.columns = ["Insumo", "Qtd", "Unid"]
+    st.markdown("<div class='insumo-header'><div>Insumo</div><div>Qtd</div><div>Unid</div><div></div></div>", unsafe_allow_html=True)
 
-    # Exibe em colunas lado a lado
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([6, 1.5, 1, 0.5])
+        col1, col2, col3, col4 = st.columns([6, 1, 1, 0.5])
         with col1:
-            st.markdown(f"**{insumo['descricao']}**")
+            st.markdown(f"<div class='insumo-col'>{insumo['descricao']}</div>", unsafe_allow_html=True)
         with col2:
-            st.markdown(f"{insumo['quantidade']}")
+            st.markdown(f"<div class='insumo-col' style='text-align:center;'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
         with col3:
-            st.markdown(f"{insumo['unidade']}")
+            st.markdown(f"<div class='insumo-col' style='text-align:center;'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
-
-    st.divider()
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -432,6 +451,7 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
 
