@@ -295,7 +295,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                         pass
 
             st.success("✅ Insumo adicionado com sucesso!")
-            st.rerun()
+        st.rerun()
 
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
@@ -448,4 +448,5 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
