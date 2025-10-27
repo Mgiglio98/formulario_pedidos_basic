@@ -299,71 +299,83 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
-# --- TABELA DE INSUMOS ---
+# --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
     st.markdown("""
     <style>
+    /* Cabeçalhos */
     .tabela-header {
         font-weight: 600;
         color: #333;
         border-bottom: 2px solid #ccc;
-        padding: 6px 0;
+        padding-bottom: 2px;
+        margin-bottom: 2px;
         font-size: 15px;
         display: flex;
         align-items: center;
+        justify-content: flex-start;
     }
+    .tabela-header.center {
+        justify-content: center; /* centraliza só Qtd */
+    }
+
+    /* Linhas */
     .linha-insumo {
         border-bottom: 1px solid #e6e6e6;
-        padding: 4px 0;
+        padding: 3px 0;
         font-size: 14px;
+        line-height: 1.4;
         display: flex;
         align-items: center;
-        justify-content: space-between;
     }
+
     .center {
+        justify-content: center;
         text-align: center;
-        width: 100%;
     }
-    .trash-btn {
-        background: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        color: #777 !important;
-        font-size: 18px !important;
-        line-height: 1 !important;
+
+    /* Botão 🗑️ */
+    div[data-testid="stButton"] button {
+        border: none;
+        background-color: transparent;
+        color: #666;
+        font-size: 18px;
+        padding: 0;
+        line-height: 1;
+        transform: translateY(-2px);
     }
-    .trash-btn:hover {
-        color: red !important;
-        cursor: pointer;
+
+    div[data-testid="stButton"] button:hover {
+        color: #d9534f;
+        transform: scale(1.15) translateY(-2px);
     }
     </style>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.3])
+    # Cabeçalho
+    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
         st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
     with col4:
         st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
+    # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.3])
+        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
         with col2:
             st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
         with col3:
-            st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
-            st.markdown("<div style='display:flex;align-items:center;justify-content:center;'>", unsafe_allow_html=True)
-            if st.button("🗑️", key=f"delete_{i}", help="Remover insumo", use_container_width=False):
+            if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
 
 # --- FINALIZAÇÃO DO PEDIDO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -465,6 +477,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
