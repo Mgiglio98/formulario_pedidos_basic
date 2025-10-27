@@ -288,29 +288,42 @@ if st.session_state.insumos:
     # Monta o HTML da tabela
     tabela_html = """
     <style>
-        table {
+        table.custom-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 15px;
+            margin-top: 10px;
         }
-        th, td {
+        table.custom-table th, table.custom-table td {
             border: 1px solid #e0e0e0;
             padding: 6px 10px;
             text-align: left;
         }
-        th {
-            background-color: #f9f9f9;
+        table.custom-table th {
+            background-color: #f5f5f5;
             font-weight: bold;
+            color: #333;
         }
-        tr:hover {
-            background-color: #f2f2f2;
+        table.custom-table tr:hover {
+            background-color: #f9f9f9;
         }
         td.botao {
             text-align: center;
-            width: 40px;
+            width: 50px;
+        }
+        button.deletar {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 17px;
+        }
+        button.deletar:hover {
+            color: red;
+            transform: scale(1.1);
         }
     </style>
-    <table>
+
+    <table class="custom-table">
         <thead>
             <tr>
                 <th>Nº</th>
@@ -323,6 +336,7 @@ if st.session_state.insumos:
         <tbody>
     """
 
+    # Linhas da tabela
     for i, insumo in enumerate(st.session_state.insumos, start=1):
         tabela_html += f"""
             <tr>
@@ -331,27 +345,23 @@ if st.session_state.insumos:
                 <td>{insumo['quantidade']}</td>
                 <td>{insumo['unidade']}</td>
                 <td class='botao'>
-                    <form action="" method="post">
-                        <button name="delete_{i-1}" style="
-                            background-color: transparent;
-                            border: none;
-                            cursor: pointer;
-                            font-size: 16px;
-                        ">🗑️</button>
-                    </form>
+                    🗑️
                 </td>
             </tr>
         """
 
     tabela_html += "</tbody></table>"
 
+    # Renderiza o HTML da tabela
     st.markdown(tabela_html, unsafe_allow_html=True)
 
-    # Controle dos botões de exclusão
-    for i in range(len(st.session_state.insumos)):
-        if st.session_state.get(f"delete_{i}", False):
-            st.session_state.insumos.pop(i)
-            st.rerun()
+    # Cria botões reais para exclusão (fora da tabela)
+    for i, insumo in enumerate(st.session_state.insumos):
+        col1, col2, col3, col4, col5 = st.columns([0.5, 3, 1, 1, 0.3])
+        with col5:
+            if st.button("🗑️", key=f"delete_{i}"):
+                st.session_state.insumos.pop(i)
+                st.rerun()
 
 # --- Finalização do Pedido ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
@@ -479,5 +489,6 @@ st.components.v1.html(
     """,
     height=0,
 )
+
 
 
