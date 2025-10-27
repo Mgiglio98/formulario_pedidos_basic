@@ -479,6 +479,17 @@ if st.session_state.get("limpando_formulario", False):
     st.session_state.limpando_formulario = False
     st.rerun()
 
+# --- Botão de limpar formulário completamente ---
+if st.session_state.get("excel_bytes") is None and not st.session_state.get("limpando_formulario", False):
+    if st.button("🔄 Novo Pedido", use_container_width=True):
+        st.session_state.limpar_pedido = True
+        st.session_state.insumos = []
+        st.session_state.excel_bytes = None
+        st.session_state.nome_arquivo = ""
+        resetar_formulario()
+        st.success("🧹 Formulário limpo e pronto para um novo pedido!")
+        st.rerun()
+
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
 st.components.v1.html(
     """
@@ -488,17 +499,3 @@ st.components.v1.html(
     """,
     height=0,
 )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
