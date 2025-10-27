@@ -31,6 +31,24 @@ if "excel_bytes" not in st.session_state:
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
 
+# --- Rerun agendado após download ---
+if st.session_state.get("rerun_depois_download", False):
+    st.session_state.rerun_depois_download = False
+
+    # Limpa tudo de forma segura antes de redesenhar a página
+    for campo in [
+        "pedido_numero", "solicitante", "executivo", "obra_selecionada",
+        "cnpj", "endereco", "cep", "data_pedido",
+        "excel_bytes", "nome_arquivo", "pedido_enviado"
+    ]:
+        if campo in st.session_state:
+            del st.session_state[campo]
+
+    st.session_state.insumos = []
+    st.session_state.limpar_formulario = False
+
+    st.rerun()
+
 # --- Garantir que os campos de cabeçalho existam no session_state ---
 for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
     if campo not in st.session_state:
@@ -460,23 +478,13 @@ with col1:
         file_name=st.session_state.nome_arquivo or "Pedido.xlsx",
         use_container_width=True
     ):
-        # 🔹 Limpa imediatamente todos os campos do formulário (removendo as chaves)
-        for campo in [
-            "pedido_numero", "solicitante", "executivo", "obra_selecionada",
-            "cnpj", "endereco", "cep", "data_pedido",
-            "excel_bytes", "nome_arquivo", "pedido_enviado"
-        ]:
-            if campo in st.session_state:
-                del st.session_state[campo]
-
-        st.session_state.insumos = []
-        st.success("🧹 Formulário limpo após download! Pronto para novo pedido.")
-
-        st.rerun()
+        # 🔹 Marca flags para limpar no próximo ciclo
+        st.session_state.limpar_formulario = True
+        st.session_state.rerun_depois_download = True
 
 with col2:
     if st.button("🔄 Novo Pedido", use_container_width=True):
-        # 🔹 Limpa imediatamente todos os campos (mesma lógica)
+        # 🔹 Limpa imediatamente todos os campos
         for campo in [
             "pedido_numero", "solicitante", "executivo", "obra_selecionada",
             "cnpj", "endereco", "cep", "data_pedido",
@@ -486,8 +494,6 @@ with col2:
                 del st.session_state[campo]
 
         st.session_state.insumos = []
-        st.success("🧹 Formulário limpo e pronto para novo pedido!")
-
         st.rerun()
         
 # --- 🔄 Keep-alive (mover para o fim do arquivo) ---
