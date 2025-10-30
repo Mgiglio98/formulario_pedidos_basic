@@ -432,7 +432,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
-    
+
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             novo_insumo = {
                 "descricao": descricao_final,
@@ -441,25 +441,43 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "quantidade": quantidade,
                 "complemento": complemento,
             }
-            st.session_state.insumos.append(novo_insumo)
-    
-            # 🔹 Limpa todos os campos de insumo após adicionar
+        
+            # Se estiver editando um item existente, substitui ele
+            if "editando_insumo" in st.session_state and st.session_state.editando_insumo is not None:
+                st.session_state.insumos[st.session_state.editando_insumo] = novo_insumo
+                st.session_state.editando_insumo = None
+                st.success("✏️ Insumo atualizado com sucesso!")
+            else:
+                st.session_state.insumos.append(novo_insumo)
+                st.success("✅ Insumo adicionado com sucesso!")
+        
+            # Limpa os campos após adicionar/editar
             for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
                 if campo in st.session_state:
                     try:
                         del st.session_state[campo]
                     except Exception:
                         pass
-    
-            # 🔹 Recarrega estado padrão da seleção e quantidade
+        
             st.session_state.quantidade = 1
             st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
-    
-            st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
-    
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
+
+def editar_insumo(index):
+    """Carrega o insumo selecionado de volta nos campos para edição."""
+    insumo = st.session_state.insumos[index]
+
+    # Preenche novamente os campos
+    st.session_state.descricao_exibicao = insumo["descricao"]
+    st.session_state.codigo = insumo["codigo"]
+    st.session_state.unidade = insumo["unidade"]
+    st.session_state.quantidade = insumo["quantidade"]
+    st.session_state.complemento = insumo["complemento"]
+
+    # Marca o item sendo editado
+    st.session_state.editando_insumo = index
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -527,7 +545,7 @@ if st.session_state.insumos:
 
     # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
+        col1, col2, col3, col4, col5 = st.columns([5.3, 1.2, 1.2, 0.5, 0.5])
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
         with col2:
@@ -535,6 +553,11 @@ if st.session_state.insumos:
         with col3:
             st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
         with col4:
+            if st.button("✏️", key=f"edit_{i}"):
+                editar_insumo(i)
+                st.success(f"Insumo selecionado para edição: {insumo['descricao']}")
+                st.rerun()
+        with col5:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
@@ -669,6 +692,3 @@ setInterval(() => {
 </script>
 
 """, height=0)
-
-
-
