@@ -55,39 +55,14 @@ if "data_pedido" not in st.session_state:
     st.session_state.data_pedido = date.today()
 
 # --- FUNÇÕES AUXILIARES ---
-def resetar_campos_insumo():
-    """Limpa apenas os campos de insumo."""
-    for campo in ["descricao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "descricao_exibicao"]:
-        if campo in st.session_state:
-            try:
-                del st.session_state[campo]
-            except Exception:
-                pass
-
-
-def resetar_formulario():
-    """Limpa todo o formulário."""
-    resetar_campos_insumo()
-    for campo in [
-        "insumos", "excel_bytes", "nome_arquivo", "pedido_numero", "data_pedido",
-        "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"
-    ]:
-        if campo in st.session_state:
-            try:
-                del st.session_state[campo]
-            except Exception:
-                pass
-    st.session_state.resetar_pedido = False
-    st.session_state.resetar_insumo = False
-
-
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
-    """Envia o e-mail do pedido."""
+    """Envia o e-mail do pedido e, se houver, alerta de insumos sem código."""
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
+    # --- Classificação dos insumos ---
     basicos, especificos, sem_codigo = [], [], []
 
     for item in insumos_adicionados:
@@ -109,18 +84,19 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
         else:
             especificos.append(f"{item['descricao']} — {qtd}")
 
-    corpo = (
+    # --- E-mail principal ---
+    corpo_principal = (
         "✅ Novo pedido recebido!\n\n"
-        "📄 Materiais Básicos:\n" + ("\n".join(basicos) if basicos else "Nenhum") +
-        "\n\n🛠️ Materiais Específicos:\n" + ("\n".join(especificos) if especificos else "Nenhum") +
-        "\n\n📌 Insumos sem código cadastrado:\n" + ("\n".join(sem_codigo) if sem_codigo else "Nenhum")
+        "📄 **Materiais Básicos:**\n" + ("\n".join(basicos) if basicos else "Nenhum") +
+        "\n\n🛠️ **Materiais Específicos:**\n" + ("\n".join(especificos) if especificos else "Nenhum") +
+        "\n\n📌 **Insumos sem código cadastrado:**\n" + ("\n".join(sem_codigo) if sem_codigo else "Nenhum")
     )
 
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
     msg["Subject"] = assunto
-    msg.attach(MIMEText(corpo, "plain"))
+    msg.attach(MIMEText(corpo_principal, "plain"))
 
     anexo = MIMEApplication(
         arquivo_bytes,
@@ -134,11 +110,38 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
-        server.quit()
-        print("📨 E-mail com anexo enviado com sucesso!")
+        print("📨 E-mail principal enviado com sucesso!")
     except Exception as e:
-        print(f"Erro ao enviar e-mail: {e}")
+        print(f"Erro ao enviar e-mail principal: {e}")
+        return
 
+    # --- E-mail auxiliar para insumos sem código ---
+    if sem_codigo:
+        try:
+            msg_aux = MIMEMultipart()
+            msg_aux["From"] = smtp_user
+            msg_aux["To"] = smtp_user
+            msg_aux["Subject"] = f"[Verificação de Insumos] {assunto}"
+
+            corpo_aux = (
+                "Bom dia!\n\n"
+                f"Foi recebido no pedido **{assunto}** os seguintes insumos sem código cadastrado:\n\n"
+                + "\n".join(sem_codigo) +
+                "\n\nConsegue verificar, por favor, se eles já estão cadastrados no sistema?\n"
+                "Se sim, poderia informar o código correto de cada um?\n"
+                "Se não, favor realizar a inclusão e me confirmar aqui.\n\n"
+                "Obrigado!"
+            )
+
+            msg_aux.attach(MIMEText(corpo_aux, "plain"))
+            server.send_message(msg_aux)
+            print("📩 E-mail auxiliar de verificação enviado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao enviar e-mail auxiliar: {e}")
+        finally:
+            server.quit()
+    else:
+        server.quit()
 
 def carregar_dados():
     """Carrega dados de empreendimentos e insumos."""
@@ -158,7 +161,6 @@ def carregar_dados():
     insumos_vazios = pd.DataFrame({"Código": [""], "Descrição": [""], "Unidade": [""]})
     df_insumos = pd.concat([insumos_vazios, df_insumos], ignore_index=True)
     return df_empreend, df_insumos
-
 
 # --- CARREGAMENTO DE DADOS ---
 df_empreend, df_insumos = carregar_dados()
@@ -477,11 +479,3 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
-
-
-
-
-
-
-
-
