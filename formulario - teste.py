@@ -341,6 +341,7 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.data_pedido = date.today()
         st.session_state.solicitante = ""
         st.session_state.executivo = ""
+        st.session_state.adm_obra = ""
         st.session_state.obra_selecionada = ""
         st.session_state.cnpj = ""
         st.session_state.endereco = ""
@@ -370,9 +371,11 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             "Roberto": "roberto.santos@osborne.com.br"
         }
         
+        opcoes_adm = [""] + list(ADM_EMAILS.keys())  # primeira opção em branco
         adm_obra = st.selectbox(
             "Administrativo da Obra",
-            list(ADM_EMAILS.keys()),
+            opcoes_adm,
+            index=0,
             key="adm_obra"
         )
 
@@ -542,7 +545,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.session_state.pedido_numero, st.session_state.data_pedido,
         st.session_state.solicitante, st.session_state.executivo,
         st.session_state.obra_selecionada, st.session_state.cnpj,
-        st.session_state.endereco, st.session_state.cep
+        st.session_state.endereco, st.session_state.cep, st.session_state.adm_obra
     ]
     if not all(campos_obrigatorios):
         st.warning("⚠️ Preencha todos os campos obrigatórios antes de enviar o pedido.")
@@ -666,5 +669,6 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
