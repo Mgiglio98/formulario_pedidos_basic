@@ -393,6 +393,21 @@ st.divider()
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
+    # --- Detecta se deve carregar dados de edição antes de renderizar os campos ---
+    if st.session_state.get("carregar_edicao", False):
+        idx = st.session_state.get("editando_insumo")
+        if idx is not None and 0 <= idx < len(st.session_state.insumos):
+            insumo = st.session_state.insumos[idx]
+    
+            # Atualiza os campos diretamente antes de renderizar
+            st.session_state.descricao_livre = insumo["descricao"]
+            st.session_state.codigo = insumo["codigo"]
+            st.session_state.unidade = insumo["unidade"]
+            st.session_state.quantidade = insumo["quantidade"]
+            st.session_state.complemento = insumo["complemento"]
+    
+        # Resetar o gatilho pra não repetir
+        st.session_state.carregar_edicao = False
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if pd.notna(x["Código"]) and str(x["Código"]).strip() != "" else x["Descrição"],
@@ -429,18 +444,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
     )
-
-    # 🔄 Se estiver editando, preenche os campos com os valores armazenados
-    if "edit_descricao" in st.session_state and st.session_state.get("editando_insumo") is not None:
-        st.session_state.descricao_livre = st.session_state.edit_descricao
-        st.session_state.codigo = st.session_state.edit_codigo
-        st.session_state.unidade = st.session_state.edit_unidade
-        st.session_state.quantidade = st.session_state.edit_quantidade
-        st.session_state.complemento = st.session_state.edit_complemento
-    
-        # Depois limpa para não tentar reatribuir várias vezes
-        for k in ["edit_descricao", "edit_codigo", "edit_unidade", "edit_quantidade", "edit_complemento"]:
-            del st.session_state[k]
     
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
@@ -478,7 +481,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
 def editar_insumo(index):
-    """Marca o insumo que será editado e força rerun."""
     st.session_state.editando_insumo = index
     st.session_state.carregar_edicao = True
     st.rerun()
@@ -696,6 +698,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
