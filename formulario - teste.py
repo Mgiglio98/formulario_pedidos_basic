@@ -469,15 +469,17 @@ def editar_insumo(index):
     """Carrega o insumo selecionado de volta nos campos para edição."""
     insumo = st.session_state.insumos[index]
 
-    # Preenche novamente os campos
-    st.session_state.descricao_exibicao = insumo["descricao"]
-    st.session_state.codigo = insumo["codigo"]
-    st.session_state.unidade = insumo["unidade"]
-    st.session_state.quantidade = insumo["quantidade"]
-    st.session_state.complemento = insumo["complemento"]
+    # Atualiza os valores em sessão de forma segura
+    st.session_state.update({
+        "descricao_exibicao": insumo["descricao"],
+        "codigo": insumo["codigo"],
+        "unidade": insumo["unidade"],
+        "quantidade": insumo["quantidade"],
+        "complemento": insumo["complemento"],
+        "editando_insumo": index
+    })
 
-    # Marca o item sendo editado
-    st.session_state.editando_insumo = index
+    st.rerun()
 
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -692,3 +694,4 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
