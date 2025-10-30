@@ -11,6 +11,81 @@ from io import BytesIO
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")
 
+# --- AUTENTICAÇÃO POR OBRA (LOGIN SIMPLES) ---
+from datetime import datetime
+
+# Exemplo de credenciais (altere/expanda conforme necessário)
+# Chave = login da obra (ex.: "OC2212"), Valor = senha
+VALID_LOGINS = {
+    "OC2212": "Osborne",
+    # adicione outras OCs aqui: "OC1234": "Osborne",
+}
+
+def autenticar(login: str, senha: str) -> bool:
+    """Retorna True se login/senha conferem (case-sensitive na senha)."""
+    if not login or not senha:
+        return False
+    senha_certa = VALID_LOGINS.get(login.strip())
+    return senha_certa is not None and senha.strip() == senha_certa
+
+# Inicializa estado de sessão de login
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "login_oc" not in st.session_state:
+    st.session_state.login_oc = None
+if "login_time" not in st.session_state:
+    st.session_state.login_time = None
+
+def render_login():
+    st.markdown("## 🔐 Acesso à obra")
+    st.caption("Entre com o login e senha fornecidos para a sua obra.")
+    col_a, col_b = st.columns([1,1])
+    with col_a:
+        login_input = st.text_input("Login (ex.: OC2212)", key="__login_input")
+    with col_b:
+        senha_input = st.text_input("Senha", type="password", key="__senha_input")
+
+    c1, c2, c3 = st.columns([1,1,2])
+    with c1:
+        entrar = st.button("Entrar", use_container_width=True)
+    with c2:
+        limpar = st.button("Limpar", use_container_width=True)
+
+    if limpar:
+        st.session_state["__login_input"] = ""
+        st.session_state["__senha_input"] = ""
+        st.rerun()
+
+    if entrar:
+        if autenticar(st.session_state["__login_input"], st.session_state["__senha_input"]):
+            st.session_state.logged_in = True
+            st.session_state.login_oc = st.session_state["__login_input"].strip()
+            st.session_state.login_time = datetime.now()
+            # opcional: zere estados antigos do formulário ao logar
+            for k in ["insumos", "excel_bytes", "nome_arquivo", "pedido_numero",
+                      "solicitante", "executivo", "obra_selecionada", "cnpj",
+                      "endereco", "cep", "data_pedido"]:
+                if k in st.session_state:
+                    try:
+                        del st.session_state[k]
+                    except:
+                        pass
+            st.rerun()
+        else:
+            st.error("Login ou senha inválidos. Verifique e tente novamente.")
+
+# 🔒 Gate: se não logado, mostra tela de login e interrompe o app
+if not st.session_state.logged_in:
+    render_login()
+    st.stop()
+
+# (Opcional) Barra de status do login + botão sair
+st.sidebar.markdown(f"**OC logada:** {st.session_state.login_oc}")
+if st.sidebar.button("Sair"):
+    for k in list(st.session_state.keys()):
+        del st.session_state[k]
+    st.rerun()
+
 # --- CSS (espaçamento) ---
 st.markdown("""
 <style>
@@ -483,4 +558,5 @@ setInterval(() => {
     fetch(window.location.pathname + '_stcore/health');
 }, 120000);
 </script>
+
 """, height=0)
