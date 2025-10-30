@@ -62,6 +62,9 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
+    # --- Endereços de cópia ---
+    cc_addr = ["maria.eduarda@osborne.com.br"]
+
     # --- Classificação dos insumos ---
     basicos, especificos, sem_codigo = [], [], []
 
@@ -95,6 +98,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
+    msg["Cc"] = ", ".join(cc_addr)
     msg["Subject"] = assunto
     msg.attach(MIMEText(corpo_principal, "plain"))
 
@@ -121,6 +125,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
             msg_aux = MIMEMultipart()
             msg_aux["From"] = smtp_user
             msg_aux["To"] = smtp_user
+            msg_aux["Cc"] = ", ".join(cc_addr)
             msg_aux["Subject"] = f"[Verificação de Insumos] {assunto}"
 
             corpo_aux = (
@@ -479,4 +484,5 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
