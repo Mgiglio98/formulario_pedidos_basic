@@ -7,12 +7,36 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 from io import BytesIO
+import sqlite3, json
+from datetime import datetime
+
+# --- Inicializa banco SQLite ---
+def init_db():
+    conn = sqlite3.connect("pedidos.db")
+    c = conn.cursor()
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS pedidos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            oc TEXT,
+            pedido_numero TEXT,
+            solicitante TEXT,
+            executivo TEXT,
+            obra TEXT,
+            cnpj TEXT,
+            endereco TEXT,
+            cep TEXT,
+            data_pedido TEXT,
+            insumos TEXT,
+            data_envio TEXT
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+init_db()
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")
-
-# --- AUTENTICAÇÃO POR OBRA (LOGIN SIMPLES) ---
-from datetime import datetime
 
 # Exemplo de credenciais (altere/expanda conforme necessário)
 # Chave = login da obra (ex.: "OC2212"), Valor = senha
@@ -85,6 +109,28 @@ if st.sidebar.button("Sair"):
     for k in list(st.session_state.keys()):
         del st.session_state[k]
     st.rerun()
+
+def carregar_ultimo_pedido(oc):
+    conn = sqlite3.connect("pedidos.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM pedidos WHERE oc = ? ORDER BY id DESC LIMIT 1", (oc,))
+    row = c.fetchone()
+    conn.close()
+    if row:
+        # Preenche os campos automaticamente
+        (_, _, pedido_numero, solicitante, executivo, obra,
+         cnpj, endereco, cep, data_pedido, insumos_json, _) = row
+        st.session_state.pedido_numero = pedido_numero or ""
+        st.session_state.solicitante = solicitante or ""
+        st.session_state.executivo = executivo or ""
+        st.session_state.obra_selecionada = obra or ""
+        st.session_state.cnpj = cnpj or ""
+        st.session_state.endereco = endereco or ""
+        st.session_state.cep = cep or ""
+        st.session_state.data_pedido = datetime.strptime(data_pedido, "%Y-%m-%d").date()
+        st.session_state.insumos = json.loads(insumos_json)
+        return True
+    return False
 
 # --- CSS (espaçamento) ---
 st.markdown("""
@@ -272,6 +318,16 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
+# --- BOTÃO PARA CARREGAR ÚLTIMO PEDIDO ---
+st.markdown("### 🔄 Reabrir Pedido Anterior")
+if st.button("📝 Carregar último pedido"):
+    if carregar_ultimo_pedido(st.session_state.login_oc):
+        st.success("✅ Último pedido carregado com sucesso! Você pode editá-lo e reenviar.")
+    else:
+        st.info("ℹ️ Nenhum pedido anterior encontrado para esta obra.")
+
+st.divider()
 
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
@@ -525,6 +581,35 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     elif erro:
         st.error(f"❌ Erro ao gerar pedido: {erro}")
 
+    # --- Salva o pedido no banco ---
+    try:
+        conn = sqlite3.connect("pedidos.db")
+        c = conn.cursor()
+        c.execute("""
+            INSERT INTO pedidos (
+                oc, pedido_numero, solicitante, executivo, obra,
+                cnpj, endereco, cep, data_pedido, insumos, data_envio
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            st.session_state.get("login_oc"),
+            st.session_state.pedido_numero,
+            st.session_state.solicitante,
+            st.session_state.executivo,
+            st.session_state.obra_selecionada,
+            st.session_state.cnpj,
+            st.session_state.endereco,
+            st.session_state.cep,
+            st.session_state.data_pedido.strftime("%Y-%m-%d"),
+            json.dumps(st.session_state.insumos, ensure_ascii=False),
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ))
+        conn.commit()
+        conn.close()
+        print("📦 Pedido salvo no banco de dados.")
+    except Exception as e:
+        print(f"Erro ao salvar pedido: {e}")
+
 # --- BOTÕES APÓS ENVIO ---
 if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
     col1, col2 = st.columns(2)
@@ -560,3 +645,4 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
