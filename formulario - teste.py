@@ -430,6 +430,21 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         key="complemento"
     )
 
+    # Se estiver marcado para carregar um item em edição
+    if st.session_state.get("carregar_edicao", False):
+        idx = st.session_state.get("editando_insumo")
+        if idx is not None and 0 <= idx < len(st.session_state.insumos):
+            insumo = st.session_state.insumos[idx]
+    
+            # Atualiza os campos de forma segura (fora do ciclo de renderização anterior)
+            st.session_state.descricao_exibicao = insumo["descricao"]
+            st.session_state.codigo = insumo["codigo"]
+            st.session_state.unidade = insumo["unidade"]
+            st.session_state.quantidade = insumo["quantidade"]
+            st.session_state.complemento = insumo["complemento"]
+    
+        st.session_state.carregar_edicao = False
+    
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
 
@@ -466,19 +481,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
 def editar_insumo(index):
-    """Carrega o insumo selecionado de volta nos campos para edição."""
-    insumo = st.session_state.insumos[index]
-
-    # Atualiza os valores em sessão de forma segura
-    st.session_state.update({
-        "descricao_exibicao": insumo["descricao"],
-        "codigo": insumo["codigo"],
-        "unidade": insumo["unidade"],
-        "quantidade": insumo["quantidade"],
-        "complemento": insumo["complemento"],
-        "editando_insumo": index
-    })
-
+    """Prepara o item para edição sem modificar imediatamente o estado do widget ativo."""
+    st.session_state.editando_insumo = index
+    st.session_state.carregar_edicao = True
     st.rerun()
 
 # --- Renderiza tabela de insumos ---
@@ -694,4 +699,5 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
