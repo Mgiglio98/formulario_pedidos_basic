@@ -430,20 +430,17 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         key="complemento"
     )
 
-    # Se estiver marcado para carregar um item em edição
-    if st.session_state.get("carregar_edicao", False):
-        idx = st.session_state.get("editando_insumo")
-        if idx is not None and 0 <= idx < len(st.session_state.insumos):
-            insumo = st.session_state.insumos[idx]
+    # 🔄 Se estiver editando, preenche os campos com os valores armazenados
+    if "edit_descricao" in st.session_state and st.session_state.get("editando_insumo") is not None:
+        st.session_state.descricao_livre = st.session_state.edit_descricao
+        st.session_state.codigo = st.session_state.edit_codigo
+        st.session_state.unidade = st.session_state.edit_unidade
+        st.session_state.quantidade = st.session_state.edit_quantidade
+        st.session_state.complemento = st.session_state.edit_complemento
     
-            # Atualiza os campos de forma segura (fora do ciclo de renderização anterior)
-            st.session_state.descricao_exibicao = insumo["descricao"]
-            st.session_state.codigo = insumo["codigo"]
-            st.session_state.unidade = insumo["unidade"]
-            st.session_state.quantidade = insumo["quantidade"]
-            st.session_state.complemento = insumo["complemento"]
-    
-        st.session_state.carregar_edicao = False
+        # Depois limpa para não tentar reatribuir várias vezes
+        for k in ["edit_descricao", "edit_codigo", "edit_unidade", "edit_quantidade", "edit_complemento"]:
+            del st.session_state[k]
     
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
@@ -481,7 +478,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
 def editar_insumo(index):
-    """Prepara o item para edição sem modificar imediatamente o estado do widget ativo."""
+    """Marca o insumo que será editado e força rerun."""
     st.session_state.editando_insumo = index
     st.session_state.carregar_edicao = True
     st.rerun()
@@ -699,5 +696,6 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
