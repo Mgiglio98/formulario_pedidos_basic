@@ -183,8 +183,13 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
-    # --- Endereços de cópia ---
-    cc_addr = ["maria.eduarda@osborne.com.br"]
+    # --- Endereços de cópia (fixos + administrativo da obra) ---
+    cc_addr = []
+    
+    # Adiciona o administrativo da obra, se existir
+    adm_email = ADM_EMAILS.get(st.session_state.get("adm_obra"))
+    if adm_email and adm_email not in cc_addr:
+        cc_addr.append(adm_email)
 
     # --- Classificação dos insumos ---
     basicos, especificos, sem_codigo = [], [], []
@@ -354,6 +359,22 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
         )
         executivo = st.text_input("Executivo", key="executivo")
+        
+        # --- Novo campo: Administrativo da Obra ---
+        ADM_EMAILS = {
+            "Maria Eduarda": "maria.eduarda@osborne.com.br",
+            "Joice": "joice.oliveira@osborne.com.br",
+            "Micaele": "micaele.ferreira@osborne.com.br",
+            "Graziele": "graziele.horacio@osborne.com.br",
+            "Fabio": "fabio.maia@osborne.com.br",
+            "Roberto": "roberto.santos@osborne.com.br"
+        }
+        
+        adm_obra = st.selectbox(
+            "Administrativo da Obra",
+            list(ADM_EMAILS.keys()),
+            key="adm_obra"
+        )
 
     if obra_selecionada:
         dados_obra = df_empreend[df_empreend["EMPREENDIMENTO"] == obra_selecionada].iloc[0]
@@ -645,4 +666,5 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
