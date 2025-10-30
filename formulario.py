@@ -87,9 +87,9 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     # --- E-mail principal ---
     corpo_principal = (
         "✅ Novo pedido recebido!\n\n"
-        "📄 **Materiais Básicos:**\n" + ("\n".join(basicos) if basicos else "Nenhum") +
-        "\n\n🛠️ **Materiais Específicos:**\n" + ("\n".join(especificos) if especificos else "Nenhum") +
-        "\n\n📌 **Insumos sem código cadastrado:**\n" + ("\n".join(sem_codigo) if sem_codigo else "Nenhum")
+        "📄 Materiais Básicos:\n" + ("\n".join(basicos) if basicos else "Nenhum") +
+        "\n\n🛠️ Materiais Específicos:\n" + ("\n".join(especificos) if especificos else "Nenhum") +
+        "\n\n📌 Insumos sem código cadastrado:\n" + ("\n".join(sem_codigo) if sem_codigo else "Nenhum")
     )
 
     msg = MIMEMultipart()
@@ -124,8 +124,8 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
             msg_aux["Subject"] = f"[Verificação de Insumos] {assunto}"
 
             corpo_aux = (
-                "Bom dia!\n\n"
-                f"Foi recebido no pedido **{assunto}** os seguintes insumos sem código cadastrado:\n\n"
+                "Olá!\n\n"
+                f"Foi recebido no pedido {assunto} os seguintes insumos sem código cadastrado:\n\n"
                 + "\n".join(sem_codigo) +
                 "\n\nConsegue verificar, por favor, se eles já estão cadastrados no sistema?\n"
                 "Se sim, poderia informar o código correto de cada um?\n"
@@ -479,3 +479,4 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
