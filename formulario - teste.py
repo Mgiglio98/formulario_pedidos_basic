@@ -402,6 +402,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         axis=1
     )
 
+    # --- Limpeza pós-adicionar ---
+    if st.session_state.get("limpar_campos_insumo", False):
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
+            st.session_state.pop(campo, None)
+        st.session_state.limpar_campos_insumo = False
+
     # ✅ DEPOIS: o trecho de pré-preenchimento (que usa df_insumos_lista)
     if st.session_state.get("carregar_edicao", False):
         idx = st.session_state.get("editando_insumo")
@@ -462,7 +468,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
-
+    
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             novo_insumo = {
                 "descricao": descricao_final,
@@ -471,7 +477,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "quantidade": quantidade,
                 "complemento": complemento,
             }
-        
+    
             # Se estiver editando um item existente, substitui ele
             if "editando_insumo" in st.session_state and st.session_state.editando_insumo is not None:
                 st.session_state.insumos[st.session_state.editando_insumo] = novo_insumo
@@ -480,24 +486,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             else:
                 st.session_state.insumos.append(novo_insumo)
                 st.success("✅ Insumo adicionado com sucesso!")
-        
-            # 🔹 Limpa os campos após adicionar/editar
-            for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade"]:
-                if campo in st.session_state:
-                    try:
-                        del st.session_state[campo]
-                    except Exception:
-                        pass
-            
-            # 🔹 Força o reset dos widgets numéricos e de texto (maneira segura)
-            st.session_state.update({
-                "quantidade": 1,
-                "complemento": "",
-                "descricao_exibicao": df_insumos_lista["opcao_exibicao"].iloc[0],
-                "editando_insumo": None,
-                "carregar_edicao": False,
-            })
-            
+    
+            # 🔹 Marca flag para limpar no próximo ciclo
+            st.session_state.limpar_campos_insumo = True
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
@@ -720,6 +711,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
