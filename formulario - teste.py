@@ -404,8 +404,19 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     # --- Limpeza pós-adicionar ---
     if st.session_state.get("limpar_campos_insumo", False):
+        # Remove os campos antigos
         for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
             st.session_state.pop(campo, None)
+    
+        # Define valores padrão após limpeza
+        st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]  # volta ao primeiro da lista
+        st.session_state.quantidade = 1
+        st.session_state.complemento = ""
+        st.session_state.descricao_livre = ""
+        st.session_state.codigo = ""
+        st.session_state.unidade = ""
+    
+        # Desativa a flag
         st.session_state.limpar_campos_insumo = False
 
     # ✅ DEPOIS: o trecho de pré-preenchimento (que usa df_insumos_lista)
@@ -711,6 +722,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
