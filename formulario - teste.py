@@ -489,12 +489,15 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                     except Exception:
                         pass
             
-            # 🔹 Força o reset dos widgets numéricos e de texto
-            st.session_state.quantidade = 1
-            st.session_state.complemento = ""  # limpa o textarea
-            st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
-            st.session_state.editando_insumo = None
-            st.session_state.carregar_edicao = False
+            # 🔹 Força o reset dos widgets numéricos e de texto (maneira segura)
+            st.session_state.update({
+                "quantidade": 1,
+                "complemento": "",
+                "descricao_exibicao": df_insumos_lista["opcao_exibicao"].iloc[0],
+                "editando_insumo": None,
+                "carregar_edicao": False,
+            })
+            
             st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
@@ -717,6 +720,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
