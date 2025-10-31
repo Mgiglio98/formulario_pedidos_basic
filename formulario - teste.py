@@ -393,40 +393,39 @@ st.divider()
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
-    # --- Pré-preenche os campos quando estiver editando ---
+    # ✅ PRIMEIRO: cria a lista de insumos
+    df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
+    df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
+        lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})"
+        if pd.notna(x["Código"]) and str(x["Código"]).strip() != ""
+        else x["Descrição"],
+        axis=1
+    )
+
+    # ✅ DEPOIS: o trecho de pré-preenchimento (que usa df_insumos_lista)
     if st.session_state.get("carregar_edicao", False):
         idx = st.session_state.get("editando_insumo")
         if idx is not None and 0 <= idx < len(st.session_state.insumos):
             ins = st.session_state.insumos[idx]
-    
-            # Se tem código, é item da base -> precisamos marcar o selectbox
+
+            # Se tem código, é item da base -> marcar o selectbox
             if ins.get("codigo"):
                 alvo = f"{ins['descricao']} – {ins['codigo']} ({ins['unidade']})"
-                # Se a opção existe na lista, seleciona
                 if alvo in df_insumos_lista["opcao_exibicao"].values:
                     st.session_state.descricao_exibicao = alvo
                 else:
-                    # fallback: trata como livre se não achar (ex.: unidade mudou)
                     st.session_state.descricao_livre = ins["descricao"]
             else:
-                # Item livre (sem código)
                 st.session_state.descricao_livre = ins["descricao"]
-    
-            # Campos complementares
+
             st.session_state.codigo = ins.get("codigo", "")
             st.session_state.unidade = ins.get("unidade", "")
             st.session_state.quantidade = ins.get("quantidade", 1)
             st.session_state.complemento = ins.get("complemento", "")
-    
-        # limpa o gatilho para não reaplicar no próximo ciclo
-        st.session_state.carregar_edicao = False
-        
-    df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
-    df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
-        lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if pd.notna(x["Código"]) and str(x["Código"]).strip() != "" else x["Descrição"],
-        axis=1
-    )
 
+        st.session_state.carregar_edicao = False
+
+    # ✅ Agora o selectbox (renderiza já com o item marcado)
     descricao_exibicao = st.selectbox(
         "Descrição do insumo (Digite em MAIÚSCULO)",
         df_insumos_lista["opcao_exibicao"],
@@ -711,6 +710,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
