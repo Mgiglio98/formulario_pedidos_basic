@@ -452,6 +452,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     st.text_input("Código do insumo", key="codigo", disabled=True)
     st.text_input("Unidade", key="unidade", disabled=usando_base)
     quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%d", key="quantidade")
+    # Garante que o valor carregado da edição exista antes do text_area
+    if "complemento" not in st.session_state:
+        st.session_state.complemento = ""
     complemento = st.text_area(
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
@@ -488,10 +491,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             
             # 🔹 Força o reset dos widgets numéricos e de texto
             st.session_state.quantidade = 1
-            st.session_state.complemento = ""  # <-- ESSENCIAL para limpar o textarea
+            st.session_state.complemento = ""  # limpa o textarea
             st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
-
-            st.session_state.editando_insumo = None  # sai do modo edição
+            st.session_state.editando_insumo = None
             st.session_state.carregar_edicao = False
             st.rerun()
         else:
@@ -715,6 +717,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
