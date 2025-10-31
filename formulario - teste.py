@@ -393,21 +393,34 @@ st.divider()
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
-    # --- Detecta se deve carregar dados de edição antes de renderizar os campos ---
+    # --- Pré-preenche os campos quando estiver editando ---
     if st.session_state.get("carregar_edicao", False):
         idx = st.session_state.get("editando_insumo")
         if idx is not None and 0 <= idx < len(st.session_state.insumos):
-            insumo = st.session_state.insumos[idx]
+            ins = st.session_state.insumos[idx]
     
-            # Atualiza os campos diretamente antes de renderizar
-            st.session_state.descricao_livre = insumo["descricao"]
-            st.session_state.codigo = insumo["codigo"]
-            st.session_state.unidade = insumo["unidade"]
-            st.session_state.quantidade = insumo["quantidade"]
-            st.session_state.complemento = insumo["complemento"]
+            # Se tem código, é item da base -> precisamos marcar o selectbox
+            if ins.get("codigo"):
+                alvo = f"{ins['descricao']} – {ins['codigo']} ({ins['unidade']})"
+                # Se a opção existe na lista, seleciona
+                if alvo in df_insumos_lista["opcao_exibicao"].values:
+                    st.session_state.descricao_exibicao = alvo
+                else:
+                    # fallback: trata como livre se não achar (ex.: unidade mudou)
+                    st.session_state.descricao_livre = ins["descricao"]
+            else:
+                # Item livre (sem código)
+                st.session_state.descricao_livre = ins["descricao"]
     
-        # Resetar o gatilho pra não repetir
+            # Campos complementares
+            st.session_state.codigo = ins.get("codigo", "")
+            st.session_state.unidade = ins.get("unidade", "")
+            st.session_state.quantidade = ins.get("quantidade", 1)
+            st.session_state.complemento = ins.get("complemento", "")
+    
+        # limpa o gatilho para não reaplicar no próximo ciclo
         st.session_state.carregar_edicao = False
+        
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if pd.notna(x["Código"]) and str(x["Código"]).strip() != "" else x["Descrição"],
@@ -698,6 +711,7 @@ setInterval(() => {
 </script>
 
 """, height=0)
+
 
 
 
