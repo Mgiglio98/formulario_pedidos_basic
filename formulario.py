@@ -63,7 +63,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
     # --- Endereços de cópia ---
-    cc_addr = ["maria.eduarda@osborne.com.br"]
+    cc_addr = []
 
     # --- Classificação dos insumos ---
     basicos, especificos, sem_codigo = [], [], []
@@ -484,5 +484,6 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
