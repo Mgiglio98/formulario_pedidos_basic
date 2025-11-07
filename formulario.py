@@ -56,52 +56,51 @@ if "data_pedido" not in st.session_state:
 
 # --- FUNÇÕES AUXILIARES ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
-    """Envia o e-mail do pedido e, se houver, alerta de insumos sem código."""
+    """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
     # --- Endereços de cópia ---
-    cc_addr = []
+    cc_addr = ["vanderlei.souza@osborne.com.br"]  # cópia fixa
+    adm_email = ADM_EMAILS.get(st.session_state.get("adm_obra"))
+    if adm_email and adm_email not in cc_addr:
+        cc_addr.append(adm_email)
 
-    # --- Classificação dos insumos ---
-    basicos, especificos, sem_codigo = [], [], []
+    # --- Identifica insumos sem código ---
+    sem_codigo = [
+        f"{item['descricao']} — {item['quantidade']}"
+        for item in insumos_adicionados
+        if not item.get("codigo") or str(item["codigo"]).strip() == ""
+    ]
 
-    for item in insumos_adicionados:
-        qtd = item["quantidade"]
-        descricao = item["descricao"]
-        codigo = item.get("codigo", "")
+    # --- Corpo principal do e-mail ---
+    if sem_codigo:
+        corpo_email = f"""
+Olá! Novo pedido recebido ✅
 
-        if not codigo or str(codigo).strip() == "":
-            sem_codigo.append(f"{descricao} — {qtd}")
-            continue
+Favor validar antes de criarmos a requisição.
 
-        linha_df = df_insumos[df_insumos["Descrição"] == item["descricao"]]
-        if not linha_df.empty and linha_df.iloc[0]["Basico"]:
-            max_qtd = linha_df.iloc[0]["Max"]
-            if pd.notna(max_qtd) and qtd <= max_qtd:
-                basicos.append(f"{item['descricao']} — {qtd}")
-            else:
-                especificos.append(f"{item['descricao']} — {qtd}")
-        else:
-            especificos.append(f"{item['descricao']} — {qtd}")
+Os seguintes insumos estão no pedido sem o código cadastrado:
+{chr(10).join(sem_codigo)}
+        """
+    else:
+        corpo_email = """
+Olá! Novo pedido recebido ✅
 
-    # --- E-mail principal ---
-    corpo_principal = (
-        "✅ Novo pedido recebido!\n\n"
-        "📄 Materiais Básicos:\n" + ("\n".join(basicos) if basicos else "Nenhum") +
-        "\n\n🛠️ Materiais Específicos:\n" + ("\n".join(especificos) if especificos else "Nenhum") +
-        "\n\n📌 Insumos sem código cadastrado:\n" + ("\n".join(sem_codigo) if sem_codigo else "Nenhum")
-    )
+Favor validar antes de criarmos a requisição.
+        """
 
+    # --- Montagem do e-mail ---
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
     msg["Cc"] = ", ".join(cc_addr)
     msg["Subject"] = assunto
-    msg.attach(MIMEText(corpo_principal, "plain"))
+    msg.attach(MIMEText(corpo_email.strip(), "plain"))
 
+    # --- Anexo ---
     anexo = MIMEApplication(
         arquivo_bytes,
         _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -109,44 +108,15 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
     anexo.add_header('Content-Disposition', 'attachment', filename="Pedido.xlsx")
     msg.attach(anexo)
 
+    # --- Envio ---
     try:
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(smtp_user, smtp_password)
-        server.send_message(msg)
-        print("📨 E-mail principal enviado com sucesso!")
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+            print("📨 E-mail de pedido enviado com sucesso!")
     except Exception as e:
-        print(f"Erro ao enviar e-mail principal: {e}")
-        return
-
-    # --- E-mail auxiliar para insumos sem código ---
-    if sem_codigo:
-        try:
-            msg_aux = MIMEMultipart()
-            msg_aux["From"] = smtp_user
-            msg_aux["To"] = smtp_user
-            msg_aux["Cc"] = ", ".join(cc_addr)
-            msg_aux["Subject"] = f"[Verificação de Insumos] {assunto}"
-
-            corpo_aux = (
-                "Olá!\n\n"
-                f"Foi recebido no pedido {assunto} os seguintes insumos sem código cadastrado:\n\n"
-                + "\n".join(sem_codigo) +
-                "\n\nConsegue verificar, por favor, se eles já estão cadastrados no sistema?\n"
-                "Se sim, poderia informar o código correto de cada um?\n"
-                "Se não, favor realizar a inclusão e me confirmar aqui.\n\n"
-                "Obrigado!"
-            )
-
-            msg_aux.attach(MIMEText(corpo_aux, "plain"))
-            server.send_message(msg_aux)
-            print("📩 E-mail auxiliar de verificação enviado com sucesso!")
-        except Exception as e:
-            print(f"Erro ao enviar e-mail auxiliar: {e}")
-        finally:
-            server.quit()
-    else:
-        server.quit()
+        print(f"Erro ao enviar e-mail: {e}")
 
 def carregar_dados():
     """Carrega dados de empreendimentos e insumos."""
@@ -205,6 +175,7 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.data_pedido = date.today()
         st.session_state.solicitante = ""
         st.session_state.executivo = ""
+        st.session_state.adm_obra = ""
         st.session_state.obra_selecionada = ""
         st.session_state.cnpj = ""
         st.session_state.endereco = ""
@@ -223,6 +194,24 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
         )
         executivo = st.text_input("Executivo", key="executivo")
+        
+        # --- Novo campo: Administrativo da Obra ---
+        ADM_EMAILS = {
+            "Maria Eduarda": "maria.eduarda@osborne.com.br",
+            "Joice": "joice.oliveira@osborne.com.br",
+            "Micaele": "micaele.ferreira@osborne.com.br",
+            "Graziele": "graziele.horacio@osborne.com.br",
+            "Fabio": "fabio.maia@osborne.com.br",
+            "Roberto": "roberto.santos@osborne.com.br"
+        }
+        
+        opcoes_adm = [""] + list(ADM_EMAILS.keys())  # primeira opção em branco
+        adm_obra = st.selectbox(
+            "Administrativo da Obra",
+            opcoes_adm,
+            index=0,
+            key="adm_obra"
+        )
 
     if obra_selecionada:
         dados_obra = df_empreend[df_empreend["EMPREENDIMENTO"] == obra_selecionada].iloc[0]
@@ -484,6 +473,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
