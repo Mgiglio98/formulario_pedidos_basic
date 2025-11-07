@@ -291,15 +291,15 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             # 🔹 Limpa todos os campos de insumo após adicionar
             for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
                 if campo in st.session_state:
-                    try:
-                        del st.session_state[campo]
-                    except Exception:
-                        pass
-    
+                    st.session_state.pop(campo, None)
+            
+            # 🔹 Força o campo complemento a resetar antes do rerun
+            st.session_state["complemento"] = ""
+            
             # 🔹 Recarrega estado padrão da seleção e quantidade
             st.session_state.quantidade = 1
             st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
-    
+            
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
     
@@ -484,6 +484,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
