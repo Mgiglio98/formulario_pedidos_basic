@@ -379,7 +379,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.session_state.pedido_numero, st.session_state.data_pedido,
         st.session_state.solicitante, st.session_state.executivo,
         st.session_state.obra_selecionada, st.session_state.cnpj,
-        st.session_state.endereco, st.session_state.cep
+        st.session_state.endereco, st.session_state.cep, st.session_state.adm_obra
     ]
     if not all(campos_obrigatorios):
         st.warning("⚠️ Preencha todos os campos obrigatórios antes de enviar o pedido.")
@@ -473,8 +473,3 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
-
-
-
-
-
