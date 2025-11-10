@@ -240,11 +240,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
             if campo in st.session_state:
                 del st.session_state[campo]
-        st.session_state.limpar_campos_insumo = False
 
         # 🔹 Garante valor padrão inicial
         st.session_state.quantidade = 1
         st.session_state.descricao_exibicao = ""
+        st.session_state.complemento = ""
+        st.session_state.limpar_campos_insumo = False
         st.rerun()  # 🔁 força recarregar já limpo
     
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
@@ -488,6 +489,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
