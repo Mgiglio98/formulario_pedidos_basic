@@ -221,10 +221,10 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             st.session_state.cnpj = dados_obra["CNPJ"]
             st.session_state.endereco = dados_obra["ENDERECO"]
             st.session_state.cep = dados_obra["CEP"]
-
+    
     st.text_input("CNPJ/CPF", key="cnpj", disabled=True)
     st.text_input("Endereço", key="endereco", disabled=True)
-    st.text_input("CEP", key="cep", disabled=True)
+    st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
 
 st.divider()
 
@@ -478,4 +478,5 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
