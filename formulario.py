@@ -54,8 +54,17 @@ for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "
 if "data_pedido" not in st.session_state:
     st.session_state.data_pedido = date.today()
 
+# --- MAPA DE E-MAILS DOS ADMINISTRATIVOS ---
+ADM_EMAILS = {
+    "Maria Eduarda": "maria.eduarda@osborne.com.br",
+    "Joice": "joice.oliveira@osborne.com.br",
+    "Micaele": "micaele.ferreira@osborne.com.br",
+    "Graziele": "graziele.horacio@osborne.com.br",
+    "Roberto": "roberto.santos@osborne.com.br"
+}
+
 # --- FUNÇÕES AUXILIARES ---
-def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos):
+def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails):
     """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
     smtp_server = "smtp.office365.com"
     smtp_port = 587
@@ -64,7 +73,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, df_insumos)
 
     # --- Endereços de cópia ---
     cc_addr = ["vanderlei.souza@osborne.com.br"]  # cópia fixa
-    adm_email = ADM_EMAILS.get(st.session_state.get("adm_obra"))
+    adm_email = adm_emails.get(st.session_state.get("adm_obra"))
     if adm_email and adm_email not in cc_addr:
         cc_addr.append(adm_email)
 
@@ -105,7 +114,8 @@ Favor validar antes de criarmos a requisição.
         arquivo_bytes,
         _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    anexo.add_header('Content-Disposition', 'attachment', filename="Pedido.xlsx")
+    nome_arquivo = st.session_state.nome_arquivo or "Pedido.xlsx"
+    anexo.add_header('Content-Disposition', 'attachment', filename=nome_arquivo)
     msg.attach(anexo)
 
     # --- Envio ---
@@ -135,6 +145,7 @@ def carregar_dados():
 
     insumos_vazios = pd.DataFrame({"Código": [""], "Descrição": [""], "Unidade": [""]})
     df_insumos = pd.concat([insumos_vazios, df_insumos], ignore_index=True)
+    df_insumos["Código"] = df_insumos["Código"].fillna("").astype(str)
     return df_empreend, df_insumos
 
 # --- CARREGAMENTO DE DADOS ---
@@ -195,16 +206,6 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         )
         executivo = st.text_input("Executivo", key="executivo")
         
-        # --- Novo campo: Administrativo da Obra ---
-        ADM_EMAILS = {
-            "Maria Eduarda": "maria.eduarda@osborne.com.br",
-            "Joice": "joice.oliveira@osborne.com.br",
-            "Micaele": "micaele.ferreira@osborne.com.br",
-            "Graziele": "graziele.horacio@osborne.com.br",
-            "Fabio": "fabio.maia@osborne.com.br",
-            "Roberto": "roberto.santos@osborne.com.br"
-        }
-        
         opcoes_adm = [""] + list(ADM_EMAILS.keys())  # primeira opção em branco
         adm_obra = st.selectbox(
             "Administrativo da Obra",
@@ -214,14 +215,16 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         )
 
     if obra_selecionada:
-        dados_obra = df_empreend[df_empreend["EMPREENDIMENTO"] == obra_selecionada].iloc[0]
-        st.session_state.cnpj = dados_obra["CNPJ"]
-        st.session_state.endereco = dados_obra["ENDERECO"]
-        st.session_state.cep = dados_obra["CEP"]
+        filtro = df_empreend["EMPREENDIMENTO"] == obra_selecionada
+        if filtro.any():
+            dados_obra = df_empreend.loc[filtro].iloc[0]
+            st.session_state.cnpj = dados_obra["CNPJ"]
+            st.session_state.endereco = dados_obra["ENDERECO"]
+            st.session_state.cep = dados_obra["CEP"]
 
-    st.text_input("CNPJ/CPF", value=st.session_state.get("cnpj", ""), disabled=True)
-    st.text_input("Endereço", value=st.session_state.get("endereco", ""), disabled=True)
-    st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
+    st.text_input("CNPJ/CPF", key="cnpj", disabled=True)
+    st.text_input("Endereço", key="endereco", disabled=True)
+    st.text_input("CEP", key="cep", disabled=True)
 
 st.divider()
 
@@ -240,7 +243,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     )
 
     dados_insumo = df_insumos_lista[df_insumos_lista["opcao_exibicao"] == descricao_exibicao].iloc[0]
-    usando_base = bool(dados_insumo["Código"]) and str(dados_insumo["Código"]).strip() != ""
+    codigo_sel = str(dados_insumo["Código"]).strip()
+    usando_base = codigo_sel != ""
 
     if usando_base:
         st.session_state.codigo = dados_insumo["Código"]
@@ -278,16 +282,14 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.session_state.insumos.append(novo_insumo)
     
             # 🔹 Limpa todos os campos de insumo após adicionar
-            for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
-                if campo in st.session_state:
-                    st.session_state.pop(campo, None)
-            
-            # 🔹 Força o campo complemento a resetar antes do rerun
-            st.session_state["complemento"] = ""
-            
-            # 🔹 Recarrega estado padrão da seleção e quantidade
-            st.session_state.quantidade = 1
-            st.session_state.descricao_exibicao = df_insumos_lista["opcao_exibicao"].iloc[0]
+            st.session_state.update({
+                "descricao_exibicao": df_insumos_lista["opcao_exibicao"].iloc[0],
+                "descricao_livre": "",
+                "codigo": "",
+                "unidade": "",
+                "quantidade": 1,
+                "complemento": "",
+            })
             
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
@@ -381,6 +383,9 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.session_state.obra_selecionada, st.session_state.cnpj,
         st.session_state.endereco, st.session_state.cep, st.session_state.adm_obra
     ]
+    if not st.session_state.adm_obra or st.session_state.adm_obra.strip() == "":
+        st.warning("⚠️ Selecione o Administrativo da obra antes de enviar o pedido.")
+        st.stop()
     if not all(campos_obrigatorios):
         st.warning("⚠️ Preencha todos os campos obrigatórios antes de enviar o pedido.")
         st.stop()
@@ -427,7 +432,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
                 st.session_state.excel_bytes,
                 st.session_state.insumos,
-                df_insumos
+                ADM_EMAILS
             )
             ok = True
         except Exception as e:
@@ -473,3 +478,4 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
