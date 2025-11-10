@@ -32,6 +32,10 @@ if "excel_bytes" not in st.session_state:
     st.session_state.excel_bytes = None
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
+if "quantidade" not in st.session_state:
+    st.session_state.quantidade = 1
+if "descricao_exibicao" not in st.session_state:
+    st.session_state.descricao_exibicao = ""
 
 # --- RERUN APÓS DOWNLOAD ---
 if st.session_state.get("rerun_depois_download", False):
@@ -236,6 +240,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         axis=1
     )
 
+    # --- Limpeza pós-adicionar ---
+    if st.session_state.get("limpar_campos_insumo", False):
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
+            st.session_state.pop(campo, None)
+        st.session_state.limpar_campos_insumo = False
+    
     descricao_exibicao = st.selectbox(
         "Descrição do insumo (Digite em MAIÚSCULO)",
         df_insumos_lista["opcao_exibicao"],
@@ -281,19 +291,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             }
             st.session_state.insumos.append(novo_insumo)
     
-            # 🔹 Limpa todos os campos de insumo após adicionar
-            st.session_state.update({
-                "descricao_exibicao": df_insumos_lista["opcao_exibicao"].iloc[0],
-                "descricao_livre": "",
-                "codigo": "",
-                "unidade": "",
-                "quantidade": 1,
-                "complemento": "",
-            })
-            
+            # 🔹 Marca para limpar na próxima renderização
+            st.session_state.limpar_campos_insumo = True
+    
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
-    
+        
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
 
@@ -478,5 +481,6 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
