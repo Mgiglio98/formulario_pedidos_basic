@@ -234,17 +234,24 @@ st.divider()
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
+
+    if st.session_state.get("limpar_campos_insumo", False):
+        # 🔹 Remove todos os valores dos campos
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
+            if campo in st.session_state:
+                del st.session_state[campo]
+        st.session_state.limpar_campos_insumo = False
+
+        # 🔹 Garante valor padrão inicial
+        st.session_state.quantidade = 1
+        st.session_state.descricao_exibicao = ""
+        st.rerun()  # 🔁 força recarregar já limpo
+    
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if pd.notna(x["Código"]) and str(x["Código"]).strip() != "" else x["Descrição"],
         axis=1
     )
-
-    # --- Limpeza pós-adicionar ---
-    if st.session_state.get("limpar_campos_insumo", False):
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
-            st.session_state.pop(campo, None)
-        st.session_state.limpar_campos_insumo = False
     
     descricao_exibicao = st.selectbox(
         "Descrição do insumo (Digite em MAIÚSCULO)",
@@ -481,6 +488,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
