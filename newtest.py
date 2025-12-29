@@ -95,40 +95,74 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails,
         if not item.get("codigo") or str(item["codigo"]).strip() == ""
     ]
 
-    # --- Corpo principal base ---
+    # --- Dados básicos do formulário para resumo ---
+    tipo_proc = st.session_state.get("tipo_processo", "Pedido de Materiais")
+    pedido_num = st.session_state.get("pedido_numero", "")
+    obra = st.session_state.get("obra_selecionada", "")
+    solicitante = st.session_state.get("solicitante", "")
+    executivo = st.session_state.get("executivo", "")
+    data_pedido = st.session_state.get("data_pedido", date.today())
+
+    try:
+        data_fmt = data_pedido.strftime("%d/%m/%Y")
+    except Exception:
+        data_fmt = str(data_pedido)
+
+    sem_codigo_texto = ""
     if sem_codigo:
-        corpo_email = f"""
-Olá! Novo formulário recebido ✅
+        sem_codigo_texto = "\n\nInsumos sem código cadastrado:\n" + "\n".join(f"- {linha}" for linha in sem_codigo)
 
-Favor validar antes de criarmos a requisição/OF.
+    # --- Corpo do e-mail por tipo de processo ---
+    if tipo_proc == "Pedido de Materiais":
+        corpo_email = f"""Olá! Novo PEDIDO DE MATERIAIS recebido ✅
 
-Os seguintes insumos estão no pedido sem o código cadastrado:
-{chr(10).join(sem_codigo)}
-        """
-    else:
-        corpo_email = """
-Olá! Novo formulário recebido ✅
+Resumo do pedido:
+- Nº Pedido: {pedido_num}
+- Obra: {obra}
+- Solicitante: {solicitante}
+- Executivo: {executivo}
+- Data: {data_fmt}
 
-Favor validar antes de criarmos a requisição/OF.
-        """
+Esse pedido deve ser conferido e, se estiver de acordo, seguirá para Requisição e OF.{sem_codigo_texto}
+"""
 
-    # --- Detalhes adicionais por tipo de processo ---
-    tipo_proc = st.session_state.get("tipo_processo", "")
-    detalhes_extra = ""
+    elif tipo_proc == "Requisição para Cotação":
+        corpo_email = f"""Olá! Nova COTAÇÃO recebida ✅
 
-    if tipo_proc:
-        detalhes_extra += f"\n\nTipo de processo selecionado: {tipo_proc}"
+Resumo da solicitação:
+- Referência: {pedido_num}
+- Obra: {obra}
+- Solicitante: {solicitante}
+- Executivo: {executivo}
+- Data: {data_fmt}
 
-    if tipo_proc == TIPO_ED or tipo_proc == "Criação de ED":
+As propostas/orçamentos enviados pela obra estão anexos a este e-mail.
+Utilizar este pedido como base para análise das cotações e definição do fornecedor.{sem_codigo_texto}
+"""
+
+    elif tipo_proc == "Criação de ED":
         num_of_mae = st.session_state.get("num_of_mae", "")
         fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "")
-        detalhes_extra += "\n\nDados da ED / OF filha:"
-        if num_of_mae:
-            detalhes_extra += f"\n- Nº OF Mãe: {num_of_mae}"
-        if fornecedor_of_filha:
-            detalhes_extra += f"\n- Fornecedor da OF filha: {fornecedor_of_filha}"
 
-    corpo_email = (corpo_email.strip() + detalhes_extra).strip()
+        corpo_email = f"""Olá! Nova SOLICITAÇÃO DE ED recebida ✅
+
+Resumo da solicitação:
+- Referência: {pedido_num}
+- Obra: {obra}
+- Solicitante: {solicitante}
+- Executivo: {executivo}
+- Data: {data_fmt}
+- Nº OF Mãe: {num_of_mae}
+- Fornecedor da OF filha: {fornecedor_of_filha}
+
+Favor analisar e, se estiver de acordo, proceder com a criação da Requisição da ED e OF filha no sistema, vinculando à OF Mãe informada.{sem_codigo_texto}
+"""
+    else:
+        # fallback (não deveria acontecer, mas deixa robusto)
+        corpo_email = f"""Olá! Novo formulário recebido ✅
+
+Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
+"""
 
     # --- Montagem do e-mail ---
     msg = MIMEMultipart()
@@ -171,6 +205,7 @@ Favor validar antes de criarmos a requisição/OF.
             print("📨 E-mail enviado com sucesso!")
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
+
 
 def carregar_dados():
     """Carrega dados de empreendimentos e insumos."""
