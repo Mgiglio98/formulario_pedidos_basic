@@ -214,10 +214,10 @@ with col2:
 
 st.markdown("""
 <div style='text-align: center;'>
-    <h2 style='color: #000000;'>Pedido de Materiais</h2>
+    <h2 style='color: #000000;'>Suprimentos - Osborne</h2>
     <p style='font-size: 14px; color: #555;'>
         Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
-        Ao finalizar, o pedido será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
+        Ao finalizar, a solicitação será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
         Você poderá baixar a planilha gerada após o envio, para registro ou controle.
     </p>
 </div>
@@ -226,9 +226,9 @@ st.markdown("""
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
 st.markdown("### Tipo de processo")
 
-TIPO_PEDIDO = "Pedido → Requisição → Compra"
+TIPO_PEDIDO = "Pedido de Materiais"
 TIPO_COTACAO = "Requisição para Cotação"
-TIPO_ED = "Requisição para criação de ED / OF filha"
+TIPO_ED = "Criação de ED"
 
 opcoes_tipo = [TIPO_PEDIDO, TIPO_COTACAO, TIPO_ED]
 
@@ -508,6 +508,27 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
         st.warning("⚠️ Adicione pelo menos um insumo antes de enviar o pedido.")
         st.stop()
 
+    if tipo_proc == TIPO_COTACAO:
+        if not anexos_processo:
+            st.warning("⚠️ Para 'Requisição para Cotação', anexe pelo menos uma proposta/orçamento.")
+            st.stop()
+
+    if tipo_proc == TIPO_ED:
+        num_of_mae = st.session_state.get("num_of_mae", "").strip()
+        fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "").strip()
+
+        if not num_of_mae:
+            st.warning("⚠️ Informe o Nº da OF Mãe para criar a ED / OF filha.")
+            st.stop()
+
+        if not fornecedor_of_filha:
+            st.warning("⚠️ Informe o Fornecedor da OF filha.")
+            st.stop()
+
+        if not anexos_processo:
+            st.warning("⚠️ Anexe pelo menos um documento para a ED / OF filha.")
+            st.stop()
+    
     erro = None
     ok = False
     with st.spinner("Enviando pedido e gerando arquivo... Aguarde!"):
