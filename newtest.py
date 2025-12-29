@@ -225,16 +225,30 @@ st.markdown("""
 
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
 st.markdown("### Tipo de processo")
-st.session_state.tipo_processo = st.radio(
+
+opcoes_tipo = [
+    "Pedido de Materiais",      # Pedido → Requisição → Compra
+    "Cotação",                  # Requisição para Cotação
+    "Criação de ED"             # Requisição para criação de ED / OF filha
+]
+
+# pega o que estiver salvo na sessão ou assume a primeira opção
+valor_atual = st.session_state.get("tipo_processo", opcoes_tipo[0])
+
+# se por algum motivo o valor salvo não estiver nas opções, volta pro padrão
+if valor_atual not in opcoes_tipo:
+    valor_atual = opcoes_tipo[0]
+
+tipo_processo = st.radio(
     "Selecione o tipo de processo para este formulário:",
-    options=[
-        "Pedido → Requisição → Compra",
-        "Requisição para Cotação",
-        "Requisição para criação de ED / OF filha"
-    ],
-    key="tipo_processo",
+    options=opcoes_tipo,
+    index=opcoes_tipo.index(valor_atual),
     horizontal=True
 )
+
+# agora sim, depois do widget, atualiza a sessão
+st.session_state["tipo_processo"] = tipo_processo
+
 st.divider()
 
 # --- DADOS DO PEDIDO ---
