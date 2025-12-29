@@ -37,7 +37,7 @@ if "quantidade" not in st.session_state:
 if "descricao_exibicao" not in st.session_state:
     st.session_state.descricao_exibicao = ""
 if "tipo_processo" not in st.session_state:
-    st.session_state.tipo_processo = "Pedido → Requisição → Compra"
+    st.session_state.tipo_processo = "Pedido de Materiais"
 if "num_of_mae" not in st.session_state:
     st.session_state.num_of_mae = ""
 if "fornecedor_of_filha" not in st.session_state:
@@ -206,6 +206,71 @@ Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
+def carregar_pedido_existente(arquivo):
+    """Lê um Excel de pedido gerado pelo formulário e recarrega os campos no session_state."""
+    try:
+        wb = load_workbook(arquivo)
+        ws = wb["Pedido"]
+    except Exception as e:
+        st.error(f"Não foi possível ler o arquivo de pedido: {e}")
+        return
+
+    # --- Cabeçalho (mesmos campos que você grava ao gerar) ---
+    st.session_state.pedido_numero = str(ws["F2"].value or "").strip()
+
+    data_raw = ws["C3"].value
+    data_pedido = pd.to_datetime(data_raw, errors="coerce")
+    if pd.isna(data_pedido):
+        data_pedido = date.today()
+    else:
+        data_pedido = data_pedido.date()
+    st.session_state.data_pedido = data_pedido
+
+    st.session_state.solicitante      = str(ws["C4"].value or "").strip()
+    st.session_state.executivo        = str(ws["C5"].value or "").strip()
+    st.session_state.obra_selecionada = str(ws["C7"].value or "").strip()
+    st.session_state.cnpj             = str(ws["C8"].value or "").strip()
+    st.session_state.endereco         = str(ws["C9"].value or "").strip()
+    st.session_state.cep              = str(ws["C10"].value or "").strip()
+
+    # Campos que não vêm do Excel
+    st.session_state.adm_obra = ""
+    st.session_state.num_of_mae = ""
+    st.session_state.fornecedor_of_filha = ""
+
+    # --- Itens do pedido (a partir da linha 13) ---
+    st.session_state.insumos = []
+    linha = 13
+    while True:
+        cod   = ws[f"B{linha}"].value
+        desc  = ws[f"C{linha}"].value
+        unid  = ws[f"D{linha}"].value
+        qtd   = ws[f"E{linha}"].value
+        compl = ws[f"F{linha}"].value
+
+        # linha totalmente vazia -> fim
+        if not any([cod, desc, unid, qtd, compl]):
+            break
+
+        if desc and qtd:
+            try:
+                qtd_int = int(qtd)
+            except Exception:
+                try:
+                    qtd_int = int(float(qtd))
+                except Exception:
+                    qtd_int = qtd
+
+            novo_insumo = {
+                "descricao": str(desc).strip(),
+                "codigo": "" if cod is None else str(cod).strip(),
+                "unidade": "" if unid is None else str(unid).strip(),
+                "quantidade": qtd_int,
+                "complemento": "" if compl is None else str(compl).strip(),
+            }
+            st.session_state.insumos.append(novo_insumo)
+
+        linha += 1
 
 def carregar_dados():
     """Carrega dados de empreendimentos e insumos."""
@@ -259,13 +324,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
+# --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED / CORRIGIR) ---
 st.markdown("### Tipo de processo")
 
-TIPO_PEDIDO = "Pedido de Materiais"
-TIPO_COTACAO = "Requisição para Cotação"
-TIPO_ED = "Criação de ED"
+TIPO_PEDIDO   = "Pedido de Materiais"
+TIPO_COTACAO  = "Requisição para Cotação"
+TIPO_ED       = "Criação de ED"
+TIPO_CORRIGIR = "Corrigir Pedido"
 
-opcoes_tipo = [TIPO_PEDIDO, TIPO_COTACAO, TIPO_ED]
+opcoes_tipo = [TIPO_PEDIDO, TIPO_COTACAO, TIPO_ED, TIPO_CORRIGIR]
 
 # valor atual na sessão (se não tiver, usa Pedido como padrão)
 valor_atual = st.session_state.get("tipo_processo", TIPO_PEDIDO)
@@ -283,6 +350,27 @@ tipo_processo = st.radio(
 st.session_state["tipo_processo"] = tipo_processo
 
 st.divider()
+
+# --- CORRIGIR PEDIDO (upload vem antes de Dados do Pedido) ---
+if st.session_state.tipo_processo == TIPO_CORRIGIR:
+    st.markdown("#### Corrigir pedido existente")
+    st.write("Envie abaixo o arquivo Excel de um pedido gerado anteriormente pelo formulário para carregar os dados novamente.")
+
+    arquivo_corrigir = st.file_uploader(
+        "Arquivo do pedido (Excel gerado pelo formulário)",
+        type=["xlsx"],
+        key="arquivo_corrigir"
+    )
+
+    if arquivo_corrigir is not None:
+        if st.button("Carregar pedido para edição"):
+            carregar_pedido_existente(arquivo_corrigir)
+            # depois de carregar, voltamos o tipo para Pedido de Materiais
+            st.session_state["tipo_processo"] = TIPO_PEDIDO
+            st.success("✅ Pedido carregado! Revise os dados, ajuste o que for necessário e clique em 'Enviar Pedido'.")
+            st.rerun()
+
+    st.markdown("---")
 
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
