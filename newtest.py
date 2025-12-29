@@ -226,18 +226,16 @@ st.markdown("""
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
 st.markdown("### Tipo de processo")
 
-opcoes_tipo = [
-    "Pedido de Materiais",      # Pedido → Requisição → Compra
-    "Cotação",                  # Requisição para Cotação
-    "Criação de ED"             # Requisição para criação de ED / OF filha
-]
+TIPO_PEDIDO = "Pedido → Requisição → Compra"
+TIPO_COTACAO = "Requisição para Cotação"
+TIPO_ED = "Requisição para criação de ED / OF filha"
 
-# pega o que estiver salvo na sessão ou assume a primeira opção
-valor_atual = st.session_state.get("tipo_processo", opcoes_tipo[0])
+opcoes_tipo = [TIPO_PEDIDO, TIPO_COTACAO, TIPO_ED]
 
-# se por algum motivo o valor salvo não estiver nas opções, volta pro padrão
+# valor atual na sessão (se não tiver, usa Pedido como padrão)
+valor_atual = st.session_state.get("tipo_processo", TIPO_PEDIDO)
 if valor_atual not in opcoes_tipo:
-    valor_atual = opcoes_tipo[0]
+    valor_atual = TIPO_PEDIDO
 
 tipo_processo = st.radio(
     "Selecione o tipo de processo para este formulário:",
@@ -246,7 +244,7 @@ tipo_processo = st.radio(
     horizontal=True
 )
 
-# agora sim, depois do widget, atualiza a sessão
+# atualiza sessão DEPOIS do rádio
 st.session_state["tipo_processo"] = tipo_processo
 
 st.divider()
@@ -301,9 +299,16 @@ with st.expander("📋 Dados do Pedido", expanded=True):
 st.divider()
 
 # --- CAMPOS ESPECÍFICOS POR TIPO DE PROCESSO ---
-anexos_processo = []  # garante que exista sempre
+anexos_processo = []  # default, para usar mais à frente
 
-if st.session_state.tipo_processo == "Requisição para Cotação":
+# garante que os campos extras existam na sessão
+if "num_of_mae" not in st.session_state:
+    st.session_state.num_of_mae = ""
+if "fornecedor_of_filha" not in st.session_state:
+    st.session_state.fornecedor_of_filha = ""
+
+if st.session_state.tipo_processo == TIPO_COTACAO:
+    # --------- COTAÇÃO ---------
     with st.expander("📎 Propostas / Orçamentos (Cotação)", expanded=True):
         st.write("Anexe aqui as propostas recebidas para esta cotação.")
         anexos_processo = st.file_uploader(
@@ -315,10 +320,15 @@ if st.session_state.tipo_processo == "Requisição para Cotação":
         if anexos_processo:
             st.info(f"{len(anexos_processo)} arquivo(s) será(ão) enviado(s) junto com a requisição de cotação.")
 
-elif st.session_state.tipo_processo == "Requisição para criação de ED / OF filha":
+elif st.session_state.tipo_processo == TIPO_ED:
+    # --------- ED / OF FILHA ---------
     with st.expander("📄 Dados da ED / OF filha", expanded=True):
-        st.session_state.num_of_mae = st.text_input("Nº OF Mãe", key="num_of_mae")
-        st.session_state.fornecedor_of_filha = st.text_input("Fornecedor da OF filha", key="fornecedor_of_filha")
+        st.session_state.num_of_mae = st.text_input("Nº OF Mãe", value=st.session_state.num_of_mae, key="num_of_mae")
+        st.session_state.fornecedor_of_filha = st.text_input(
+            "Fornecedor da OF filha",
+            value=st.session_state.fornecedor_of_filha,
+            key="fornecedor_of_filha"
+        )
 
     with st.expander("📎 Documentos da ED / OF filha", expanded=False):
         anexos_processo = st.file_uploader(
