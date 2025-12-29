@@ -83,7 +83,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails,
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
     # --- Endereços de cópia ---
-    cc_addr = ["vanderlei.souza@osborne.com.br"]  # cópia fixa
+    cc_addr = ["joice.oliveira@osborne.com.br"]  # cópia fixa
     adm_email = adm_emails.get(st.session_state.get("adm_obra"))
     if adm_email and adm_email not in cc_addr:
         cc_addr.append(adm_email)
