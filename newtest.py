@@ -621,6 +621,7 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
 if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
     col1, col2 = st.columns(2)
 
+    # Botão de download do Excel
     with col1:
         if st.download_button(
             "📥 Baixar Excel",
@@ -631,29 +632,28 @@ if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
             # 🔹 Marca flags para limpar no próximo ciclo
             st.session_state.rerun_depois_download = True
 
+    # Botão de novo pedido
     with col2:
         if st.button("🔄 Novo Pedido", use_container_width=True):
             for campo in [
                 "pedido_numero", "solicitante", "executivo", "obra_selecionada",
                 "cnpj", "endereco", "cep", "data_pedido",
                 "excel_bytes", "nome_arquivo", "pedido_enviado",
-                "adm_obra",              # 👈 mantém aqui
+                "adm_obra",              # 👈 limpa o ADM
                 "num_of_mae",
                 "fornecedor_of_filha",
-                "tipo_processo",         # (opcional: volta pro padrão)
+                "tipo_processo",
                 "anexos_cotacao",
                 "anexos_ed",
             ]:
                 if campo in st.session_state:
                     del st.session_state[campo]
-    
-            # 👇 garante que o select do ADM volte pro branco
-            st.session_state["adm_obra"] = ""
-    
-            # se quiser também garantir o tipo padrão:
-            st.session_state["tipo_processo"] = TIPO_PEDIDO
-    
+
+            # garante defaults para próximo carregamento
             st.session_state.insumos = []
+            st.session_state["adm_obra"] = ""        # 👈 volta select p/ branco
+            st.session_state["tipo_processo"] = TIPO_PEDIDO
+
             st.rerun()
 
 # --- 🔄 KEEP-ALIVE (mantém app ativo no Streamlit Cloud) ---
