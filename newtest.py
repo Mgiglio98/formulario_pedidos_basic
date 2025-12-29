@@ -636,7 +636,7 @@ if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
             for campo in [
                 "pedido_numero", "solicitante", "executivo", "obra_selecionada",
                 "cnpj", "endereco", "cep", "data_pedido",
-                "excel_bytes", "nome_arquivo", "pedido_enviado"
+                "excel_bytes", "nome_arquivo", "pedido_enviado", "adm_obra"
             ]:
                 if campo in st.session_state:
                     del st.session_state[campo]
