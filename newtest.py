@@ -317,7 +317,7 @@ st.markdown("""
     <p style='font-size: 14px; color: #555;'>
         Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
         Ao finalizar, a solicitação será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
-        Você poderá baixar a planilha gerada após o envio, para registro ou controle.
+        Você poderá baixar a planilha gerada após o envio para controle.
     <h2 style='color: #000000;'>Suprimentos - Osborne</h2>
     </p>
 </div>
