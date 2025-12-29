@@ -36,6 +36,13 @@ if "quantidade" not in st.session_state:
     st.session_state.quantidade = 1
 if "descricao_exibicao" not in st.session_state:
     st.session_state.descricao_exibicao = ""
+if "tipo_processo" not in st.session_state:
+    st.session_state.tipo_processo = "Pedido → Requisição → Compra"
+if "num_of_mae" not in st.session_state:
+    st.session_state.num_of_mae = ""
+if "fornecedor_of_filha" not in st.session_state:
+    st.session_state.fornecedor_of_filha = ""
+
 
 # --- RERUN APÓS DOWNLOAD ---
 if st.session_state.get("rerun_depois_download", False):
@@ -68,7 +75,7 @@ ADM_EMAILS = {
 }
 
 # --- FUNÇÕES AUXILIARES ---
-def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails):
+def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails, anexos=None):
     """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
     smtp_server = "smtp.office365.com"
     smtp_port = 587
@@ -88,22 +95,40 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails)
         if not item.get("codigo") or str(item["codigo"]).strip() == ""
     ]
 
-    # --- Corpo principal do e-mail ---
+    # --- Corpo principal base ---
     if sem_codigo:
         corpo_email = f"""
-Olá! Novo pedido recebido ✅
+Olá! Novo formulário recebido ✅
 
-Favor validar antes de criarmos a requisição.
+Favor validar antes de criarmos a requisição/OF.
 
 Os seguintes insumos estão no pedido sem o código cadastrado:
 {chr(10).join(sem_codigo)}
         """
     else:
         corpo_email = """
-Olá! Novo pedido recebido ✅
+Olá! Novo formulário recebido ✅
 
-Favor validar antes de criarmos a requisição.
+Favor validar antes de criarmos a requisição/OF.
         """
+
+    # --- Detalhes adicionais por tipo de processo ---
+    tipo_proc = st.session_state.get("tipo_processo", "")
+    detalhes_extra = ""
+
+    if tipo_proc:
+        detalhes_extra += f"\n\nTipo de processo selecionado: {tipo_proc}"
+
+    if tipo_proc == "Requisição para criação de ED / OF filha":
+        num_of_mae = st.session_state.get("num_of_mae", "")
+        fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "")
+        detalhes_extra += "\n\nDados da ED / OF filha:"
+        if num_of_mae:
+            detalhes_extra += f"\n- Nº OF Mãe: {num_of_mae}"
+        if fornecedor_of_filha:
+            detalhes_extra += f"\n- Fornecedor da OF filha: {fornecedor_of_filha}"
+
+    corpo_email = (corpo_email.strip() + detalhes_extra).strip()
 
     # --- Montagem do e-mail ---
     msg = MIMEMultipart()
@@ -111,9 +136,9 @@ Favor validar antes de criarmos a requisição.
     msg["To"] = smtp_user
     msg["Cc"] = ", ".join(cc_addr)
     msg["Subject"] = assunto
-    msg.attach(MIMEText(corpo_email.strip(), "plain"))
+    msg.attach(MIMEText(corpo_email, "plain"))
 
-    # --- Anexo ---
+    # --- Anexo principal (planilha do formulário) ---
     anexo = MIMEApplication(
         arquivo_bytes,
         _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -122,13 +147,28 @@ Favor validar antes de criarmos a requisição.
     anexo.add_header('Content-Disposition', 'attachment', filename=nome_arquivo)
     msg.attach(anexo)
 
+    # --- Anexos extras (cotação / ED) ---
+    if anexos:
+        for arquivo in anexos:
+            try:
+                conteudo = arquivo.getvalue()
+                anexo_extra = MIMEApplication(conteudo)
+                anexo_extra.add_header(
+                    'Content-Disposition',
+                    'attachment',
+                    filename=arquivo.name
+                )
+                msg.attach(anexo_extra)
+            except Exception as e:
+                print(f"Erro ao anexar arquivo extra {getattr(arquivo, 'name', 'sem_nome')}: {e}")
+
     # --- Envio ---
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
-            print("📨 E-mail de pedido enviado com sucesso!")
+            print("📨 E-mail enviado com sucesso!")
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
@@ -183,6 +223,20 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
+st.markdown("### Tipo de processo")
+st.session_state.tipo_processo = st.radio(
+    "Selecione o tipo de processo para este formulário:",
+    options=[
+        "Pedido de Materiais",
+        "Cotação",
+        "Criação de ED"
+    ],
+    key="tipo_processo",
+    horizontal=True
+)
+st.divider()
+
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
     if st.session_state.resetar_pedido:
@@ -231,6 +285,36 @@ with st.expander("📋 Dados do Pedido", expanded=True):
     st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
 
 st.divider()
+
+# --- CAMPOS ESPECÍFICOS POR TIPO DE PROCESSO ---
+anexos_processo = []  # garante que exista sempre
+
+if st.session_state.tipo_processo == "Requisição para Cotação":
+    with st.expander("📎 Propostas / Orçamentos (Cotação)", expanded=True):
+        st.write("Anexe aqui as propostas recebidas para esta cotação.")
+        anexos_processo = st.file_uploader(
+            "Selecionar arquivos de proposta",
+            type=["pdf", "xlsx", "xls", "csv", "png", "jpg", "jpeg"],
+            accept_multiple_files=True,
+            key="anexos_cotacao"
+        )
+        if anexos_processo:
+            st.info(f"{len(anexos_processo)} arquivo(s) será(ão) enviado(s) junto com a requisição de cotação.")
+
+elif st.session_state.tipo_processo == "Requisição para criação de ED / OF filha":
+    with st.expander("📄 Dados da ED / OF filha", expanded=True):
+        st.session_state.num_of_mae = st.text_input("Nº OF Mãe", key="num_of_mae")
+        st.session_state.fornecedor_of_filha = st.text_input("Fornecedor da OF filha", key="fornecedor_of_filha")
+
+    with st.expander("📎 Documentos da ED / OF filha", expanded=False):
+        anexos_processo = st.file_uploader(
+            "Anexar documentos (planilhas, PDFs, prints, etc.)",
+            type=["pdf", "xlsx", "xls", "csv", "png", "jpg", "jpeg"],
+            accept_multiple_files=True,
+            key="anexos_ed"
+        )
+        if anexos_processo:
+            st.info(f"{len(anexos_processo)} arquivo(s) será(ão) enviado(s) junto com a requisição de ED.")
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
@@ -443,7 +527,8 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
                 st.session_state.excel_bytes,
                 st.session_state.insumos,
-                ADM_EMAILS
+                ADM_EMAILS,
+                anexos=anexos_processo
             )
             ok = True
         except Exception as e:
