@@ -296,8 +296,6 @@ with st.expander("📋 Dados do Pedido", expanded=True):
     st.text_input("Endereço", key="endereco", disabled=True)
     st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
 
-st.divider()
-
 # --- CAMPOS ESPECÍFICOS POR TIPO DE PROCESSO ---
 anexos_processo = []  # default, para usar mais à frente
 
