@@ -314,18 +314,18 @@ with col2:
 
 st.markdown("""
 <div style='text-align: center;'>
-    <h2 style='color: #000000;'>Suprimentos - Osborne</h2>
     <p style='font-size: 14px; color: #555;'>
         Preencha os campos com atenção. Verifique se todos os dados estão corretos antes de enviar.<br>
         Ao finalizar, a solicitação será automaticamente enviado para o e-mail do setor de Suprimentos.<br>
         Você poderá baixar a planilha gerada após o envio, para registro ou controle.
+    <h2 style='color: #000000;'>Suprimentos - Osborne</h2>
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED) ---
 # --- TIPO DE PROCESSO (PEDIDO / COTAÇÃO / ED / CORRIGIR) ---
-st.markdown("### Tipo de processo")
+#st.markdown("### Tipo de processo")
 
 TIPO_PEDIDO   = "Pedido de Materiais"
 TIPO_COTACAO  = "Requisição para Cotação"
@@ -340,13 +340,12 @@ if valor_atual not in opcoes_tipo:
     valor_atual = TIPO_PEDIDO
 
 tipo_processo = st.radio(
-    "Selecione o tipo de processo para este formulário:",
+    "Selecione o processo para este formulário:",
     options=opcoes_tipo,
     index=opcoes_tipo.index(valor_atual),
     horizontal=True
 )
 
-# atualiza sessão DEPOIS do rádio
 st.session_state["tipo_processo"] = tipo_processo
 
 st.divider()
