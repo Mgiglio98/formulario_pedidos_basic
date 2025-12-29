@@ -323,12 +323,8 @@ if st.session_state.tipo_processo == TIPO_COTACAO:
 elif st.session_state.tipo_processo == TIPO_ED:
     # --------- ED / OF FILHA ---------
     with st.expander("📄 Dados da ED / OF filha", expanded=True):
-        st.session_state.num_of_mae = st.text_input("Nº OF Mãe", value=st.session_state.num_of_mae, key="num_of_mae")
-        st.session_state.fornecedor_of_filha = st.text_input(
-            "Fornecedor da OF filha",
-            value=st.session_state.fornecedor_of_filha,
-            key="fornecedor_of_filha"
-        )
+        st.text_input("Nº OF Mãe", key="num_of_mae")
+        st.text_input("Fornecedor da OF filha", key="fornecedor_of_filha")
 
     with st.expander("📎 Documentos da ED / OF filha", expanded=False):
         anexos_processo = st.file_uploader(
