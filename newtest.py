@@ -228,9 +228,9 @@ st.markdown("### Tipo de processo")
 st.session_state.tipo_processo = st.radio(
     "Selecione o tipo de processo para este formulário:",
     options=[
-        "Pedido de Materiais",
-        "Cotação",
-        "Criação de ED"
+        "Pedido → Requisição → Compra",
+        "Requisição para Cotação",
+        "Requisição para criação de ED / OF filha"
     ],
     key="tipo_processo",
     horizontal=True
