@@ -119,7 +119,7 @@ Favor validar antes de criarmos a requisição/OF.
     if tipo_proc:
         detalhes_extra += f"\n\nTipo de processo selecionado: {tipo_proc}"
 
-    if tipo_proc == "Requisição para criação de ED / OF filha":
+    if tipo_proc == TIPO_ED or tipo_proc == "Criação de ED":
         num_of_mae = st.session_state.get("num_of_mae", "")
         fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "")
         detalhes_extra += "\n\nDados da ED / OF filha:"
@@ -490,6 +490,9 @@ if st.session_state.insumos:
 
 # --- FINALIZAÇÃO DO PEDIDO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
+
+    tipo_proc = st.session_state.get("tipo_processo", TIPO_PEDIDO)
+    
     campos_obrigatorios = [
         st.session_state.pedido_numero, st.session_state.data_pedido,
         st.session_state.solicitante, st.session_state.executivo,
