@@ -33,7 +33,7 @@ if "excel_bytes" not in st.session_state:
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = ""
 if "quantidade" not in st.session_state:
-    st.session_state.quantidade = 1
+    st.session_state.quantidade = 1.0
 if "descricao_exibicao" not in st.session_state:
     st.session_state.descricao_exibicao = ""
 
@@ -396,7 +396,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 del st.session_state[campo]
 
         # 🔹 Garante valor padrão inicial
-        st.session_state.quantidade = 1
+        st.session_state.quantidade = 1.0
         st.session_state.descricao_exibicao = ""
         st.session_state.complemento = ""
         st.session_state.limpar_campos_insumo = False
@@ -434,7 +434,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
     st.text_input("Código do insumo", key="codigo", disabled=True)
     st.text_input("Unidade", key="unidade", disabled=usando_base)
-    quantidade = st.number_input("Quantidade", min_value=1, step=1, format="%.2f", key="quantidade")
+    quantidade = st.number_input("Quantidade", min_value=1.0, step=1, format="%.2f", key="quantidade")
     complemento = st.text_area(
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
