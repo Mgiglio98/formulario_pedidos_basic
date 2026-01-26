@@ -445,8 +445,6 @@ elif st.session_state.tipo_processo == TIPO_ED:
     with st.expander("📄 Dados da ED / OF filha", expanded=True):
         st.text_input("Nº OF Mãe", key="num_of_mae")
         st.text_input("Fornecedor da OF filha", key="fornecedor_of_filha")
-
-    with st.expander("📎 Documentos da ED / OF filha", expanded=False):
         anexos_processo = st.file_uploader(
             "Anexar documentos (planilhas, PDFs, prints, etc.)",
             type=["pdf", "xlsx", "xls", "csv", "png", "jpg", "jpeg"],
