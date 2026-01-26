@@ -434,7 +434,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
     st.text_input("Código do insumo", key="codigo", disabled=True)
     st.text_input("Unidade", key="unidade", disabled=usando_base)
-    quantidade = st.number_input("Quantidade", min_value=1.0, step=0.01, format="%.2f", key="quantidade")
+    quantidade = st.number_input("Quantidade", min_value=0.0, value=float(st.session_state.get("quantidade", 1)), step=0.01, format="%g", key="quantidade")
     complemento = st.text_area(
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
@@ -444,11 +444,14 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
+            qtd = float(quantidade)
+            if qtd.is_integer():
+                qtd = int(qtd)
             novo_insumo = {
                 "descricao": descricao_final,
                 "codigo": st.session_state.codigo if usando_base else "",
                 "unidade": st.session_state.unidade,
-                "quantidade": quantidade,
+                "quantidade": qtd,
                 "complemento": complemento,
             }
             st.session_state.insumos.append(novo_insumo)
@@ -643,6 +646,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
