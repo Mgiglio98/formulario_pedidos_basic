@@ -67,6 +67,23 @@ ADM_EMAILS = {
     "Roberto": "roberto.santos@osborne.com.br"
 }
 
+EXECUTIVO_EMAILS = {
+    "Julia Vigorito": "julia.vigorito@osborne.com.br",
+    "Matheus Sanches": "matheus.sanches@osborne.com.br",
+    "Vitor Ramos": "vitor.ramos@osborne.com.br",
+    "Carolina Oliveira": "carolina.oliveira@osborne.com.br",
+    "Andre Pestana": "andre.pestana@osborne.com.br",
+    "Leonardo Devico": "leonardo.devico@osborne.com.br",
+    "Felipe Duarte": "felipe.duarte@osborne.com.br",
+    "Caio Fausto": "caio.fausto@osborne.com.br",
+    "Alberto Teixeira": "alberto.teixeira@osborne.com.br",
+    "Leno Fagundes": "leno.fagundes@osborne.com.br",
+    "Vitor Carvalho": "vitor.carvalho@osborne.com.br",
+    "Danielle Monteiro": "danielle.monteiro@osborne.com.br",
+    "Igor Bueno": "igor.bueno@osborne.com.br",
+    "Najara Camargo": "najara.camargo@osborne.com.br"
+}
+
 # --- FUNÇÕES AUXILIARES ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails):
     """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
@@ -208,7 +225,14 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             key="data_pedido",
             value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
         )
-        executivo = st.text_input("Executivo", key="executivo")
+        # executivo = st.text_input("Executivo", key="executivo")
+        opcoes_executivo = [""] + list(EXECUTIVO_EMAILS.keys())
+        executivo_obra = st.selectbox(
+            "Executivo",
+            opcoes_executivo,
+            index=0,
+            key="executivo_obra"
+        )
         
         opcoes_adm = [""] + list(ADM_EMAILS.keys())  # primeira opção em branco
         adm_obra = st.selectbox(
@@ -489,6 +513,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
