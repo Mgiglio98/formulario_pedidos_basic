@@ -268,9 +268,10 @@ st.markdown("""
 
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
+    # --- RESET ---
     if st.session_state.resetar_pedido:
         st.session_state.pedido_numero = ""
-        st.session_state.data_pedido = date.today()
+        st.session_state.data_pedido = date.today()   # data do início do preenchimento
         st.session_state.solicitante = ""
         st.session_state.executivo = ""
         st.session_state.executivo_obra = ""
@@ -283,6 +284,10 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.cep = ""
         st.session_state.resetar_pedido = False
 
+    # 🔒 Data fixa do pedido (fica a do dia em que começou a preencher; não muda em rerun)
+    if "data_pedido" not in st.session_state or not st.session_state.data_pedido:
+        st.session_state.data_pedido = date.today()
+
     # --- limpa executivo manual quando trocar de obra ---
     if "obra_anterior" not in st.session_state:
         st.session_state.obra_anterior = ""
@@ -290,49 +295,54 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.executivo_manual = ""
         st.session_state.obra_anterior = st.session_state.get("obra_selecionada", "")
 
+    # garante keys (caso rode direto sem reset)
+    for k, v in {
+        "executivo_manual": "",
+        "executivo_obra": "",
+        "executivo": "",
+        "exec_emails_obra": []
+    }.items():
+        if k not in st.session_state:
+            st.session_state[k] = v
+
     col1, col2 = st.columns(2)
+
+    # --- COLUNA 1 ---
     with col1:
-        pedido_numero = st.text_input("Pedido Nº", key="pedido_numero")
-        solicitante = st.text_input("Solicitante", key="solicitante")
-        obra_selecionada = st.selectbox(
+        st.text_input("Pedido Nº", key="pedido_numero")
+        st.text_input("Solicitante", key="solicitante")
+        st.selectbox(
             "Obra",
             df_empreend["EMPREENDIMENTO"].unique(),
             index=0,
             key="obra_selecionada"
         )
 
-    # 🔥 auto-executivo(s) por obra (quando tiver) + exceção para obras coringa
+    obra_selecionada = st.session_state.get("obra_selecionada", "")
     is_obra_coringa = obra_selecionada in OBRAS_SEM_EXECUTIVO_FIXO
 
+    # executivos pré-definidos por obra
     execs = OBRA_EXECUTIVOS.get(obra_selecionada, [])
-    nomes_execs = [e["executivo"] for e in execs if e.get("executivo")]
-    emails_execs = [e["email"] for e in execs if e.get("email")]
+    nomes_execs = [e.get("executivo", "").strip() for e in execs if e.get("executivo")]
+    emails_execs = [e.get("email", "").strip() for e in execs if e.get("email")]
 
-    # garante keys (caso rode direto sem reset)
-    if "executivo_manual" not in st.session_state:
-        st.session_state.executivo_manual = ""
-    if "executivo_obra" not in st.session_state:
-        st.session_state.executivo_obra = ""
-    if "executivo" not in st.session_state:
-        st.session_state.executivo = ""
-    if "exec_emails_obra" not in st.session_state:
-        st.session_state.exec_emails_obra = []
-
+    # --- COLUNA 2 ---
     with col2:
-        data_pedido = st.date_input(
+        # ✅ Data fixa (somente leitura)
+        st.text_input(
             "Data",
-            key="data_pedido",
-            value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
+            value=st.session_state.data_pedido.strftime("%d/%m/%Y"),
+            disabled=True
         )
 
         if is_obra_coringa:
-            # ✅ para 9991/9992: escolhe executivo manualmente
+            # ✅ para 9991/9992: escolhe executivo manualmente (a partir do OBRA_EXECUTIVOS)
             opcoes_executivo = [""] + EXECUTIVOS_OPCOES
             exec_manual = st.selectbox("Executivo", opcoes_executivo, index=0, key="executivo_manual")
-            
+
             st.session_state.executivo = exec_manual
             st.session_state.executivo_obra = exec_manual
-            
+
             # pega o email do executivo escolhido (procura dentro do OBRA_EXECUTIVOS)
             if exec_manual:
                 email_manual = next(
@@ -340,12 +350,12 @@ with st.expander("📋 Dados do Pedido", expanded=True):
                      if item.get("executivo") == exec_manual),
                     ""
                 )
-                st.session_state.exec_emails_obra = [email_manual] if email_manual else []
+                st.session_state.exec_emails_obra = [email_manual] if (email_manual or "").strip() else []
             else:
                 st.session_state.exec_emails_obra = []
 
         else:
-            # ✅ obras normais: auto preenchimento
+            # ✅ obras normais: auto preenchimento (1 ou 2 executivos)
             if nomes_execs:
                 st.session_state.executivo_obra = "; ".join(nomes_execs)  # exibição (1 ou 2)
                 st.session_state.executivo = nomes_execs[0]              # usado no Excel/validação
@@ -357,14 +367,11 @@ with st.expander("📋 Dados do Pedido", expanded=True):
 
             st.text_input("Executivo", key="executivo_obra", disabled=True)
 
+        # ADM segue manual (como você já faz)
         opcoes_adm = [""] + list(ADM_EMAILS.keys())
-        adm_obra = st.selectbox(
-            "Administrativo da Obra",
-            opcoes_adm,
-            index=0,
-            key="adm_obra"
-        )
+        st.selectbox("Administrativo da Obra", opcoes_adm, index=0, key="adm_obra")
 
+    # --- autopreenche dados da obra (cnpj/endereco/cep) ---
     if obra_selecionada:
         filtro = df_empreend["EMPREENDIMENTO"] == obra_selecionada
         if filtro.any():
@@ -636,6 +643,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
