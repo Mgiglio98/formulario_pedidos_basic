@@ -434,7 +434,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     descricao_livre = st.text_input("Nome do insumo (livre)", key="descricao_livre", disabled=usando_base)
     st.text_input("Código do insumo", key="codigo", disabled=True)
     st.text_input("Unidade", key="unidade", disabled=usando_base)
-    quantidade = st.number_input("Quantidade", min_value=1.0, step=1, format="%.2f", key="quantidade")
+    quantidade = st.number_input("Quantidade", min_value=1.0, step=0.01, format="%.2f", key="quantidade")
     complemento = st.text_area(
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
@@ -643,6 +643,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
