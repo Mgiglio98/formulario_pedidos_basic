@@ -149,9 +149,18 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails)
 
     # --- Endereços de cópia ---
     cc_addr = ["vanderlei.souza@osborne.com.br"]  # cópia fixa
+    
+    # copia do administrativo selecionado
     adm_email = adm_emails.get(st.session_state.get("adm_obra"))
     if adm_email and adm_email not in cc_addr:
         cc_addr.append(adm_email)
+    
+    # copia do(s) executivo(s) da obra (1 ou 2) / ou manual nas obras coringa
+    exec_emails = st.session_state.get("exec_emails_obra", [])
+    for e in exec_emails:
+        e = (e or "").strip()
+        if e and e not in cc_addr:
+            cc_addr.append(e)
 
     # --- Identifica insumos sem código ---
     sem_codigo = [
@@ -162,13 +171,15 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails)
 
     # --- Corpo principal do e-mail ---
     if sem_codigo:
+        lista_formatada = "".join(f"- {item}\n" for item in sem_codigo)
+        
         corpo_email = f"""
 Olá! Novo pedido recebido ✅
 
 Favor validar antes de criarmos a requisição.
 
 Os seguintes insumos estão no pedido sem o código cadastrado:
-{chr(10).join(sem_codigo)}
+{lista_formatada}
         """
     else:
         corpo_email = """
@@ -625,6 +636,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
