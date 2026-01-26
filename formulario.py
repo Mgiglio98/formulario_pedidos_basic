@@ -126,6 +126,11 @@ OBRA_EXECUTIVOS = {
     ],
 }
 
+OBRAS_SEM_EXECUTIVO_FIXO = {
+    "9992 - GARANTIA DE OBRAS",
+    "9991 - DÉBITO ADMINISTRAÇÃO (OBRAS)",
+}
+
 # --- FUNÇÕES AUXILIARES ---
 def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails):
     """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
@@ -242,7 +247,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- DADOS DO PEDIDO ---
+ --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
     if st.session_state.resetar_pedido:
         st.session_state.pedido_numero = ""
@@ -251,12 +256,20 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.executivo = ""
         st.session_state.executivo_obra = ""
         st.session_state.exec_emails_obra = []
+        st.session_state.executivo_manual = ""
         st.session_state.adm_obra = ""
         st.session_state.obra_selecionada = ""
         st.session_state.cnpj = ""
         st.session_state.endereco = ""
         st.session_state.cep = ""
         st.session_state.resetar_pedido = False
+
+    # --- limpa executivo manual quando trocar de obra ---
+    if "obra_anterior" not in st.session_state:
+        st.session_state.obra_anterior = ""
+    if st.session_state.get("obra_selecionada", "") != st.session_state.obra_anterior:
+        st.session_state.executivo_manual = ""
+        st.session_state.obra_anterior = st.session_state.get("obra_selecionada", "")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -269,18 +282,21 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             key="obra_selecionada"
         )
 
-    # 🔥 auto-executivo(s) por obra
+    # 🔥 auto-executivo(s) por obra (quando tiver) + exceção para obras coringa
+    is_obra_coringa = obra_selecionada in OBRAS_SEM_EXECUTIVO_FIXO
+
     execs = OBRA_EXECUTIVOS.get(obra_selecionada, [])
     nomes_execs = [e["executivo"] for e in execs if e.get("executivo")]
     emails_execs = [e["email"] for e in execs if e.get("email")]
 
-    if nomes_execs:
-        st.session_state.executivo_obra = "; ".join(nomes_execs)  # exibição (1 ou 2)
-        st.session_state.executivo = nomes_execs[0]              # usado no Excel/validação
-        st.session_state.exec_emails_obra = emails_execs
-    else:
+    # garante keys (caso rode direto sem reset)
+    if "executivo_manual" not in st.session_state:
+        st.session_state.executivo_manual = ""
+    if "executivo_obra" not in st.session_state:
         st.session_state.executivo_obra = ""
+    if "executivo" not in st.session_state:
         st.session_state.executivo = ""
+    if "exec_emails_obra" not in st.session_state:
         st.session_state.exec_emails_obra = []
 
     with col2:
@@ -290,8 +306,27 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
         )
 
-        # ✅ mostra 1 ou 2 executivos no mesmo campo (somente leitura)
-        st.text_input("Executivo", key="executivo_obra", disabled=True)
+        if is_obra_coringa:
+            # ✅ para 9991/9992: escolhe executivo manualmente
+            opcoes_executivo = [""] + list(EXECUTIVO_EMAILS.keys())
+            exec_manual = st.selectbox("Executivo", opcoes_executivo, index=0, key="executivo_manual")
+
+            st.session_state.executivo = exec_manual
+            st.session_state.executivo_obra = exec_manual  # exibição
+            st.session_state.exec_emails_obra = [EXECUTIVO_EMAILS.get(exec_manual, "")] if exec_manual else []
+
+        else:
+            # ✅ obras normais: auto preenchimento
+            if nomes_execs:
+                st.session_state.executivo_obra = "; ".join(nomes_execs)  # exibição (1 ou 2)
+                st.session_state.executivo = nomes_execs[0]              # usado no Excel/validação
+                st.session_state.exec_emails_obra = emails_execs
+            else:
+                st.session_state.executivo_obra = ""
+                st.session_state.executivo = ""
+                st.session_state.exec_emails_obra = []
+
+            st.text_input("Executivo", key="executivo_obra", disabled=True)
 
         opcoes_adm = [""] + list(ADM_EMAILS.keys())
         adm_obra = st.selectbox(
@@ -572,6 +607,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
