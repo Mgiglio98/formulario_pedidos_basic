@@ -102,7 +102,6 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
     "2509 - RAFAEL CURSINO DE MOURA LEVY": [
-        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
     ],
     "2510 - SAMAUMA EVENTOS LTDA": [
@@ -573,6 +572,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
