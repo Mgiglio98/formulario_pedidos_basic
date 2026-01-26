@@ -67,21 +67,64 @@ ADM_EMAILS = {
     "Roberto": "roberto.santos@osborne.com.br"
 }
 
-EXECUTIVO_EMAILS = {
-    "Julia Vigorito": "julia.vigorito@osborne.com.br",
-    "Matheus Sanches": "matheus.sanches@osborne.com.br",
-    "Vitor Ramos": "vitor.ramos@osborne.com.br",
-    "Carolina Oliveira": "carolina.oliveira@osborne.com.br",
-    "Andre Pestana": "andre.pestana@osborne.com.br",
-    "Leonardo Devico": "leonardo.devico@osborne.com.br",
-    "Felipe Duarte": "felipe.duarte@osborne.com.br",
-    "Caio Fausto": "caio.fausto@osborne.com.br",
-    "Alberto Teixeira": "alberto.teixeira@osborne.com.br",
-    "Leno Fagundes": "leno.fagundes@osborne.com.br",
-    "Vitor Carvalho": "vitor.carvalho@osborne.com.br",
-    "Danielle Monteiro": "danielle.monteiro@osborne.com.br",
-    "Igor Bueno": "igor.bueno@osborne.com.br",
-    "Najara Camargo": "najara.camargo@osborne.com.br"
+OBRA_EXECUTIVOS = {
+    "2317 - LUIZ ALBERTO HESS BORGES": [
+        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
+    ],
+    "2514 - FELIPE HESS BORGES": [
+        {"executivo": "Matheus Sanches", "email": "matheus.sanches@osborne.com.br"},
+    ],
+    "2411 - JOÃO CARLOS BEHISNELIAN": [
+        {"executivo": "Vitor Ramos", "email": "vitor.ramos@osborne.com.br"},
+    ],
+    "2407 - SUN MORITZ ADMINISTRADORA": [
+        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
+    ],
+    "2503 - KAENA PARTICIPAÇÕES LTDA": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+    ],
+    "2511 - 1807 PARTICIPAÇÕES LTDA": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+    ],
+    "2512 - ROBERTO KLABIN MARTINS XAVIER": [
+        {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
+    ],
+    "2516 - JOSÉ CARLOS MORAES ABREU FILHO": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+    ],
+    "2505 - EW ADMINISTRADORA LTDA": [
+        {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
+    ],
+    "2316 - MARCO AURÉLIO SIMÃO FREIRE": [
+        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
+    "2504 - MARIA ANGÉLICA A. MONTEIRO DA COSTA": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+    ],
+    "2509 - RAFAEL CURSINO DE MOURA LEVY": [
+        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
+        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
+    "2510 - SAMAUMA EVENTOS LTDA": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+    ],
+    "2515 - MARCO FREIRE (ÁREA EXTERNA)": [
+        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
+    "2506 - KATIA FERRIRA DE BARROS": [
+        {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
+        {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
+    ],
+    "2507 - KATIA FERREIRA DE BARROS": [
+        {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
+        {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
+    ],
+    "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
+        {"executivo": "Igor Bueno", "email": "igor.bueno@osborne.com.br"},
+    ],
+    "2409 - MARIA BELTRÃO SALDANHA COELHO": [
+        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+    ],
 }
 
 # --- FUNÇÕES AUXILIARES ---
@@ -207,6 +250,8 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         st.session_state.data_pedido = date.today()
         st.session_state.solicitante = ""
         st.session_state.executivo = ""
+        st.session_state.executivo_obra = ""
+        st.session_state.exec_emails_obra = []
         st.session_state.adm_obra = ""
         st.session_state.obra_selecionada = ""
         st.session_state.cnpj = ""
@@ -218,23 +263,38 @@ with st.expander("📋 Dados do Pedido", expanded=True):
     with col1:
         pedido_numero = st.text_input("Pedido Nº", key="pedido_numero")
         solicitante = st.text_input("Solicitante", key="solicitante")
-        obra_selecionada = st.selectbox("Obra", df_empreend["EMPREENDIMENTO"].unique(), index=0, key="obra_selecionada")
+        obra_selecionada = st.selectbox(
+            "Obra",
+            df_empreend["EMPREENDIMENTO"].unique(),
+            index=0,
+            key="obra_selecionada"
+        )
+
+    # 🔥 auto-executivo(s) por obra
+    execs = OBRA_EXECUTIVOS.get(obra_selecionada, [])
+    nomes_execs = [e["executivo"] for e in execs if e.get("executivo")]
+    emails_execs = [e["email"] for e in execs if e.get("email")]
+
+    if nomes_execs:
+        st.session_state.executivo_obra = "; ".join(nomes_execs)  # exibição (1 ou 2)
+        st.session_state.executivo = nomes_execs[0]              # usado no Excel/validação
+        st.session_state.exec_emails_obra = emails_execs
+    else:
+        st.session_state.executivo_obra = ""
+        st.session_state.executivo = ""
+        st.session_state.exec_emails_obra = []
+
     with col2:
         data_pedido = st.date_input(
             "Data",
             key="data_pedido",
             value=st.session_state.data_pedido if "data_pedido" in st.session_state else date.today()
         )
-        # executivo = st.text_input("Executivo", key="executivo")
-        opcoes_executivo = [""] + list(EXECUTIVO_EMAILS.keys())
-        executivo_obra = st.selectbox(
-            "Executivo",
-            opcoes_executivo,
-            index=0,
-            key="executivo_obra"
-        )
-        
-        opcoes_adm = [""] + list(ADM_EMAILS.keys())  # primeira opção em branco
+
+        # ✅ mostra 1 ou 2 executivos no mesmo campo (somente leitura)
+        st.text_input("Executivo", key="executivo_obra", disabled=True)
+
+        opcoes_adm = [""] + list(ADM_EMAILS.keys())
         adm_obra = st.selectbox(
             "Administrativo da Obra",
             opcoes_adm,
@@ -249,7 +309,7 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             st.session_state.cnpj = dados_obra["CNPJ"]
             st.session_state.endereco = dados_obra["ENDERECO"]
             st.session_state.cep = dados_obra["CEP"]
-    
+
     st.text_input("CNPJ/CPF", key="cnpj", disabled=True)
     st.text_input("Endereço", key="endereco", disabled=True)
     st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
@@ -513,6 +573,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
