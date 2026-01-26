@@ -126,6 +126,14 @@ OBRA_EXECUTIVOS = {
     ],
 }
 
+# Lista única de executivos a partir do OBRA_EXECUTIVOS
+EXECUTIVOS_OPCOES = sorted({
+    item["executivo"].strip()
+    for lista in OBRA_EXECUTIVOS.values()
+    for item in lista
+    if item.get("executivo") and str(item["executivo"]).strip()
+})
+
 OBRAS_SEM_EXECUTIVO_FIXO = {
     "9992 - GARANTIA DE OBRAS",
     "9991 - DÉBITO ADMINISTRAÇÃO (OBRAS)",
@@ -308,12 +316,22 @@ with st.expander("📋 Dados do Pedido", expanded=True):
 
         if is_obra_coringa:
             # ✅ para 9991/9992: escolhe executivo manualmente
-            opcoes_executivo = [""] + list(EXECUTIVO_EMAILS.keys())
+            opcoes_executivo = [""] + EXECUTIVOS_OPCOES
             exec_manual = st.selectbox("Executivo", opcoes_executivo, index=0, key="executivo_manual")
-
+            
             st.session_state.executivo = exec_manual
-            st.session_state.executivo_obra = exec_manual  # exibição
-            st.session_state.exec_emails_obra = [EXECUTIVO_EMAILS.get(exec_manual, "")] if exec_manual else []
+            st.session_state.executivo_obra = exec_manual
+            
+            # pega o email do executivo escolhido (procura dentro do OBRA_EXECUTIVOS)
+            if exec_manual:
+                email_manual = next(
+                    (item.get("email", "") for lista in OBRA_EXECUTIVOS.values() for item in lista
+                     if item.get("executivo") == exec_manual),
+                    ""
+                )
+                st.session_state.exec_emails_obra = [email_manual] if email_manual else []
+            else:
+                st.session_state.exec_emails_obra = []
 
         else:
             # ✅ obras normais: auto preenchimento
@@ -607,6 +625,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
