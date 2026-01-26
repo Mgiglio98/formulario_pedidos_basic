@@ -247,7 +247,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
- --- DADOS DO PEDIDO ---
+# --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
     if st.session_state.resetar_pedido:
         st.session_state.pedido_numero = ""
@@ -607,6 +607,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
