@@ -111,7 +111,7 @@ OBRA_EXECUTIVOS = {
     "2515 - MARCO FREIRE (ÁREA EXTERNA)": [
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
     ],
-    "2506 - KATIA FERRIRA DE BARROS": [
+    "2506 - KATIA FERREIRA DE BARROS": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
@@ -573,6 +573,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
