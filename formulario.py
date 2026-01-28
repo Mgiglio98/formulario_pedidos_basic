@@ -98,7 +98,7 @@ OBRA_EXECUTIVOS = {
     "2316 - MARCO AURÉLIO SIMÃO FREIRE": [
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
     ],
-    "2504 - MARIA ANGÉLICA A. MONTEIRO DA COSTA": [
+    "2504 - MARIA ANGÉLICA A. M. DA COSTA": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
     "2509 - RAFAEL CURSINO DE MOURA LEVY": [
@@ -646,6 +646,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
