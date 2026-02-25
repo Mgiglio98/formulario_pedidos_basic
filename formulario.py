@@ -124,6 +124,9 @@ OBRA_EXECUTIVOS = {
     "2409 - MARIA BELTRÃO SALDANHA COELHO": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
+    "2601 - REGINA CAMPOS SALLES MORAES ABREU": [
+        {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
@@ -646,6 +649,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
