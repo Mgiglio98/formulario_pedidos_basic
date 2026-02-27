@@ -151,7 +151,7 @@ def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails)
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
     # --- Endereços de cópia ---
-    cc_addr = ["vanderlei.souza@osborne.com.br"; "antonio.macedo@osborne.com.br"]  # cópia fixa
+    cc_addr = ["vanderlei.souza@osborne.com.br", "antonio.macedo@osborne.com.br"]  # cópia fixa
     
     # copia do administrativo selecionado
     adm_email = adm_emails.get(st.session_state.get("adm_obra"))
@@ -649,6 +649,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
