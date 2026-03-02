@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 from io import BytesIO
+from datetime import datetime
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")
@@ -49,6 +50,16 @@ if st.session_state.get("rerun_depois_download", False):
             del st.session_state[campo]
     st.session_state.insumos = []
     st.rerun()
+
+def validar_data_br(txt: str):
+    txt = (txt or "").strip()
+    if not txt:
+        return None, "Preencha a data de necessidade do insumo (DD/MM/YYYY)."
+    try:
+        dt = datetime.strptime(txt, "%d/%m/%Y").date()
+        return dt, None
+    except ValueError:
+        return None, "Data inválida. Use o formato DD/MM/YYYY."
 
 # --- CAMPOS PADRÃO ---
 for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
@@ -394,7 +405,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.session_state.get("limpar_campos_insumo", False):
         # 🔹 Remove todos os valores dos campos
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria", "definir_data"]:
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria_txt"]:
             if campo in st.session_state:
                 del st.session_state[campo]
 
@@ -443,44 +454,42 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
     )
-    definir_data = st.checkbox(
-        "Definir data de necessidade",
-        key="definir_data"
+    data_necessaria_txt = st.text_input(
+        "Data de necessidade do insumo",
+        key="data_necessaria_txt",
+        placeholder="DD/MM/YYYY"
     )
-    
-    data_necessaria = None
-    
-    if definir_data:
-        data_necessaria = st.date_input(
-            "Data de necessidade do insumo",
-            key="data_necessaria",
-            format="DD/MM/YYYY"
-        )
         
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
-        if descricao_final and quantidade > 0 and definir_data and data_necessaria and (usando_base or st.session_state.unidade.strip()):
+        # valida data obrigatória somente na hora de adicionar
+        dt, err = validar_data_br(st.session_state.get("data_necessaria_txt"))
+    
+        if err:
+            st.warning(f"⚠️ {err}")
+            st.stop()
+    
+        if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             qtd = float(quantidade)
             if qtd.is_integer():
                 qtd = int(qtd)
+    
             novo_insumo = {
                 "descricao": descricao_final,
                 "codigo": st.session_state.codigo if usando_base else "",
                 "unidade": st.session_state.unidade,
                 "quantidade": qtd,
                 "complemento": complemento,
-                "data_necessaria": data_necessaria,
+                "data_necessaria": dt,  # <-- agora é date validado
             }
             st.session_state.insumos.append(novo_insumo)
     
-            # 🔹 Marca para limpar na próxima renderização
             st.session_state.limpar_campos_insumo = True
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
-        
         else:
-            st.warning("⚠️ Preencha todos os campos obrigatórios do insumo, incluindo a data de necessidade.")
+            st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
     
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -678,18 +687,3 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
