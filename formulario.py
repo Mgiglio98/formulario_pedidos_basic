@@ -480,7 +480,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.rerun()
         
         else:
-    st.warning("⚠️ Preencha todos os campos obrigatórios do insumo, incluindo a data de necessidade.")
+            st.warning("⚠️ Preencha todos os campos obrigatórios do insumo, incluindo a data de necessidade.")
     
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
@@ -678,6 +678,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
