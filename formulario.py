@@ -394,7 +394,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.session_state.get("limpar_campos_insumo", False):
         # 🔹 Remove todos os valores dos campos
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento"]:
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria"]:
             if campo in st.session_state:
                 del st.session_state[campo]
 
@@ -412,7 +412,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     )
     
     descricao_exibicao = st.selectbox(
-        "Descrição do insumo (Digite em MAIÚSCULO)",
+        "Descrição do insumo",
         df_insumos_lista["opcao_exibicao"],
         key="descricao_exibicao"
     )
@@ -442,6 +442,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
     )
+    data_necessaria = st.date_input(
+        "Data de necessidade do insumo (opcional)",
+        value=None,
+        key="data_necessaria",
+        format="DD/MM/YYYY"
+    )
 
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
@@ -456,12 +462,13 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "unidade": st.session_state.unidade,
                 "quantidade": qtd,
                 "complemento": complemento,
+                "data_necessaria": data_necessaria,
             }
             st.session_state.insumos.append(novo_insumo)
     
             # 🔹 Marca para limpar na próxima renderização
             st.session_state.limpar_campos_insumo = True
-    
+    for campo in ["descr
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
         
@@ -522,26 +529,37 @@ if st.session_state.insumos:
     """, unsafe_allow_html=True)
 
     # Cabeçalho
-    col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
+    col1, col2, col3, col4, col5 = st.columns([5.0, 1.0, 1.6, 1.0, 0.5])
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
         st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header center'>Entrega</div>", unsafe_allow_html=True)
     with col4:
+        st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
+    with col5:
         st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
 
     # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4 = st.columns([5.8, 1.2, 1.2, 0.5])
+        col1, col2, col3, col4, col5 = st.columns([5.0, 1.0, 1.6, 1.0, 0.5])
+    
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
+    
         with col2:
             st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
+    
         with col3:
-            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+            dt = insumo.get("data_necessaria")
+            dt_txt = dt.strftime("%d/%m/%Y") if dt else ""
+            st.markdown(f"<div class='linha-insumo center'>{dt_txt}</div>", unsafe_allow_html=True)
+    
         with col4:
+            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+    
+        with col5:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
@@ -588,10 +606,14 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 ws[f"D{linha}"] = insumo["unidade"]
                 ws[f"E{linha}"] = insumo["quantidade"]
                 ws[f"F{linha}"] = insumo["complemento"]
+                ws[f"G{linha}"] = (
+                    insumo["data_necessaria"].strftime("%d/%m/%Y")
+                    if insumo.get("data_necessaria") else ""
+                )
                 linha += 1
 
             ultima_linha_util = linha - 1
-            ws.print_area = f"A1:F{ultima_linha_util}"
+            ws.print_area = f"A1:G{ultima_linha_util}"
 
             buffer = BytesIO()
             wb.save(buffer)
@@ -649,6 +671,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
