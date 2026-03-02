@@ -413,7 +413,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.quantidade = 1.0
         st.session_state.descricao_exibicao = ""
         st.session_state.complemento = ""
-        st.session_state.data_necessaria = date.today()
+        st.session_state.data_necessaria_txt = ""
         st.session_state.limpar_campos_insumo = False
         st.rerun()  # 🔁 força recarregar já limpo
     
@@ -687,3 +687,4 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
