@@ -468,7 +468,6 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
             # 🔹 Marca para limpar na próxima renderização
             st.session_state.limpar_campos_insumo = True
-    for campo in ["descr
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
         
@@ -671,6 +670,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
