@@ -402,6 +402,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.quantidade = 1.0
         st.session_state.descricao_exibicao = ""
         st.session_state.complemento = ""
+        st.session_state.data_necessaria = date.today()
         st.session_state.limpar_campos_insumo = False
         st.rerun()  # 🔁 força recarregar já limpo
     
@@ -443,8 +444,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         key="complemento"
     )
     data_necessaria = st.date_input(
-        "Data de necessidade do insumo (opcional)",
-        value=None,
+        "Data de necessidade do insumo",
+        value=st.session_state.get("data_necessaria", date.today()),
         key="data_necessaria",
         format="DD/MM/YYYY"
     )
@@ -452,7 +453,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
-        if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
+        if descricao_final and quantidade > 0 and data_necessaria and (usando_base or st.session_state.unidade.strip()):
             qtd = float(quantidade)
             if qtd.is_integer():
                 qtd = int(qtd)
@@ -670,6 +671,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
