@@ -394,7 +394,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.session_state.get("limpar_campos_insumo", False):
         # 🔹 Remove todos os valores dos campos
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria"]:
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria", "definir_data"]:
             if campo in st.session_state:
                 del st.session_state[campo]
 
@@ -443,17 +443,24 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
     )
-    data_necessaria = st.date_input(
-        "Data de necessidade do insumo",
-        value=st.session_state.get("data_necessaria", date.today()),
-        key="data_necessaria",
-        format="DD/MM/YYYY"
+    definir_data = st.checkbox(
+        "Definir data de necessidade",
+        key="definir_data"
     )
-
+    
+    data_necessaria = None
+    
+    if definir_data:
+        data_necessaria = st.date_input(
+            "Data de necessidade do insumo",
+            key="data_necessaria",
+            format="DD/MM/YYYY"
+        )
+        
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
-        if descricao_final and quantidade > 0 and data_necessaria and (usando_base or st.session_state.unidade.strip()):
+        if descricao_final and quantidade > 0 and definir_data and data_necessaria and (usando_base or st.session_state.unidade.strip()):
             qtd = float(quantidade)
             if qtd.is_integer():
                 qtd = int(qtd)
@@ -473,8 +480,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.rerun()
         
         else:
-            st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
-
+    st.warning("⚠️ Preencha todos os campos obrigatórios do insumo, incluindo a data de necessidade.")
+    
 # --- Renderiza tabela de insumos ---
 if st.session_state.insumos:
     st.markdown("""
@@ -671,6 +678,7 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
+
 
 
 
