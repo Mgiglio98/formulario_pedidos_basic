@@ -138,6 +138,10 @@ OBRA_EXECUTIVOS = {
     "2601 - REGINA CAMPOS SALLES MORAES ABREU": [
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
     ],
+    "2404 - LUIZ HENRIQUE FRAGA": [
+        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
+        {"executivo": "Sofia Goes", "email": "sofia.goes@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
