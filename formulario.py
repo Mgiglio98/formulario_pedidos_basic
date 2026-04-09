@@ -142,6 +142,9 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
         {"executivo": "Sofia Goes", "email": "sofia.goes@osborne.com.br"},
     ],
+    "2303 - LUIZ ROGÉRIO BERTO": [
+        {"executivo": "Igor Bueno", "email": "igor.bueno@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
