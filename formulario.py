@@ -130,7 +130,8 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
     "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
-        {"executivo": "Igor Bueno", "email": "igor.bueno@osborne.com.br"},
+        {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
+        {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
     ],
     "2409 - MARIA BELTRÃO SALDANHA COELHO": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
