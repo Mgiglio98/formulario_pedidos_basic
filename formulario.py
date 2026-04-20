@@ -146,6 +146,9 @@ OBRA_EXECUTIVOS = {
     "2303 - LUIZ ROGÉRIO BERTO": [
         {"executivo": "Igor Bueno", "email": "igor.bueno@osborne.com.br"},
     ],
+    "2603 - FERNANDO AUGUSTO COELHO F DE VASCONCELLOS": [
+        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
