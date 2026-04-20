@@ -91,9 +91,6 @@ OBRA_EXECUTIVOS = {
     "2407 - SUN MORITZ ADMINISTRADORA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
     ],
-    "2503 - KAENA PARTICIPAÇÕES LTDA": [
-        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
-    ],
     "2511 - 1807 PARTICIPAÇÕES LTDA": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
