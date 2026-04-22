@@ -37,6 +37,12 @@ if "quantidade" not in st.session_state:
     st.session_state.quantidade = 1.0
 if "descricao_exibicao" not in st.session_state:
     st.session_state.descricao_exibicao = ""
+if "tipo_processo" not in st.session_state:
+    st.session_state.tipo_processo = "Pedido de Materiais"
+if "num_of_mae" not in st.session_state:
+    st.session_state.num_of_mae = ""
+if "fornecedor_of_filha" not in st.session_state:
+    st.session_state.fornecedor_of_filha = ""
 
 # --- RERUN APÓS DOWNLOAD ---
 if st.session_state.get("rerun_depois_download", False):
@@ -44,11 +50,14 @@ if st.session_state.get("rerun_depois_download", False):
     for campo in [
         "pedido_numero", "solicitante", "executivo", "obra_selecionada",
         "cnpj", "endereco", "cep", "data_pedido", "excel_bytes",
-        "nome_arquivo", "pedido_enviado"
+        "nome_arquivo", "pedido_enviado",
+        "adm_obra", "num_of_mae", "fornecedor_of_filha",
+        "tipo_processo", "anexos_ed"
     ]:
         if campo in st.session_state:
             del st.session_state[campo]
     st.session_state.insumos = []
+    st.session_state["tipo_processo"] = "Pedido de Materiais"
     st.rerun()
 
 def validar_data_br(txt: str):
@@ -162,55 +171,88 @@ OBRAS_SEM_EXECUTIVO_FIXO = {
 }
 
 # --- FUNÇÕES AUXILIARES ---
-def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails):
+def enviar_email_pedido(assunto, arquivo_bytes, insumos_adicionados, adm_emails, anexos=None):
     """Envia um único e-mail do pedido, com cópia fixa e variável, e aviso se houver insumos sem código."""
     smtp_server = "smtp.office365.com"
     smtp_port = 587
     smtp_user = "matheus.almeida@osborne.com.br"
     smtp_password = st.secrets["SMTP_PASSWORD"]
 
-    # --- Endereços de cópia ---
-    cc_addr = ["antonio.macedo@osborne.com.br"]  # cópia fixa
-    
-    # copia do administrativo selecionado
+    cc_addr = ["antonio.macedo@osborne.com.br"]
+
     adm_email = adm_emails.get(st.session_state.get("adm_obra"))
     if adm_email and adm_email not in cc_addr:
         cc_addr.append(adm_email)
-    
-    # copia do(s) executivo(s) da obra (1 ou 2) / ou manual nas obras coringa
+
     exec_emails = st.session_state.get("exec_emails_obra", [])
     for e in exec_emails:
         e = (e or "").strip()
         if e and e not in cc_addr:
             cc_addr.append(e)
 
-    # --- Identifica insumos sem código ---
     sem_codigo = [
         f"{item['descricao']} — {item['quantidade']}"
         for item in insumos_adicionados
         if not item.get("codigo") or str(item["codigo"]).strip() == ""
     ]
 
-    # --- Corpo principal do e-mail ---
+    tipo_proc = st.session_state.get("tipo_processo", "Pedido de Materiais")
+    pedido_num = st.session_state.get("pedido_numero", "")
+    obra = st.session_state.get("obra_selecionada", "")
+    solicitante = st.session_state.get("solicitante", "")
+    executivo = st.session_state.get("executivo", "")
+    data_pedido = st.session_state.get("data_pedido", date.today())
+
+    try:
+        data_fmt = data_pedido.strftime("%d/%m/%Y")
+    except Exception:
+        data_fmt = str(data_pedido)
+
+    sem_codigo_texto = ""
     if sem_codigo:
-        lista_formatada = "".join(f"- {item}\n" for item in sem_codigo)
-        
-        corpo_email = f"""
+        sem_codigo_texto = "\n\nInsumos sem código cadastrado:\n" + "\n".join(f"- {linha}" for linha in sem_codigo)
+
+    if tipo_proc == "Pedido de Materiais":
+        if sem_codigo:
+            lista_formatada = "".join(f"- {item}\n" for item in sem_codigo)
+            corpo_email = f"""
 Olá! Novo pedido recebido ✅
 
 Favor validar antes de criarmos a requisição.
 
 Os seguintes insumos estão no pedido sem o código cadastrado:
 {lista_formatada}
-        """
-    else:
-        corpo_email = """
+            """
+        else:
+            corpo_email = """
 Olá! Novo pedido recebido ✅
 
 Favor validar antes de criarmos a requisição.
-        """
+            """
 
-    # --- Montagem do e-mail ---
+    elif tipo_proc == "Criação de ED":
+        num_of_mae = st.session_state.get("num_of_mae", "")
+        fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "")
+
+        corpo_email = f"""Olá! Nova SOLICITAÇÃO DE ED recebida ✅
+
+Resumo da solicitação:
+- Referência: {pedido_num}
+- Obra: {obra}
+- Solicitante: {solicitante}
+- Executivo: {executivo}
+- Data: {data_fmt}
+- Nº OF Mãe: {num_of_mae}
+- Fornecedor da OF filha: {fornecedor_of_filha}
+
+Favor analisar e, se estiver de acordo, proceder com a criação da Requisição da ED e OF filha no sistema, vinculando à OF Mãe informada.{sem_codigo_texto}
+"""
+    else:
+        corpo_email = f"""Olá! Novo formulário recebido ✅
+
+Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
+"""
+
     msg = MIMEMultipart()
     msg["From"] = smtp_user
     msg["To"] = smtp_user
@@ -218,7 +260,6 @@ Favor validar antes de criarmos a requisição.
     msg["Subject"] = assunto
     msg.attach(MIMEText(corpo_email.strip(), "plain"))
 
-    # --- Anexo ---
     anexo = MIMEApplication(
         arquivo_bytes,
         _subtype="vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -227,7 +268,20 @@ Favor validar antes de criarmos a requisição.
     anexo.add_header('Content-Disposition', 'attachment', filename=nome_arquivo)
     msg.attach(anexo)
 
-    # --- Envio ---
+    if anexos:
+        for arquivo in anexos:
+            try:
+                conteudo = arquivo.getvalue()
+                anexo_extra = MIMEApplication(conteudo)
+                anexo_extra.add_header(
+                    'Content-Disposition',
+                    'attachment',
+                    filename=arquivo.name
+                )
+                msg.attach(anexo_extra)
+            except Exception as e:
+                print(f"Erro ao anexar arquivo extra {getattr(arquivo, 'name', 'sem_nome')}: {e}")
+
     try:
         with smtplib.SMTP(smtp_server, smtp_port) as server:
             server.starttls()
@@ -287,6 +341,24 @@ st.markdown("""
     </p>
 </div>
 """, unsafe_allow_html=True)
+
+TIPO_PEDIDO   = "Pedido de Materiais"
+TIPO_ED       = "Criação de ED"
+
+opcoes_tipo = [TIPO_PEDIDO, TIPO_ED]
+
+valor_atual = st.session_state.get("tipo_processo", TIPO_PEDIDO)
+if valor_atual not in opcoes_tipo:
+    valor_atual = TIPO_PEDIDO
+
+tipo_processo = st.radio(
+    "Selecione o processo para este formulário:",
+    options=opcoes_tipo,
+    index=opcoes_tipo.index(valor_atual),
+    horizontal=True
+)
+
+st.session_state["tipo_processo"] = tipo_processo
 
 # --- DADOS DO PEDIDO ---
 with st.expander("📋 Dados do Pedido", expanded=True):
@@ -406,7 +478,21 @@ with st.expander("📋 Dados do Pedido", expanded=True):
     st.text_input("Endereço", key="endereco", disabled=True)
     st.text_input("CEP", value=st.session_state.get("cep", ""), disabled=True)
 
-st.divider()
+# --- CAMPOS ESPECÍFICOS POR TIPO DE PROCESSO ---
+anexos_processo = []  # default, para usar mais à frente
+
+if st.session_state.tipo_processo == TIPO_ED:
+    with st.expander("📄 Dados da ED / OF filha", expanded=True):
+        st.text_input("Nº OF Mãe", key="num_of_mae")
+        st.text_input("Fornecedor da OF filha", key="fornecedor_of_filha")
+        anexos_processo = st.file_uploader(
+            "Anexar documentos (planilhas, PDFs, prints, etc.)",
+            type=["pdf", "xlsx", "xls", "csv", "png", "jpg", "jpeg"],
+            accept_multiple_files=True,
+            key="anexos_ed"
+        )
+        if anexos_processo:
+            st.info(f"{len(anexos_processo)} arquivo(s) será(ão) enviado(s) junto com a requisição de ED.")
 
 # --- ADIÇÃO DE INSUMOS ---
 with st.expander("➕ Adicionar Insumo", expanded=True):
@@ -590,6 +676,9 @@ if st.session_state.insumos:
 
 # --- FINALIZAÇÃO DO PEDIDO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
+
+    tipo_proc = st.session_state.get("tipo_processo", TIPO_PEDIDO)
+    
     campos_obrigatorios = [
         st.session_state.pedido_numero, st.session_state.data_pedido,
         st.session_state.solicitante, st.session_state.executivo,
@@ -605,6 +694,22 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
     if not st.session_state.insumos:
         st.warning("⚠️ Adicione pelo menos um insumo antes de enviar o pedido.")
         st.stop()
+
+    if tipo_proc == TIPO_ED:
+        num_of_mae = st.session_state.get("num_of_mae", "").strip()
+        fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "").strip()
+
+        if not num_of_mae:
+            st.warning("⚠️ Informe o Nº da OF Mãe para criar a ED / OF filha.")
+            st.stop()
+
+        if not fornecedor_of_filha:
+            st.warning("⚠️ Informe o Fornecedor da OF filha.")
+            st.stop()
+
+        if not anexos_processo:
+            st.warning("⚠️ Anexe pelo menos um documento para a ED / OF filha.")
+            st.stop()
 
     erro = None
     ok = False
@@ -649,7 +754,8 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                 f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
                 st.session_state.excel_bytes,
                 st.session_state.insumos,
-                ADM_EMAILS
+                ADM_EMAILS,
+                anexos=anexos_processo
             )
             ok = True
         except Exception as e:
@@ -680,11 +786,19 @@ if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
             for campo in [
                 "pedido_numero", "solicitante", "executivo", "obra_selecionada",
                 "cnpj", "endereco", "cep", "data_pedido",
-                "excel_bytes", "nome_arquivo", "pedido_enviado"
+                "excel_bytes", "nome_arquivo", "pedido_enviado",
+                "adm_obra",
+                "num_of_mae",
+                "fornecedor_of_filha",
+                "tipo_processo",
+                "anexos_ed",
             ]:
                 if campo in st.session_state:
                     del st.session_state[campo]
+            
             st.session_state.insumos = []
+            st.session_state["adm_obra"] = ""
+            st.session_state["tipo_processo"] = TIPO_PEDIDO
             st.rerun()
 
 # --- 🔄 KEEP-ALIVE (mantém app ativo no Streamlit Cloud) ---
@@ -695,4 +809,3 @@ setInterval(() => {
 }, 120000);
 </script>
 """, height=0)
-
