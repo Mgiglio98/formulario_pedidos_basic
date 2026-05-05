@@ -158,6 +158,10 @@ OBRA_EXECUTIVOS = {
     "2213 - TOMAS DA VEIGA PEREIRA": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
+    "2606 - MARCO FREIRE (FAZENDA BOA VISTA)": [
+        {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
+        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
