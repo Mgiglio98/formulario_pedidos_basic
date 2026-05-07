@@ -242,7 +242,7 @@ Favor validar antes de criarmos a requisição.
         num_of_mae = st.session_state.get("num_of_mae", "")
         fornecedor_of_filha = st.session_state.get("fornecedor_of_filha", "")
 
-        corpo_email = f"""Olá! Nova SOLICITAÇÃO DE ED recebida ✅
+        corpo_email = f"""Olá! Nova solicitação de ED recebida ✅
 
 Resumo da solicitação:
 - Obra: {obra}
