@@ -245,9 +245,7 @@ Favor validar antes de criarmos a requisição.
         corpo_email = f"""Olá! Nova SOLICITAÇÃO DE ED recebida ✅
 
 Resumo da solicitação:
-- Referência: {pedido_num}
 - Obra: {obra}
-- Solicitante: {solicitante}
 - Executivo: {executivo}
 - Data: {data_fmt}
 - Nº OF Mãe: {num_of_mae}
@@ -459,8 +457,8 @@ with st.expander("📋 Dados do Pedido", expanded=True):
         else:
             # ✅ obras normais: auto preenchimento (1 ou 2 executivos)
             if nomes_execs:
-                st.session_state.executivo_obra = "; ".join(nomes_execs)  # exibição (1 ou 2)
-                st.session_state.executivo = nomes_execs[0]              # usado no Excel/validação
+                st.session_state.executivo_obra = "; ".join(nomes_execs) # exibição (1 ou 2)
+                st.session_state.executivo = "; ".join(nomes_execs) # usado no Excel/validação
                 st.session_state.exec_emails_obra = emails_execs
             else:
                 st.session_state.executivo_obra = ""
