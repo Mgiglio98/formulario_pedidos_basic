@@ -88,14 +88,8 @@ ADM_EMAILS = {
 }
 
 OBRA_EXECUTIVOS = {
-    "2317 - LUIZ ALBERTO HESS BORGES": [
-        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
-    ],
     "2514 - FELIPE HESS BORGES": [
         {"executivo": "Matheus Sanches", "email": "matheus.sanches@osborne.com.br"},
-    ],
-    "2411 - JOÃO CARLOS BEHISNELIAN": [
-        {"executivo": "Vitor Ramos", "email": "vitor.ramos@osborne.com.br"},
     ],
     "2407 - SUN MORITZ ADMINISTRADORA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
@@ -124,9 +118,6 @@ OBRA_EXECUTIVOS = {
     "2510 - SAMAUMA EVENTOS LTDA": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
-    "2515 - MARCO FREIRE (ÁREA EXTERNA)": [
-        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
-    ],
     "2506 - KATIA FERREIRA DE BARROS": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
@@ -139,19 +130,9 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
         {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
     ],
-    "2409 - MARIA BELTRÃO SALDANHA COELHO": [
-        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-    ],
     "2601 - REGINA CAMPOS SALLES MORAES ABREU": [
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
         {"executivo": "Ana Luísa Sanioto", "email": "ana.sanioto@osborne.com.br"},
-    ],
-    "2404 - LUIZ HENRIQUE FRAGA": [
-        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
-        {"executivo": "Sofia Goes", "email": "sofia.goes@osborne.com.br"},
-    ],
-    "2303 - LUIZ ROGÉRIO BERTO": [
-        {"executivo": "Igor Bueno", "email": "igor.bueno@osborne.com.br"},
     ],
     "2603 - FERNANDO AUGUSTO COELHO F DE VASCONCELLOS": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
