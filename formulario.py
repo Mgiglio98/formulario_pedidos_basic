@@ -436,17 +436,25 @@ with st.expander("📋 Dados do Pedido", expanded=True):
                 st.session_state.exec_emails_obra = []
 
         else:
-            # ✅ obras normais: auto preenchimento (1 ou 2 executivos)
+            # ✅ Se a obra tiver executivo cadastrado: preenche automaticamente
             if nomes_execs:
-                st.session_state.executivo_obra = "; ".join(nomes_execs) # exibição (1 ou 2)
-                st.session_state.executivo = "; ".join(nomes_execs) # usado no Excel/validação
+                st.session_state.executivo_obra = "; ".join(nomes_execs)
+                st.session_state.executivo = "; ".join(nomes_execs)
                 st.session_state.exec_emails_obra = emails_execs
+        
+                st.text_input("Executivo", key="executivo_obra", disabled=True)
+        
+            # ✅ Se a obra NÃO tiver executivo cadastrado: libera digitação manual
             else:
-                st.session_state.executivo_obra = ""
-                st.session_state.executivo = ""
+                exec_manual = st.text_input(
+                    "Executivo",
+                    key="executivo_manual",
+                    placeholder="Digite o nome do executivo"
+                )
+        
+                st.session_state.executivo = exec_manual
+                st.session_state.executivo_obra = exec_manual
                 st.session_state.exec_emails_obra = []
-
-            st.text_input("Executivo", key="executivo_obra", disabled=True)
 
         # ADM segue manual (como você já faz)
         opcoes_adm = [""] + list(ADM_EMAILS.keys())
