@@ -88,35 +88,24 @@ ADM_EMAILS = {
 }
 
 OBRA_EXECUTIVOS = {
-    "2514 - FELIPE HESS BORGES": [
-        {"executivo": "Matheus Sanches", "email": "matheus.sanches@osborne.com.br"},
+    "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
+        {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
+        {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
     ],
-    "2407 - SUN MORITZ ADMINISTRADORA": [
-        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
-    ],
-    "2511 - 1807 PARTICIPAÇÕES LTDA": [
-        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
-    ],
-    "2512 - ROBERTO KLABIN MARTINS XAVIER": [
-        {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
-    ],
-    "2516 - JOSÉ CARLOS MORAES ABREU FILHO": [
-        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
-    ],
-    "2505 - EW ADMINISTRADORA LTDA": [
-        {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
+    "2213 - TOMAS DA VEIGA PEREIRA": [
+        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
     "2316 - MARCO AURÉLIO SIMÃO FREIRE": [
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
     ],
+    "2407 - SUN MORITZ ADMINISTRADORA": [
+        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
+    ],
     "2504 - MARIA ANGÉLICA A. M. DA COSTA": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
-    "2509 - RAFAEL CURSINO DE MOURA LEVY": [
-        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
-    ],
-    "2510 - SAMAUMA EVENTOS LTDA": [
-        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+    "2505 - EW ADMINISTRADORA LTDA": [
+        {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
     ],
     "2506 - KATIA FERREIRA DE BARROS": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
@@ -126,18 +115,29 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
-    "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
-        {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
-        {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
+    "2509 - RAFAEL CURSINO DE MOURA LEVY": [
+        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
+    "2510 - SAMAUMA EVENTOS LTDA": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+    ],
+    "2511 - 1807 PARTICIPAÇÕES LTDA": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+    ],
+    "2512 - ROBERTO KLABIN MARTINS XAVIER": [
+        {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
+    ],
+    "2514 - FELIPE HESS BORGES": [
+        {"executivo": "Matheus Sanches", "email": "matheus.sanches@osborne.com.br"},
+    ],
+    "2516 - JOSÉ CARLOS MORAES ABREU FILHO": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
     "2601 - REGINA CAMPOS SALLES MORAES ABREU": [
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
         {"executivo": "Ana Luísa Sanioto", "email": "ana.sanioto@osborne.com.br"},
     ],
     "2603 - FERNANDO AUGUSTO COELHO F DE VASCONCELLOS": [
-        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-    ],
-    "2213 - TOMAS DA VEIGA PEREIRA": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
     "2606 - MARCO FREIRE (FAZENDA BOA VISTA)": [
