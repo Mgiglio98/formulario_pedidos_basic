@@ -120,6 +120,7 @@ OBRA_EXECUTIVOS = {
     ],
     "2510 - SAMAUMA EVENTOS LTDA": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+        {"executivo": "Sofia Goes", "email": "sofia.goes@osborne.com.br"},
     ],
     "2511 - 1807 PARTICIPAÇÕES LTDA": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
@@ -143,6 +144,9 @@ OBRA_EXECUTIVOS = {
     "2606 - MARCO FREIRE (FAZENDA BOA VISTA)": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
+    ],
+    "2607 - DAN-DAN EMPREENDIMENTOS (LOJA 02)": [
+        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
     ],
 }
 
