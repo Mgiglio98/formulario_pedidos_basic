@@ -94,6 +94,7 @@ OBRA_EXECUTIVOS = {
     ],
     "2213 - TOMAS DA VEIGA PEREIRA": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
     ],
     "2316 - MARCO AURÉLIO SIMÃO FREIRE": [
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
@@ -138,7 +139,7 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
         {"executivo": "Ana Luísa Sanioto", "email": "ana.sanioto@osborne.com.br"},
     ],
-    "2603 - FERNANDO AUGUSTO COELHO F DE VASCONCELLOS": [
+    "2603 - FERNANDO AUGUSTO VASCONCELLOS": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
     "2606 - MARCO FREIRE (FAZENDA BOA VISTA)": [
