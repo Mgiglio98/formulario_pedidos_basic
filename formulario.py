@@ -135,12 +135,15 @@ OBRA_EXECUTIVOS = {
     "2516 - JOSÉ CARLOS MORAES ABREU FILHO": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
-    "2601 - REGINA CAMPOS SALLES MORAES ABREU": [
+    "2601 - REGINA CAMPOS S. MORAES ABREU": [
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
         {"executivo": "Ana Luísa Sanioto", "email": "ana.sanioto@osborne.com.br"},
     ],
     "2603 - FERNANDO AUGUSTO VASCONCELLOS": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+    ],
+    "2605 - ALESSANDRO ARDUINI": [
+        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
     ],
     "2606 - MARCO FREIRE (FAZENDA BOA VISTA)": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
