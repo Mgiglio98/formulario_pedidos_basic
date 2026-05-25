@@ -76,9 +76,6 @@ def validar_data_br(txt: str):
     if dt < hoje:
         return dt, "A data informada é menor que a data de hoje."
 
-    if dias_diferenca < 3:
-        return dt, "Atenção: a data de necessidade está com prazo menor que 3 dias."
-
     return dt, None
 
 # --- CAMPOS PADRÃO ---
@@ -513,7 +510,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.session_state.get("limpar_campos_insumo", False):
         # 🔹 Remove todos os valores dos campos
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria_txt"]:
+        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria_txt", "justificativa_urgencia"]:
             if campo in st.session_state:
                 del st.session_state[campo]
 
@@ -523,6 +520,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         st.session_state.complemento = ""
         st.session_state.data_necessaria_txt = ""
         st.session_state.limpar_campos_insumo = False
+        st.session_state.justificativa_urgencia = ""
         st.rerun()  # 🔁 força recarregar já limpo
     
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
@@ -567,7 +565,26 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         key="data_necessaria_txt",
         placeholder="DD/MM/YYYY"
     )
-        
+
+    dt_preview, _ = validar_data_br(st.session_state.get("data_necessaria_txt"))
+
+    exigir_justificativa = False
+    
+    if dt_preview:
+        dias_diferenca = (dt_preview - date.today()).days
+        exigir_justificativa = 0 <= dias_diferenca < 3
+    
+    if exigir_justificativa:
+        st.warning("⚠️ Prazo menor que 3 dias. Informe a justificativa da urgência.")
+    
+        justificativa_urgencia = st.text_area(
+            "Justificativa da urgência",
+            key="justificativa_urgencia",
+            placeholder="Explique o motivo da urgência"
+        )
+    else:
+        justificativa_urgencia = ""
+    
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
@@ -580,6 +597,17 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 st.warning(f"⚠️ {err}")
     
             st.stop()
+
+        dias_diferenca = (dt - date.today()).days
+
+        if 0 <= dias_diferenca < 3:
+            justificativa_urgencia = st.session_state.get("justificativa_urgencia", "").strip()
+        
+            if not justificativa_urgencia:
+                st.warning("⚠️ Informe a justificativa da urgência para pedidos com prazo menor que 3 dias.")
+                st.stop()
+        else:
+            justificativa_urgencia = ""
     
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             qtd = float(quantidade)
@@ -594,6 +622,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "quantidade": qtd,
                 "complemento": complemento,
                 "data_necessaria": dt,
+                "justificativa_urgencia": justificativa_urgencia,
             }
     
             st.session_state.insumos.append(novo_insumo)
@@ -759,10 +788,11 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
                     insumo["data_necessaria"].strftime("%d/%m/%Y")
                     if insumo.get("data_necessaria") else ""
                 )
+                ws[f"H{linha}"] = insumo.get("justificativa_urgencia", "")
                 linha += 1
 
             ultima_linha_util = linha - 1
-            ws.print_area = f"A1:G{ultima_linha_util}"
+            ws.print_area = f"A1:H{ultima_linha_util}"
 
             buffer = BytesIO()
             wb.save(buffer)
