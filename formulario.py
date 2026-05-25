@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import date
+from datetime import datetime, date
 from openpyxl import load_workbook
 import pandas as pd
 from email.mime.multipart import MIMEMultipart
@@ -7,7 +7,6 @@ from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 import smtplib
 from io import BytesIO
-from datetime import datetime
 
 # --- CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="Pedido de Materiais", page_icon="📦")
@@ -62,13 +61,25 @@ if st.session_state.get("rerun_depois_download", False):
 
 def validar_data_br(txt: str):
     txt = (txt or "").strip()
+
     if not txt:
         return None, "Preencha a data de necessidade do insumo (DD/MM/YYYY)."
+
     try:
         dt = datetime.strptime(txt, "%d/%m/%Y").date()
-        return dt, None
     except ValueError:
         return None, "Data inválida. Use o formato DD/MM/YYYY."
+
+    hoje = date.today()
+    dias_diferenca = (dt - hoje).days
+
+    if dt < hoje:
+        return dt, "A data informada é menor que a data de hoje."
+
+    if dias_diferenca < 3:
+        return dt, "Atenção: a data de necessidade está com prazo menor que 3 dias."
+
+    return dt, None
 
 # --- CAMPOS PADRÃO ---
 for campo in ["pedido_numero", "solicitante", "executivo", "obra_selecionada", "cnpj", "endereco", "cep"]:
@@ -560,15 +571,19 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     if st.button("➕ Adicionar insumo"):
         descricao_final = st.session_state.descricao if usando_base else descricao_livre
     
-        # valida data obrigatória somente na hora de adicionar
         dt, err = validar_data_br(st.session_state.get("data_necessaria_txt"))
     
         if err:
-            st.warning(f"⚠️ {err}")
+            if dt and dt < date.today():
+                st.error(f"❌ {err}")
+            else:
+                st.warning(f"⚠️ {err}")
+    
             st.stop()
     
         if descricao_final and quantidade > 0 and (usando_base or st.session_state.unidade.strip()):
             qtd = float(quantidade)
+    
             if qtd.is_integer():
                 qtd = int(qtd)
     
@@ -578,13 +593,15 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "unidade": st.session_state.unidade,
                 "quantidade": qtd,
                 "complemento": complemento,
-                "data_necessaria": dt,  # <-- agora é date validado
+                "data_necessaria": dt,
             }
+    
             st.session_state.insumos.append(novo_insumo)
     
             st.session_state.limpar_campos_insumo = True
             st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
+    
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
     
