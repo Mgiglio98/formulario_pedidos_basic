@@ -803,8 +803,19 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             st.session_state.excel_bytes = buffer.read()
             st.session_state.nome_arquivo = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
 
+            if st.session_state.get("tipo_processo") == "Criação de ED":
+                assunto_email = (
+                    f"Pedido{st.session_state.pedido_numero} - ED - "
+                    f"OC {st.session_state.obra_selecionada}"
+                )
+            else:
+                assunto_email = (
+                    f"Pedido{st.session_state.pedido_numero} "
+                    f"OC {st.session_state.obra_selecionada}"
+                )
+            
             enviar_email_pedido(
-                f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}",
+                assunto_email,
                 st.session_state.excel_bytes,
                 st.session_state.insumos,
                 ADM_EMAILS,
