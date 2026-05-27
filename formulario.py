@@ -110,6 +110,9 @@ OBRA_EXECUTIVOS = {
     "2407 - SUN MORITZ ADMINISTRADORA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
     ],
+    "2409 - MARIA BELTRÃO SALDANHA COELHO": [
+        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+    ],
     "2504 - MARIA ANGÉLICA A. M. DA COSTA": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
