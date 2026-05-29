@@ -145,6 +145,7 @@ OBRA_EXECUTIVOS = {
     ],
     "2516 - JOSÉ CARLOS MORAES ABREU FILHO": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+        {"executivo": "Beatriz Casellato", "email": "beatriz.casellato@osborne.com.br"},
     ],
     "2601 - REGINA CAMPOS S. MORAES ABREU": [
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
