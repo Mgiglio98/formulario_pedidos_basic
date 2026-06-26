@@ -133,6 +133,9 @@ OBRA_EXECUTIVOS = {
     "2510 - SAMAUMA EMPREEND. , SERV. E PART. LTDA.": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
+    "251001 - LUIZ ANTONIO BETTIOL": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+    ],
     "2511 - 1807 PARTICIPAÇÕES LTDA": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
@@ -150,6 +153,9 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Marcos Varjão", "email": "marcos.varjao@osborne.com.br"},
         {"executivo": "Ana Luísa Sanioto", "email": "ana.sanioto@osborne.com.br"},
     ],
+    "2602 - RENATA STUHLBERGER": [
+        {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
+    ],
     "2603 - FERNANDO AUGUSTO VASCONCELLOS": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
@@ -162,6 +168,9 @@ OBRA_EXECUTIVOS = {
     ],
     "2607 - DAN-DAN EMPREENDIMENTOS (LOJA 02)": [
         {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
+    ],
+    "2611 - GUILHERME BOTTURA": [
+        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
     ],
 }
 
