@@ -178,6 +178,9 @@ OBRA_EXECUTIVOS = {
     "2611 - GUILHERME BOTTURA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
     ],
+    "2612 - FABIO DE BARROS PINHEIRO": [
+        {"executivo": "Felipe Schwartz", "email": "felipe.schwartz@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
