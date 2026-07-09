@@ -647,12 +647,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         ) if usando_base else None
         
         if ultimo_preco is not None:
-            valor_estimado = ultimo_preco * float(quantidade)
-        
             st.info(
                 f"Último preço pago em {st.session_state.get('estado_obra')}: "
-                f"{formatar_moeda(ultimo_preco)} | "
-                f"Total estimado: {formatar_moeda(valor_estimado)}"
+                f"{formatar_moeda(ultimo_preco)}"
             )
         else:
             if usando_base:
