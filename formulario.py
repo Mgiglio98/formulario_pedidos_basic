@@ -391,14 +391,6 @@ def buscar_ultimo_preco(mapa_ultimos_precos, codigo_insumo, estado_obra):
     if not codigo_insumo or not estado_obra:
         return None
 
-    filtro = (
-        (df_ultimos_precos["INSUMOCDG"] == codigo_insumo)
-        & (df_ultimos_precos["ESTADO"] == estado_obra)
-    )
-
-    if not filtro.any():
-        return None
-
     return mapa_ultimos_precos.get((codigo_insumo, estado_obra))
 
 # --- LIMPEZA APÓS ENVIO ---
