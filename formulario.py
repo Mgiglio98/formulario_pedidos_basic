@@ -316,7 +316,8 @@ Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
         print(f"Erro ao enviar e-mail: {e}")
 
 def carregar_dados():
-    """Carrega dados de empreendimentos e insumos."""
+    """Carrega dados de empreendimentos, insumos e últimos valores praticados."""
+
     df_empreend = pd.read_excel("Empreendimentos.xlsx")
     df_empreend.columns = df_empreend.columns.str.strip().str.upper()
 
@@ -324,19 +325,76 @@ def carregar_dados():
     df_insumos["Min"] = pd.to_numeric(df_insumos.iloc[:, 3], errors="coerce")
     df_insumos["Max"] = pd.to_numeric(df_insumos.iloc[:, 4], errors="coerce")
     df_insumos["Basico"] = df_insumos["Min"].notna() & df_insumos["Max"].notna()
-    df_insumos = df_insumos[df_insumos["Descrição"].notna() & (df_insumos["Descrição"].str.strip() != "")]
+    df_insumos = df_insumos[
+        df_insumos["Descrição"].notna()
+        & (df_insumos["Descrição"].str.strip() != "")
+    ]
 
     df_empreend.loc[-1] = [""] * df_empreend.shape[1]
     df_empreend.index = df_empreend.index + 1
     df_empreend = df_empreend.sort_index()
 
-    insumos_vazios = pd.DataFrame({"Código": [""], "Descrição": [""], "Unidade": [""]})
+    insumos_vazios = pd.DataFrame({
+        "Código": [""],
+        "Descrição": [""],
+        "Unidade": [""]
+    })
+
     df_insumos = pd.concat([insumos_vazios, df_insumos], ignore_index=True)
     df_insumos["Código"] = df_insumos["Código"].fillna("").astype(str)
-    return df_empreend, df_insumos
+
+    # Base de valores praticados
+    df_valores = pd.read_excel("ValoresPraticados.xlsx")
+    df_valores.columns = df_valores.columns.str.strip().str.upper()
+
+    df_valores["INSUMOCDG"] = df_valores["INSUMOCDG"].astype(str).str.strip().str.upper()
+    df_valores["ESTADO"] = df_valores["ESTADO"].astype(str).str.strip().str.upper()
+    df_valores["DATACOMPRA"] = pd.to_datetime(df_valores["DATACOMPRA"], errors="coerce", dayfirst=True)
+    df_valores["VALOR_NUM"] = pd.to_numeric(df_valores["VALORESPRATICADOS"], errors="coerce")
+
+    df_valores = df_valores[
+        df_valores["INSUMOCDG"].notna()
+        & df_valores["ESTADO"].notna()
+        & df_valores["DATACOMPRA"].notna()
+        & df_valores["VALOR_NUM"].notna()
+    ].copy()
+
+    # Última compra por insumo + estado
+    df_ultimos_precos = (
+        df_valores
+        .sort_values("DATACOMPRA", ascending=False)
+        .drop_duplicates(subset=["INSUMOCDG", "ESTADO"], keep="first")
+        .copy()
+    )
+
+    return df_empreend, df_insumos, df_ultimos_precos
 
 # --- CARREGAMENTO DE DADOS ---
-df_empreend, df_insumos = carregar_dados()
+df_empreend, df_insumos, df_ultimos_precos = carregar_dados()
+
+def formatar_moeda(valor):
+    if pd.isna(valor):
+        return "-"
+
+    return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def buscar_ultimo_preco(df_ultimos_precos, codigo_insumo, estado_obra):
+    codigo_insumo = str(codigo_insumo or "").strip().upper()
+    estado_obra = str(estado_obra or "").strip().upper()
+
+    if not codigo_insumo or not estado_obra:
+        return None
+
+    filtro = (
+        (df_ultimos_precos["INSUMOCDG"] == codigo_insumo)
+        & (df_ultimos_precos["ESTADO"] == estado_obra)
+    )
+
+    if not filtro.any():
+        return None
+
+    return df_ultimos_precos.loc[filtro, "VALOR_NUM"].iloc[0]
 
 # --- LIMPEZA APÓS ENVIO ---
 if st.session_state.get("limpar_pedido", False):
@@ -505,6 +563,7 @@ with st.expander("📋 Dados do Pedido", expanded=True):
             st.session_state.cnpj = dados_obra["CNPJ"]
             st.session_state.endereco = dados_obra["ENDERECO"]
             st.session_state.cep = dados_obra["CEP"]
+            st.session_state.estado_obra = dados_obra.get("UF", dados_obra.get("ESTADO", ""))
 
     st.text_input("CNPJ/CPF", key="cnpj", disabled=True)
     st.text_input("Endereço", key="endereco", disabled=True)
@@ -577,6 +636,28 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     st.text_input("Código do insumo", key="codigo", disabled=True)
     st.text_input("Unidade", key="unidade", disabled=usando_base)
     quantidade = st.number_input("Quantidade", min_value=0.0, value=float(st.session_state.get("quantidade", 1)), step=0.01, format="%g", key="quantidade")
+
+    estado_obra = st.session_state.get("estado_obra", "")
+    
+    if usando_base and estado_obra:
+        ultimo_preco = buscar_ultimo_preco(
+            df_ultimos_precos,
+            st.session_state.codigo,
+            st.session_state.get("estado_obra", "")
+        ) if usando_base else None
+        
+        if ultimo_preco is not None:
+            valor_estimado = ultimo_preco * float(quantidade)
+        
+            st.info(
+                f"Último preço pago em {st.session_state.get('estado_obra')}: "
+                f"{formatar_moeda(ultimo_preco)} | "
+                f"Total estimado: {formatar_moeda(valor_estimado)}"
+            )
+        else:
+            if usando_base:
+                st.warning("Sem histórico de compra para este insumo no estado da obra.")
+    
     complemento = st.text_area(
         "Complemento, se necessário (Utilize para especificar medidas, marcas, cores e/ou tamanhos)",
         key="complemento"
@@ -635,7 +716,15 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
             if qtd.is_integer():
                 qtd = int(qtd)
-    
+
+            ultimo_preco = buscar_ultimo_preco(
+                df_ultimos_precos,
+                st.session_state.codigo,
+                st.session_state.get("estado_obra", "")
+            ) if usando_base else None
+            
+            valor_total_estimado = ultimo_preco * qtd if ultimo_preco is not None else None
+            
             novo_insumo = {
                 "descricao": descricao_final,
                 "codigo": st.session_state.codigo if usando_base else "",
@@ -644,6 +733,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 "complemento": complemento,
                 "data_necessaria": dt,
                 "justificativa_urgencia": justificativa_urgencia,
+                "ultimo_preco": ultimo_preco,
+                "valor_total_estimado": valor_total_estimado,
             }
     
             st.session_state.insumos.append(novo_insumo)
@@ -709,21 +800,26 @@ if st.session_state.insumos:
     """, unsafe_allow_html=True)
 
     # Cabeçalho
-    col1, col2, col3, col4, col5 = st.columns([5.0, 1.0, 1.6, 1.0, 0.5])
+    col1, col2, col3, col4, col5, col6, col7 = st.columns([4.0, 0.8, 0.8, 1.3, 1.3, 1.3, 0.4])
+    
     with col1:
         st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
     with col2:
         st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
     with col3:
-        st.markdown("<div class='tabela-header center'>Entrega</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
     with col4:
-        st.markdown("<div class='tabela-header'>Unid</div>", unsafe_allow_html=True)
+        st.markdown("<div class='tabela-header center'>Últ. Preço</div>", unsafe_allow_html=True)
     with col5:
+        st.markdown("<div class='tabela-header center'>Total Est.</div>", unsafe_allow_html=True)
+    with col6:
+        st.markdown("<div class='tabela-header center'>Entrega</div>", unsafe_allow_html=True)
+    with col7:
         st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-
+    
     # Linhas
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4, col5 = st.columns([5.0, 1.0, 1.6, 1.0, 0.5])
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([4.0, 0.8, 0.8, 1.3, 1.3, 1.3, 0.4])
     
         with col1:
             st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
@@ -732,17 +828,37 @@ if st.session_state.insumos:
             st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
     
         with col3:
+            st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
+    
+        with col4:
+            st.markdown(
+                f"<div class='linha-insumo center'>{formatar_moeda(insumo.get('ultimo_preco'))}</div>",
+                unsafe_allow_html=True
+            )
+    
+        with col5:
+            st.markdown(
+                f"<div class='linha-insumo center'>{formatar_moeda(insumo.get('valor_total_estimado'))}</div>",
+                unsafe_allow_html=True
+            )
+    
+        with col6:
             dt = insumo.get("data_necessaria")
             dt_txt = dt.strftime("%d/%m/%Y") if dt else ""
             st.markdown(f"<div class='linha-insumo center'>{dt_txt}</div>", unsafe_allow_html=True)
     
-        with col4:
-            st.markdown(f"<div class='linha-insumo'>{insumo['unidade']}</div>", unsafe_allow_html=True)
-    
-        with col5:
+        with col7:
             if st.button("🗑️", key=f"delete_{i}"):
                 st.session_state.insumos.pop(i)
                 st.rerun()
+                
+    total_geral_estimado = sum(
+        item.get("valor_total_estimado") or 0
+        for item in st.session_state.insumos
+    )
+    
+    st.markdown(f"### Total aproximado do pedido: {formatar_moeda(total_geral_estimado)}")
+
 
 # --- FINALIZAÇÃO DO PEDIDO ---
 if st.button("📤 Enviar Pedido", use_container_width=True):
