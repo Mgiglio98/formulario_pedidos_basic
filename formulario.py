@@ -373,7 +373,7 @@ def carregar_dados():
         for _, row in df_ultimos_precos.iterrows()
     }
 
-    return df_empreend, df_insumos, df_ultimos_precos
+    return df_empreend, df_insumos, mapa_ultimos_precos
 
 # --- CARREGAMENTO DE DADOS ---
 df_empreend, df_insumos, mapa_ultimos_precos = carregar_dados()
