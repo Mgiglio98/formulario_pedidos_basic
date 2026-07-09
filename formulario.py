@@ -315,6 +315,7 @@ Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
+@st.cache_data(ttl=3600)
 def carregar_dados():
     """Carrega dados de empreendimentos, insumos e últimos valores praticados."""
 
@@ -367,10 +368,15 @@ def carregar_dados():
         .copy()
     )
 
+    mapa_ultimos_precos = {
+        (row["INSUMOCDG"], row["ESTADO"]): row["VALOR_NUM"]
+        for _, row in df_ultimos_precos.iterrows()
+    }
+
     return df_empreend, df_insumos, df_ultimos_precos
 
 # --- CARREGAMENTO DE DADOS ---
-df_empreend, df_insumos, df_ultimos_precos = carregar_dados()
+df_empreend, df_insumos, mapa_ultimos_precos = carregar_dados()
 
 def formatar_moeda(valor):
     if pd.isna(valor):
@@ -378,8 +384,7 @@ def formatar_moeda(valor):
 
     return f"R$ {valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-
-def buscar_ultimo_preco(df_ultimos_precos, codigo_insumo, estado_obra):
+def buscar_ultimo_preco(mapa_ultimos_precos, codigo_insumo, estado_obra):
     codigo_insumo = str(codigo_insumo or "").strip().upper()
     estado_obra = str(estado_obra or "").strip().upper()
 
@@ -394,7 +399,7 @@ def buscar_ultimo_preco(df_ultimos_precos, codigo_insumo, estado_obra):
     if not filtro.any():
         return None
 
-    return df_ultimos_precos.loc[filtro, "VALOR_NUM"].iloc[0]
+    return mapa_ultimos_precos.get((codigo_insumo, estado_obra))
 
 # --- LIMPEZA APÓS ENVIO ---
 if st.session_state.get("limpar_pedido", False):
@@ -641,7 +646,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
     if usando_base and estado_obra:
         ultimo_preco = buscar_ultimo_preco(
-            df_ultimos_precos,
+            mapa_ultimos_precos,
             st.session_state.codigo,
             st.session_state.get("estado_obra", "")
         ) if usando_base else None
@@ -715,7 +720,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
                 qtd = int(qtd)
 
             ultimo_preco = buscar_ultimo_preco(
-                df_ultimos_precos,
+                mapa_ultimos_precos,
                 st.session_state.codigo,
                 st.session_state.get("estado_obra", "")
             ) if usando_base else None
