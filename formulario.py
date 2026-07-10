@@ -668,7 +668,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
     if dt_preview:
         dias_diferenca = (dt_preview - date.today()).days
-        exigir_justificativa = 0 <= dias_diferenca < 3
+        exigir_justificativa = 0 <= dias_diferenca <= 3
     
     if exigir_justificativa:
         st.warning("⚠️ Prazo menor que 3 dias. Informe a justificativa da urgência.")
@@ -696,7 +696,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
 
         dias_diferenca = (dt - date.today()).days
 
-        if 0 <= dias_diferenca < 3:
+        if 0 <= dias_diferenca <= 3:
             justificativa_urgencia = st.session_state.get("justificativa_urgencia", "").strip()
         
             if not justificativa_urgencia:
