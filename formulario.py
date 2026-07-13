@@ -375,6 +375,26 @@ def carregar_dados():
 
     return df_empreend, df_insumos, mapa_ultimos_precos
 
+def contar_dias_uteis(data_inicio, data_fim):
+    """
+    Conta dias úteis entre data_inicio e data_fim,
+    desconsiderando sábados e domingos.
+    A data inicial não entra na contagem.
+    """
+    if data_fim <= data_inicio:
+        return 0
+
+    dias_uteis = 0
+    data_atual = data_inicio
+
+    while data_atual < data_fim:
+        data_atual += pd.Timedelta(days=1)
+
+        if data_atual.weekday() < 5:
+            dias_uteis += 1
+
+    return dias_uteis
+
 # --- CARREGAMENTO DE DADOS ---
 df_empreend, df_insumos, mapa_ultimos_precos = carregar_dados()
 
@@ -667,8 +687,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     exigir_justificativa = False
     
     if dt_preview:
-        dias_diferenca = (dt_preview - date.today()).days
-        exigir_justificativa = 0 <= dias_diferenca <= 3
+        dias_uteis = contar_dias_uteis(date.today(), dt_preview)
+        exigir_justificativa = dias_uteis <= 3
     
     if exigir_justificativa:
         st.warning("⚠️ Prazo menor que 3 dias. Informe a justificativa da urgência.")
@@ -694,9 +714,9 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
     
             st.stop()
 
-        dias_diferenca = (dt - date.today()).days
+        dias_uteis = contar_dias_uteis(date.today(), dt)
 
-        if 0 <= dias_diferenca <= 3:
+        if 0 <= dias_uteis <= 3:
             justificativa_urgencia = st.session_state.get("justificativa_urgencia", "").strip()
         
             if not justificativa_urgencia:
