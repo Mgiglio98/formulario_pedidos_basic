@@ -92,7 +92,8 @@ ADM_EMAILS = {
     "Joice": "joice.oliveira@osborne.com.br",
     "Micaele": "micaele.ferreira@osborne.com.br",
     "Graziele": "graziele.horacio@osborne.com.br",
-    "Roberto": "roberto.santos@osborne.com.br"
+    "Roberto": "roberto.santos@osborne.com.br",
+    "Fabio": "fabio.maia@osborne.com.br"
 }
 
 OBRA_EXECUTIVOS = {
@@ -174,6 +175,9 @@ OBRA_EXECUTIVOS = {
     ],
     "2607 - DAN-DAN EMPREENDIMENTOS (LOJA 02)": [
         {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
+    ],
+    "2610 - ASSOCIAÇÃO DE GOVERNANÇA DOS ADQUIRENTES DO ED. URBANO": [
+        {"executivo": "Rafael Lima", "email": "rafael.lima@osborne.com.br"},
     ],
     "2611 - GUILHERME BOTTURA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
