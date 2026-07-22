@@ -275,6 +275,27 @@ Resumo da solicitação:
 
 Favor analisar e, se estiver de acordo, proceder com a criação da Requisição da ED e OF filha no sistema, vinculando à OF Mãe informada.{sem_codigo_texto}
 """
+    
+    elif tipo_proc == "Cotação de Materiais":
+        if sem_codigo:
+            lista_formatada = "".join(f"- {item}\n" for item in sem_codigo)
+
+            corpo_email = f"""
+Olá! Nova solicitação de cotação de materiais recebida ✅
+
+Favor realizar a cotação dos materiais relacionados no arquivo anexo.
+
+Os seguintes insumos estão sem código cadastrado:
+{lista_formatada}
+            """
+            
+        else:
+            corpo_email = """
+Olá! Nova solicitação de cotação de materiais recebida ✅
+
+Favor realizar a cotação dos materiais relacionados no arquivo anexo.
+            """
+    
     else:
         corpo_email = f"""Olá! Novo formulário recebido ✅
 
@@ -445,10 +466,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-TIPO_PEDIDO   = "Pedido de Materiais"
-TIPO_ED       = "Criação de ED"
+TIPO_PEDIDO = "Pedido de Materiais"
+TIPO_ED = "Criação de ED"
+TIPO_COTACAO = "Cotação de Materiais"
 
-opcoes_tipo = [TIPO_PEDIDO, TIPO_ED]
+opcoes_tipo = [TIPO_PEDIDO, TIPO_ED, TIPO_COTACAO]
 
 valor_atual = st.session_state.get("tipo_processo", TIPO_PEDIDO)
 if valor_atual not in opcoes_tipo:
@@ -953,18 +975,22 @@ if st.button("📤 Enviar Pedido", use_container_width=True):
             wb.save(buffer)
             buffer.seek(0)
             st.session_state.excel_bytes = buffer.read()
-            st.session_state.nome_arquivo = f"Pedido{st.session_state.pedido_numero} OC {st.session_state.obra_selecionada}.xlsx"
-
-            if st.session_state.get("tipo_processo") == "Criação de ED":
-                assunto_email = (
-                    f"Pedido{st.session_state.pedido_numero} - ED - "
-                    f"OC {st.session_state.obra_selecionada}"
-                )
+            
+            tipo_proc = st.session_state.get("tipo_processo", TIPO_PEDIDO)
+            numero_pedido = st.session_state.pedido_numero
+            obra = st.session_state.obra_selecionada
+            
+            if tipo_proc == TIPO_ED:
+                nome_base = f"Pedido{numero_pedido} - ED - OC {obra}"
+            
+            elif tipo_proc == TIPO_COTACAO:
+                nome_base = f"Pedido{numero_pedido} - Cotação - OC {obra}"
+            
             else:
-                assunto_email = (
-                    f"Pedido{st.session_state.pedido_numero} "
-                    f"OC {st.session_state.obra_selecionada}"
-                )
+                nome_base = f"Pedido{numero_pedido} OC {obra}"
+            
+            st.session_state.nome_arquivo = f"{nome_base}.xlsx"
+            assunto_email = nome_base
             
             enviar_email_pedido(
                 assunto_email,
