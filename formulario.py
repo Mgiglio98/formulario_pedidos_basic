@@ -126,11 +126,11 @@ OBRA_EXECUTIVOS = {
     "2505 - EW ADMINISTRADORA LTDA": [
         {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
     ],
-    "2506 - KATIA FERREIRA DE BARROS": [
+    "2506 - KÁTIA FERREIRA DE BARROS": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
-    "2507 - KATIA FERREIRA DE BARROS": [
+    "2507 - KÁTIA FERREIRA DE BARROS": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
