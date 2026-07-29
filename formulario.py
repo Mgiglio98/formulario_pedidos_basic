@@ -178,6 +178,7 @@ OBRA_EXECUTIVOS = {
     ],
     "2610 - ASSOCIAÇÃO DE GOVERNANÇA DOS A. DO ED. URBANO": [
         {"executivo": "Rafael Lima", "email": "rafael.lima@osborne.com.br"},
+        {"executivo": "Sarah Mazeto", "email": "sarah.mazeto@osborne.com.br"},
     ],
     "2611 - GUILHERME BOTTURA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
