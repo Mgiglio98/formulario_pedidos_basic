@@ -97,31 +97,15 @@ ADM_EMAILS = {
 }
 
 OBRA_EXECUTIVOS = {
-    "222001 - GERSON NASCIMENTO (PÓS OBRA)": [
-        {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
-    ],
     "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
         {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
         {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
     ],
-    "2213 - TOMAS DA VEIGA PEREIRA": [
-        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-        {"executivo": "Leno Fagundes", "email": "leno.fagundes@osborne.com.br"},
-    ],
-    "2316 - MARCO AURÉLIO SIMÃO FREIRE": [
-        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
-    ],
     "2317 - LUIZ ALBERTO HESS BORGES": [
         {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
     ],
-    "2407 - SUN MORITZ ADMINISTRADORA": [
-        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
-    ],
     "2409 - MARIA BELTRÃO SALDANHA COELHO": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-    ],
-    "2504 - MARIA ANGÉLICA A. M. DA COSTA": [
-        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
     "2505 - EW ADMINISTRADORA LTDA": [
         {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
@@ -134,13 +118,7 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
-    "2509 - RAFAEL CURSINO DE MOURA LEVY": [
-        {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
-    ],
     "2510 - SAMAUMA EMPREEND. , SERV. E PART. LTDA.": [
-        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
-    ],
-    "251001 - LUIZ ANTONIO BETTIOL": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
     "2511 - 1807 PARTICIPAÇÕES LTDA": [
@@ -167,14 +145,11 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
     "2605 - ALESSANDRO ARDUINI": [
-        {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
+        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
     ],
     "2606 - MARCO AURÉLIO SIMÃO FREIRE": [
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Caio Fausto", "email": "caio.fausto@osborne.com.br"},
-    ],
-    "2607 - DAN-DAN EMPREENDIMENTOS (LOJA 02)": [
-        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
     ],
     "2610 - ASSOCIAÇÃO DE GOVERNANÇA DOS A. DO ED. URBANO": [
         {"executivo": "Rafael Lima", "email": "rafael.lima@osborne.com.br"},
