@@ -487,7 +487,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
 
         if escolha == "Outros":
             valor_outro = st.text_input(
-                "Informe:",
+                "Informe",
                 key=key_outro,
             )
 
@@ -495,288 +495,290 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
 
         return escolha
 
-    st.markdown("""
-    <div style='text-align: center; margin-top: 10px;'>
-        <h3 style='color: #000000;'>
-            Manifesto de Transporte de Resíduos - RJ
-        </h3>
-        <p style='font-size: 14px; color: #555;'>
-            Informe os dados necessários para geração do manifesto.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("### 📋 Dados da Solicitação")
-
     if (
         "data_pedido" not in st.session_state
         or not st.session_state.data_pedido
     ):
         st.session_state.data_pedido = date.today()
 
-    col1, col2 = st.columns(2)
+    with st.expander("Dados do Manifesto - RJ", expanded=True):
 
-    with col1:
-        st.text_input(
-            "Solicitante",
-            key="solicitante",
-        )
-
-    with col2:
-        st.text_input(
-            "Data da solicitação",
-            value=st.session_state.data_pedido.strftime("%d/%m/%Y"),
-            disabled=True,
-        )
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.selectbox(
-            "Obra",
-            df_empreend["EMPREENDIMENTO"].unique(),
-            index=0,
-            key="obra_selecionada",
-        )
-
-    with col2:
-
-        data_minima_manifesto = date.today() + timedelta(days=1)
-
-        prazo_manifesto = st.date_input(
-            "Prazo para geração do manifesto",
-            min_value=data_minima_manifesto,
-            value=data_minima_manifesto,
-            format="DD/MM/YYYY",
-            key="manifesto_prazo",
-        )
-
-        st.caption(
-            "Prazo mínimo: 1 dia após a solicitação."
-        )
-
-    st.divider()
-
-    st.markdown("### ♻️ Dados do Resíduo")
-
-    residuos_manifesto = [
-        "17 01 01 - Resíduos de cimento",
-        "17 01 02 - Tijolos",
-        "17 01 03 - Ladrilhos, telhas e materiais cerâmicos",
-        "17 01 07 - Misturas de concreto, tijolos, telhas e cerâmica",
-        "17 02 01 - Madeira",
-        "17 05 04 - Solo e pedras",
-        "17 08 02 - Materiais de construção à base de gesso",
-        "17 06 05 - Materiais de construção contendo amianto",
-        "17 09 04 - Outros resíduos de construção e demolição",
-        "20 02 02 - Terras e pedras",
-        "Entulho / Alvenaria limpa",
-        "Areia / Bota-fora",
-        "Resíduo misto",
-    ]
-
-    residuo = radio_com_outros(
-        "Resíduo",
-        residuos_manifesto,
-        "manifesto_residuo",
-        "manifesto_residuo_outro",
-    )
-
-    st.markdown("#### Quantidade")
-
-    tipo_quantidade = st.radio(
-        "Tipo de retirada",
-        [
-            "Caçamba padrão - 4 toneladas por caçamba",
-            "Bota-fora de areia",
-        ],
-        key="manifesto_tipo_quantidade",
-        horizontal=True,
-    )
-
-    if tipo_quantidade == "Caçamba padrão - 4 toneladas por caçamba":
-
-        qtd_cacambas = st.number_input(
-            "Quantidade de caçambas",
-            min_value=1,
-            step=1,
-            value=1,
-            key="manifesto_qtd_cacambas",
-        )
-
-        peso_total = qtd_cacambas * 4
-
-        st.info(
-            f"⚖️ Peso considerado: "
-            f"{qtd_cacambas} caçamba(s) × 4 t = "
-            f"{peso_total:g} toneladas"
-        )
-
-    else:
+        st.markdown("**Dados da Solicitação**")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            qtd_cacambas = st.number_input(
-                "Quantidade de caçambas / viagens",
-                min_value=1,
-                step=1,
-                value=1,
-                key="manifesto_qtd_cacambas_areia",
+            st.text_input(
+                "Solicitante",
+                key="solicitante",
             )
 
         with col2:
-            peso_total = st.number_input(
-                "Peso total (toneladas)",
-                min_value=0.01,
-                step=0.01,
-                format="%.2f",
-                key="manifesto_peso_areia",
+            st.text_input(
+                "Data",
+                value=st.session_state.data_pedido.strftime("%d/%m/%Y"),
+                disabled=True,
             )
 
-    col1, col2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-    with col1:
-        st.text_input(
-            "Unidade",
-            value="TONELADA",
-            disabled=True,
+        with col1:
+            st.selectbox(
+                "Obra",
+                df_empreend["EMPREENDIMENTO"].unique(),
+                index=0,
+                key="obra_selecionada",
+            )
+
+        with col2:
+            data_minima_manifesto = (
+                st.session_state.data_pedido
+                + timedelta(days=1)
+            )
+
+            prazo_manifesto = st.date_input(
+                "Prazo para geração do Manifesto",
+                min_value=data_minima_manifesto,
+                value=data_minima_manifesto,
+                format="DD/MM/YYYY",
+                key="manifesto_prazo",
+            )
+
+            st.caption(
+                "Prazo mínimo de 1 dia após a solicitação."
+            )
+
+        st.markdown("---")
+
+        st.markdown("**Dados do Resíduo**")
+
+        residuos_manifesto = [
+            "17 01 01 - Resíduos de cimento",
+            "17 01 02 - Tijolos",
+            "17 01 03 - Ladrilhos, telhas e materiais cerâmicos",
+            "17 01 07 - Misturas de concreto, tijolos, telhas e cerâmica",
+            "17 02 01 - Madeira",
+            "17 05 04 - Solo e pedras",
+            "17 08 02 - Materiais de construção à base de gesso",
+            "17 06 05 - Materiais de construção contendo amianto",
+            "17 09 04 - Outros resíduos de construção e demolição",
+            "20 02 02 - Terras e pedras",
+            "Entulho / Alvenaria limpa",
+            "Areia / Bota-fora",
+            "Resíduo misto",
+        ]
+
+        residuo = radio_com_outros(
+            "Resíduo",
+            residuos_manifesto,
+            "manifesto_residuo",
+            "manifesto_residuo_outro",
         )
 
-    with col2:
-        st.text_input(
-            "Estado físico",
-            value="SÓLIDO",
-            disabled=True,
-        )
-
-    st.divider()
-
-    st.markdown("### 🗂️ Classificação")
-
-    classe = st.radio(
-        "Classe",
-        [
-            "Classe II B - Alvenaria limpa",
-            "Classe II A - Resíduo misturado",
-            "Outros",
-        ],
-        key="manifesto_classe",
-        horizontal=True,
-    )
-
-    if classe == "Classe II B - Alvenaria limpa":
-
-        classe_final = "Classe II B"
-
-        st.caption(
-            "Concreto, tijolo, blocos, argamassa, telhas, "
-            "cerâmica, brita e terra."
-        )
-
-    elif classe == "Classe II A - Resíduo misturado":
-
-        classe_final = "Classe II A"
-
-        st.caption(
-            "Resíduo com presença de materiais misturados, "
-            "como sacos de cimento, gesso, madeira, PVC ou fiação."
-        )
-
-    else:
-
-        classe_final = st.text_input(
-            "Informe a classe",
-            key="manifesto_classe_outro",
-        )
-
-    st.divider()
-
-    st.markdown("### 🚛 Retirada e Destinação")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        acondicionamento = radio_com_outros(
-            "Acondicionamento / retirada",
+        tipo_quantidade = st.radio(
+            "Tipo de retirada",
             [
-                "Caçamba aberta",
+                "Caçamba padrão - 4 toneladas por caçamba",
+                "Bota-fora de areia",
             ],
-            "manifesto_acondicionamento",
-            "manifesto_acondicionamento_outro",
+            key="manifesto_tipo_quantidade",
             horizontal=True,
         )
 
-    with col2:
+        if (
+            tipo_quantidade
+            == "Caçamba padrão - 4 toneladas por caçamba"
+        ):
 
-        tecnologia = radio_com_outros(
-            "Tecnologia / destinação",
+            col1, col2 = st.columns(2)
+
+            with col1:
+                qtd_cacambas = st.number_input(
+                    "Quantidade de caçambas",
+                    min_value=1,
+                    step=1,
+                    value=1,
+                    key="manifesto_qtd_cacambas",
+                )
+
+            peso_total = qtd_cacambas * 4
+
+            with col2:
+                st.text_input(
+                    "Peso total",
+                    value=f"{peso_total:g} toneladas",
+                    disabled=True,
+                )
+
+            st.caption(
+                f"{qtd_cacambas} caçamba(s) x 4 toneladas "
+                f"= {peso_total:g} toneladas."
+            )
+
+        else:
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                qtd_cacambas = st.number_input(
+                    "Quantidade de caçambas / viagens",
+                    min_value=1,
+                    step=1,
+                    value=1,
+                    key="manifesto_qtd_cacambas_areia",
+                )
+
+            with col2:
+                peso_total = st.number_input(
+                    "Peso total",
+                    min_value=0.01,
+                    step=0.01,
+                    format="%.2f",
+                    key="manifesto_peso_areia",
+                )
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.text_input(
+                "Unidade",
+                value="TONELADA",
+                disabled=True,
+            )
+
+        with col2:
+            st.text_input(
+                "Estado Físico",
+                value="SÓLIDO",
+                disabled=True,
+            )
+
+        st.markdown("---")
+
+        st.markdown("**Classificação**")
+
+        classe = st.radio(
+            "Classe",
             [
-                "Aterro",
+                "Classe II B - Alvenaria limpa",
+                "Classe II A - Resíduo misturado",
+                "Outros",
             ],
-            "manifesto_tecnologia",
-            "manifesto_tecnologia_outro",
+            key="manifesto_classe",
             horizontal=True,
         )
 
-    st.divider()
+        if classe == "Classe II B - Alvenaria limpa":
 
-    st.markdown("### 🏢 Transportador e Destinador")
+            classe_final = "Classe II B"
 
-    residuo_entulho = (
-        residuo == "Entulho / Alvenaria limpa"
-    )
+            st.caption(
+                "Concreto, tijolo, blocos, argamassa, telhas, "
+                "cerâmica, brita e terra."
+            )
 
-    if residuo_entulho:
+        elif classe == "Classe II A - Resíduo misturado":
 
-        st.info(
-            "Para retirada de entulho, os CNPJs do Transportador "
-            "e Destinador não precisam ser informados."
+            classe_final = "Classe II A"
+
+            st.caption(
+                "Resíduo com presença de materiais misturados, "
+                "como sacos de cimento, gesso, madeira, PVC ou fiação."
+            )
+
+        else:
+
+            classe_final = st.text_input(
+                "Informe a Classe",
+                key="manifesto_classe_outro",
+            )
+
+        st.markdown("---")
+
+        st.markdown("**Retirada e Destinação**")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            acondicionamento = radio_com_outros(
+                "Acondicionamento",
+                [
+                    "Caçamba aberta",
+                ],
+                "manifesto_acondicionamento",
+                "manifesto_acondicionamento_outro",
+                horizontal=True,
+            )
+
+        with col2:
+            tecnologia = radio_com_outros(
+                "Tecnologia de Destinação",
+                [
+                    "Aterro",
+                ],
+                "manifesto_tecnologia",
+                "manifesto_tecnologia_outro",
+                horizontal=True,
+            )
+
+        st.markdown("---")
+
+        st.markdown("**Transportador e Destinador**")
+
+        residuo_entulho = (
+            residuo == "Entulho / Alvenaria limpa"
         )
 
-    col1, col2 = st.columns(2)
+        if residuo_entulho:
+            st.caption(
+                "Para retirada de entulho, os CNPJs do "
+                "Transportador e do Destinador não são obrigatórios."
+            )
 
-    with col1:
+        col1, col2 = st.columns(2)
 
-        cnpj_transportador = st.text_input(
-            "CNPJ do Transportador",
-            key="manifesto_cnpj_transportador",
-            disabled=residuo_entulho,
-            placeholder="00.000.000/0000-00",
-        )
+        with col1:
+            cnpj_transportador = st.text_input(
+                "CNPJ do Transportador",
+                key="manifesto_cnpj_transportador",
+                disabled=residuo_entulho,
+                placeholder="00.000.000/0000-00",
+            )
 
-    with col2:
-
-        cnpj_destinador = st.text_input(
-            "CNPJ do Destinador",
-            key="manifesto_cnpj_destinador",
-            disabled=residuo_entulho,
-            placeholder="00.000.000/0000-00",
-        )
-
-    st.markdown("<br>", unsafe_allow_html=True)
+        with col2:
+            cnpj_destinador = st.text_input(
+                "CNPJ do Destinador",
+                key="manifesto_cnpj_destinador",
+                disabled=residuo_entulho,
+                placeholder="00.000.000/0000-00",
+            )
 
     if st.button(
-        "📤 Enviar solicitação de Manifesto",
+        "Enviar Manifesto",
         use_container_width=True,
     ):
 
         erros = []
 
-        if not st.session_state.get("solicitante", "").strip():
+        if not st.session_state.get(
+            "solicitante",
+            "",
+        ).strip():
             erros.append(
                 "Informe o solicitante."
             )
 
-        if not st.session_state.get("obra_selecionada", ""):
+        if not st.session_state.get(
+            "obra_selecionada",
+            "",
+        ):
             erros.append(
                 "Selecione a obra."
             )
 
         if not residuo:
             erros.append(
-                "Informe o tipo de resíduo."
+                "Informe o resíduo."
             )
 
         if not classe_final:
@@ -791,7 +793,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
 
         if not tecnologia:
             erros.append(
-                "Informe a tecnologia / destinação."
+                "Informe a tecnologia de destinação."
             )
 
         if not residuo_entulho:
@@ -809,14 +811,12 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
         if erros:
 
             for erro in erros:
-                st.warning(
-                    f"⚠️ {erro}"
-                )
+                st.warning(erro)
 
             st.stop()
 
         st.success(
-            "✅ Solicitação de Manifesto validada com sucesso."
+            "Solicitação de Manifesto validada com sucesso."
         )
 
     st.stop()
