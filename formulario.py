@@ -316,6 +316,121 @@ Tipo de processo selecionado: {tipo_proc or "Não informado"}{sem_codigo_texto}
     except Exception as e:
         print(f"Erro ao enviar e-mail: {e}")
 
+def enviar_email_manifesto(
+    solicitante,
+    data_solicitacao,
+    obra,
+    prazo_manifesto,
+    residuo,
+    tipo_retirada,
+    qtd_cacambas,
+    peso_total,
+    classe,
+    acondicionamento,
+    tecnologia,
+    cnpj_transportador,
+    cnpj_destinador,
+):
+    smtp_server = "smtp.office365.com"
+    smtp_port = 587
+
+    smtp_user = "matheus.almeida@osborne.com.br"
+    smtp_password = st.secrets["SMTP_PASSWORD"]
+
+    destinatarios = [
+        "matheus.almeida@osborne.com.br",
+        "antonio.macedo@osborne.com.br",
+    ]
+    
+    codigo_obra = str(obra).split(" - ")[0].strip()
+
+    data_assunto = data_solicitacao.strftime("%d/%m/%Y")
+
+    assunto = (
+        f"Solicitação de Manifesto - "
+        f"Obra {codigo_obra} - "
+        f"{data_assunto}"
+    )
+
+    cnpj_transportador_texto = (
+        cnpj_transportador.strip()
+        if cnpj_transportador
+        else "Não se aplica"
+    )
+
+    cnpj_destinador_texto = (
+        cnpj_destinador.strip()
+        if cnpj_destinador
+        else "Não se aplica"
+    )
+
+    corpo_email = f"""
+Olá,
+
+Segue solicitação para geração de Manifesto de Transporte de Resíduos.
+
+DADOS DA SOLICITAÇÃO
+
+Solicitante: {solicitante}
+Data da solicitação: {data_solicitacao.strftime("%d/%m/%Y")}
+Obra: {obra}
+Prazo para geração do Manifesto: {prazo_manifesto.strftime("%d/%m/%Y")}
+
+DADOS DO RESÍDUO
+
+Resíduo: {residuo}
+Tipo de retirada: {tipo_retirada}
+Quantidade de caçambas / viagens: {qtd_cacambas}
+Peso total: {peso_total:g} toneladas
+Unidade: TONELADA
+Estado físico: SÓLIDO
+
+CLASSIFICAÇÃO
+
+Classe: {classe}
+
+RETIRADA E DESTINAÇÃO
+
+Acondicionamento: {acondicionamento}
+Tecnologia de destinação: {tecnologia}
+
+TRANSPORTADOR E DESTINADOR
+
+CNPJ do Transportador: {cnpj_transportador_texto}
+CNPJ do Destinador: {cnpj_destinador_texto}
+"""
+
+    msg = MIMEMultipart()
+
+    msg["From"] = smtp_user
+    msg["To"] = ", ".join(destinatarios)
+    msg["Subject"] = assunto
+
+    msg.attach(
+        MIMEText(
+            corpo_email.strip(),
+            "plain",
+        )
+    )
+
+    with smtplib.SMTP(
+        smtp_server,
+        smtp_port,
+    ) as server:
+
+        server.starttls()
+
+        server.login(
+            smtp_user,
+            smtp_password,
+        )
+
+        server.send_message(msg)
+
+    print(
+        f"E-mail de Manifesto enviado: {assunto}"
+    )
+
 @st.cache_data(ttl=3600)
 def carregar_dados():
     """Carrega dados de empreendimentos, insumos e últimos valores praticados."""
@@ -812,12 +927,58 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
 
             for erro in erros:
                 st.warning(erro)
-
+        
             st.stop()
-
-        st.success(
-            "Solicitação de Manifesto validada com sucesso."
-        )
+        
+        try:
+        
+            with st.spinner(
+                "Enviando solicitação de Manifesto..."
+            ):
+        
+                enviar_email_manifesto(
+                    solicitante=st.session_state.get(
+                        "solicitante",
+                        "",
+                    ).strip(),
+        
+                    data_solicitacao=st.session_state.data_pedido,
+        
+                    obra=st.session_state.get(
+                        "obra_selecionada",
+                        "",
+                    ),
+        
+                    prazo_manifesto=prazo_manifesto,
+        
+                    residuo=residuo,
+        
+                    tipo_retirada=tipo_quantidade,
+        
+                    qtd_cacambas=qtd_cacambas,
+        
+                    peso_total=peso_total,
+        
+                    classe=classe_final,
+        
+                    acondicionamento=acondicionamento,
+        
+                    tecnologia=tecnologia,
+        
+                    cnpj_transportador=cnpj_transportador,
+        
+                    cnpj_destinador=cnpj_destinador,
+                )
+        
+            st.success(
+                "Solicitação de Manifesto enviada com sucesso."
+            )
+        
+        except Exception as e:
+        
+            st.error(
+                f"Erro ao enviar solicitação de Manifesto: {e}"
+            )
 
     st.stop()
 
