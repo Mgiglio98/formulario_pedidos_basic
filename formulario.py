@@ -99,7 +99,6 @@ ADM_EMAILS = {
 OBRA_EXECUTIVOS = {
     "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
         {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
-        {"executivo": "Luciana Abreu", "email": "luciana.abreu@osborne.com.br"},
     ],
     "2317 - LUIZ ALBERTO HESS BORGES": [
         {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
