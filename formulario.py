@@ -163,6 +163,9 @@ OBRA_EXECUTIVOS = {
     "2612 - FABIO DE BARROS PINHEIRO": [
         {"executivo": "Felipe Schwartz", "email": "felipe.schwartz@osborne.com.br"},
     ],
+    "2613 - ODARA BRASIL LTDA": [
+        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
