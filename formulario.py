@@ -153,7 +153,7 @@ OBRA_EXECUTIVOS = {
     "2607 - DAN DAN EMPREENDIMENTOS": [
         {"executivo": "Maurício Trindade", "email": "mauricio.trindade@osborne.com.br"},
     ],
-    "2610 - ASSOCIAÇÃO DE GOVERNANÇA DOS A. DO ED. URBANO": [
+    "2610 - A. DE G. DOS A. DO EDIFÍCIO URBANO": [
         {"executivo": "Rafael Lima", "email": "rafael.lima@osborne.com.br"},
         {"executivo": "Sarah Mazeto", "email": "sarah.mazeto@osborne.com.br"},
     ],
