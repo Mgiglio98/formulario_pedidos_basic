@@ -117,7 +117,7 @@ OBRA_EXECUTIVOS = {
         {"executivo": "Vitor Carvalho", "email": "vitor.carvalho@osborne.com.br"},
         {"executivo": "Danielle Monteiro", "email": "danielle.monteiro@osborne.com.br"},
     ],
-    "2510 - SAMAUMA EMPREEND. , SERV. E PART. LTDA.": [
+    "2510 - SAMAUMA EMPREEND. SERV. E PART. LTDA.": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
     ],
     "2511 - 1807 PARTICIPAÇÕES LTDA": [
