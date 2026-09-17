@@ -674,19 +674,16 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
         st.markdown("**Dados do Resíduo**")
 
         residuos_manifesto = [
-            "17 01 01 - Resíduos de cimento",
+            "17 01 01 - Resíduos de cimento / Entulho / Alvenaria limpa",
             "17 01 02 - Tijolos",
             "17 01 03 - Ladrilhos, telhas e materiais cerâmicos",
-            "17 01 07 - Misturas de concreto, tijolos, telhas e cerâmica",
+            "17 01 07 - Misturas de concreto, tijolos, telhas e cerâmica / Resíduo Misto",
             "17 02 01 - Madeira",
             "17 05 04 - Solo e pedras",
             "17 08 02 - Materiais de construção à base de gesso",
             "17 06 05 - Materiais de construção contendo amianto",
             "17 09 04 - Outros resíduos de construção e demolição",
-            "20 02 02 - Terras e pedras",
-            "Entulho / Alvenaria limpa",
-            "Areia / Bota-fora",
-            "Resíduo misto",
+            "20 02 02 - Terras e pedras / Areia / Bota-fora",
         ]
 
         residuo = radio_com_outros(
