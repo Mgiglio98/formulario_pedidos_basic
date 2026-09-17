@@ -654,7 +654,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
         with col2:
             data_minima_manifesto = (
                 st.session_state.data_pedido
-                + timedelta(days=1)
+                + timedelta(days=2)
             )
 
             prazo_manifesto = st.date_input(
@@ -666,7 +666,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
             )
 
             st.caption(
-                "Prazo mínimo de 1 dia após a solicitação."
+                "Prazo mínimo de 2 dias após a solicitação."
             )
 
         st.markdown("---")
