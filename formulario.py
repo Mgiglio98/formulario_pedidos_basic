@@ -167,6 +167,10 @@ OBRA_EXECUTIVOS = {
     "2613 - ODARA BRASIL LTDA": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
+    "2614 - CAROLINE DA SILVA RODRIGUES": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+        {"executivo": "Jose Lenilson", "email": "jose.lenilson@osborne.com.br"},
+    ],
 }
 
 # Lista única de executivos a partir do OBRA_EXECUTIVOS
