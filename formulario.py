@@ -143,6 +143,9 @@ OBRA_EXECUTIVOS = {
     "2603 - FERNANDO AUGUSTO VASCONCELLOS": [
         {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
     ],
+    "2604 - ANDRE FRANCO SALES": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
+    ],
     "2605 - ALESSANDRO ARDUINI": [
         {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
     ],
