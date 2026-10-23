@@ -1139,20 +1139,25 @@ if st.session_state.tipo_processo == TIPO_ED:
 with st.expander("➕ Adicionar Insumo", expanded=True):
 
     if st.session_state.get("limpar_campos_insumo", False):
-        # 🔹 Remove todos os valores dos campos
-        for campo in ["descricao_exibicao", "descricao_livre", "codigo", "unidade", "quantidade", "complemento", "data_necessaria_txt", "justificativa_urgencia"]:
-            if campo in st.session_state:
-                del st.session_state[campo]
+        for campo in [
+            "descricao_exibicao",
+            "descricao_livre",
+            "codigo",
+            "unidade",
+            "quantidade",
+            "complemento",
+            "data_necessaria_txt",
+            "justificativa_urgencia",
+        ]:
+            st.session_state.pop(campo, None)
 
-        # 🔹 Garante valor padrão inicial
-        st.session_state.quantidade = 1.0
-        st.session_state.descricao_exibicao = ""
-        st.session_state.complemento = ""
-        st.session_state.data_necessaria_txt = ""
-        st.session_state.limpar_campos_insumo = False
-        st.session_state.justificativa_urgencia = ""
-        st.rerun()  # 🔁 força recarregar já limpo
-    
+    st.session_state.quantidade = 1.0
+    st.session_state.descricao_exibicao = ""
+    st.session_state.complemento = ""
+    st.session_state.data_necessaria_txt = ""
+    st.session_state.justificativa_urgencia = ""
+    st.session_state.limpar_campos_insumo = False
+        
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
         lambda x: f"{x['Descrição']} – {x['Código']} ({x['Unidade']})" if pd.notna(x["Código"]) and str(x["Código"]).strip() != "" else x["Descrição"],
@@ -1285,9 +1290,8 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             }
     
             st.session_state.insumos.append(novo_insumo)
-    
+
             st.session_state.limpar_campos_insumo = True
-            st.success("✅ Insumo adicionado com sucesso!")
             st.rerun()
     
         else:
@@ -1549,12 +1553,3 @@ if st.session_state.get("excel_bytes"):  # só renderiza se o arquivo existir
             st.session_state["adm_obra"] = ""
             st.session_state["tipo_processo"] = TIPO_PEDIDO
             st.rerun()
-
-# --- 🔄 KEEP-ALIVE (mantém app ativo no Streamlit Cloud) ---
-st.components.v1.html("""
-<script>
-setInterval(() => {
-    fetch(window.location.pathname + '_stcore/health');
-}, 120000);
-</script>
-""", height=0)
