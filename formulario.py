@@ -1297,118 +1297,75 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         else:
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
     
-# --- Renderiza tabela de insumos ---
-if False and st.session_state.insumos:
-    st.markdown("""
-    <style>
-    /* Cabeçalhos */
-    .tabela-header {
-        font-weight: 600;
-        color: #333;
-        border-bottom: 2px solid #ccc;
-        padding-bottom: 2px;
-        margin-bottom: 2px;
-        font-size: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-    .tabela-header.center {
-        justify-content: center; /* centraliza só Qtd */
-    }
+# --- TABELA DE INSUMOS ADICIONADOS ---
+if st.session_state.insumos:
 
-    /* Linhas */
-    .linha-insumo {
-        border-bottom: 1px solid #e6e6e6;
-        padding: 3px 0;
-        font-size: 14px;
-        line-height: 1.4;
-        display: flex;
-        align-items: center;
-    }
-
-    .center {
-        justify-content: center;
-        text-align: center;
-    }
-
-    /* Botão 🗑️ */
-    div[data-testid="stButton"] button {
-        border: none;
-        background-color: transparent;
-        color: #666;
-        font-size: 18px;
-        padding: 0;
-        line-height: 1;
-        transform: translateY(-2px);
-    }
-
-    div[data-testid="stButton"] button:hover {
-        color: #d9534f;
-        transform: scale(1.15) translateY(-2px);
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown("### 📋 Insumos Adicionados")
 
     # Cabeçalho
-    col1, col2, col3, col4, col5, col6, col7 = st.columns([4.0, 0.8, 0.8, 1.3, 1.3, 1.3, 0.4])
-    
-    with col1:
-        st.markdown("<div class='tabela-header'>Insumos Adicionados</div>", unsafe_allow_html=True)
-    with col2:
-        st.markdown("<div class='tabela-header center'>Qtd</div>", unsafe_allow_html=True)
-    with col3:
-        st.markdown("<div class='tabela-header center'>Unid</div>", unsafe_allow_html=True)
-    with col4:
-        st.markdown("<div class='tabela-header center'>Últ. Preço</div>", unsafe_allow_html=True)
-    with col5:
-        st.markdown("<div class='tabela-header center'>Total Est.</div>", unsafe_allow_html=True)
-    with col6:
-        st.markdown("<div class='tabela-header center'>Entrega</div>", unsafe_allow_html=True)
-    with col7:
-        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-    
-    # Linhas
+    colunas = st.columns([4, 0.8, 0.8, 1.3, 1.3, 1.3, 0.5])
+
+    cabecalhos = [
+        "Descrição",
+        "Qtd",
+        "Unid",
+        "Últ. Preço",
+        "Total Est.",
+        "Entrega",
+        ""
+    ]
+
+    for coluna, titulo in zip(colunas, cabecalhos):
+        coluna.markdown(f"**{titulo}**")
+
+    # Linhas de insumos
     for i, insumo in enumerate(st.session_state.insumos):
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([4.0, 0.8, 0.8, 1.3, 1.3, 1.3, 0.4])
-    
-        with col1:
-            st.markdown(f"<div class='linha-insumo'>{insumo['descricao']}</div>", unsafe_allow_html=True)
-    
-        with col2:
-            st.markdown(f"<div class='linha-insumo center'>{insumo['quantidade']}</div>", unsafe_allow_html=True)
-    
-        with col3:
-            st.markdown(f"<div class='linha-insumo center'>{insumo['unidade']}</div>", unsafe_allow_html=True)
-    
-        with col4:
-            st.markdown(
-                f"<div class='linha-insumo center'>{formatar_moeda(insumo.get('ultimo_preco'))}</div>",
-                unsafe_allow_html=True
-            )
-    
-        with col5:
-            st.markdown(
-                f"<div class='linha-insumo center'>{formatar_moeda(insumo.get('valor_total_estimado'))}</div>",
-                unsafe_allow_html=True
-            )
-    
-        with col6:
-            dt = insumo.get("data_necessaria")
-            dt_txt = dt.strftime("%d/%m/%Y") if dt else ""
-            st.markdown(f"<div class='linha-insumo center'>{dt_txt}</div>", unsafe_allow_html=True)
-    
-        with col7:
-            if st.button("🗑️", key=f"delete_{i}"):
+
+        colunas = st.columns(
+            [4, 0.8, 0.8, 1.3, 1.3, 1.3, 0.5]
+        )
+
+        data_entrega = insumo.get("data_necessaria")
+        data_formatada = (
+            data_entrega.strftime("%d/%m/%Y")
+            if data_entrega else "-"
+        )
+
+        valores = [
+            str(insumo.get("descricao", "")),
+            str(insumo.get("quantidade", "")),
+            str(insumo.get("unidade", "")),
+            formatar_moeda(insumo.get("ultimo_preco")),
+            formatar_moeda(
+                insumo.get("valor_total_estimado")
+            ),
+            data_formatada
+        ]
+
+        for coluna, valor in zip(colunas[:6], valores):
+            coluna.write(valor)
+
+        with colunas[6]:
+            if st.button(
+                "🗑️",
+                key=f"excluir_insumo_{i}",
+                help="Excluir insumo"
+            ):
                 st.session_state.insumos.pop(i)
                 st.rerun()
-                
+
+    st.divider()
+
+    # Total estimado
     total_geral_estimado = sum(
         item.get("valor_total_estimado") or 0
         for item in st.session_state.insumos
     )
-    
-    st.markdown(f"### Total aproximado do pedido: {formatar_moeda(total_geral_estimado)}")
+
+    st.markdown(
+        f"### Total aproximado do pedido: "
+        f"{formatar_moeda(total_geral_estimado)}"
+    )
 
 
 # --- FINALIZAÇÃO DO PEDIDO ---
