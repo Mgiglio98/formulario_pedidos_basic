@@ -1151,12 +1151,12 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
         ]:
             st.session_state.pop(campo, None)
 
-    st.session_state.quantidade = 1.0
-    st.session_state.descricao_exibicao = ""
-    st.session_state.complemento = ""
-    st.session_state.data_necessaria_txt = ""
-    st.session_state.justificativa_urgencia = ""
-    st.session_state.limpar_campos_insumo = False
+        st.session_state.quantidade = 1.0
+        st.session_state.descricao_exibicao = ""
+        st.session_state.complemento = ""
+        st.session_state.data_necessaria_txt = ""
+        st.session_state.justificativa_urgencia = ""
+        st.session_state.limpar_campos_insumo = False
         
     df_insumos_lista = df_insumos.sort_values(by="Descrição", ascending=True).copy()
     df_insumos_lista["opcao_exibicao"] = df_insumos_lista.apply(
