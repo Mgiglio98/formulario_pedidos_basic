@@ -1298,7 +1298,7 @@ with st.expander("➕ Adicionar Insumo", expanded=True):
             st.warning("⚠️ Preencha todos os campos obrigatórios do insumo.")
     
 # --- Renderiza tabela de insumos ---
-if st.session_state.insumos:
+if False and st.session_state.insumos:
     st.markdown("""
     <style>
     /* Cabeçalhos */
