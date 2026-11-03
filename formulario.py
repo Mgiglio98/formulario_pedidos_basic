@@ -97,15 +97,6 @@ ADM_EMAILS = {
 }
 
 OBRA_EXECUTIVOS = {
-    "2212 - IDEA INVEST. IMOBILIÁRIOS LTDA.": [
-        {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
-    ],
-    "2317 - LUIZ ALBERTO HESS BORGES": [
-        {"executivo": "Julia Vigorito", "email": "julia.vigorito@osborne.com.br"},
-    ],
-    "2409 - MARIA BELTRÃO SALDANHA COELHO": [
-        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-    ],
     "2505 - EW ADMINISTRADORA LTDA": [
         {"executivo": "Felipe Duarte", "email": "felipe.duarte@osborne.com.br"},
     ],
@@ -140,9 +131,6 @@ OBRA_EXECUTIVOS = {
     "2602 - RENATA STUHLBERGER": [
         {"executivo": "Leonardo Devico", "email": "leonardo.devico@osborne.com.br"},
     ],
-    "2603 - FERNANDO AUGUSTO VASCONCELLOS": [
-        {"executivo": "Najara Camargo", "email": "najara.camargo@osborne.com.br"},
-    ],
     "2604 - ANDRE FRANCO SALES": [
         {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
@@ -155,10 +143,15 @@ OBRA_EXECUTIVOS = {
     ],
     "2607 - DAN DAN EMPREENDIMENTOS": [
         {"executivo": "Maurício Trindade", "email": "mauricio.trindade@osborne.com.br"},
+        {"executivo": "Felipe Schwartz", "email": "felipe.schwartz@osborne.com.br"},
+    ],
+    "2608 - MARIA CAROLINA C. M. DE GOUVÊA": [
+        {"executivo": "Andre Pestana", "email": "andre.pestana@osborne.com.br"},
     ],
     "2610 - A. DE G. DOS A. DO EDIFÍCIO URBANO": [
         {"executivo": "Rafael Lima", "email": "rafael.lima@osborne.com.br"},
         {"executivo": "Sarah Mazeto", "email": "sarah.mazeto@osborne.com.br"},
+        {"executivo": "Bruno Brito", "email": "bruno.brito@osborne.com.br"},
     ],
     "2611 - GUILHERME BOTTURA": [
         {"executivo": "Carolina Oliveira", "email": "carolina.oliveira@osborne.com.br"},
@@ -173,6 +166,14 @@ OBRA_EXECUTIVOS = {
     "2614 - CAROLINE DA SILVA RODRIGUES": [
         {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
         {"executivo": "Jose Lenilson", "email": "jose.lenilson@osborne.com.br"},
+    ],
+     "2615 - ANITA BAGGIO BARRETO": [
+        {"executivo": "Alberto Teixeira", "email": "alberto.teixeira@osborne.com.br"},
+        {"executivo": "Giullian Moura", "email": "giullian.moura@osborne.com.br"},
+    ],
+     "2616 - MARCELO MUNIZ DE SOUZA SIMAS": [
+        {"executivo": "Maurício Trindade", "email": "mauricio.trindade@osborne.com.br"},
+        {"executivo": "Felipe Schwartz", "email": "felipe.schwartz@osborne.com.br"},
     ],
 }
 
