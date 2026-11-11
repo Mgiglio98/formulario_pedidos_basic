@@ -355,6 +355,13 @@ def enviar_email_manifesto(
         "matheus.almeida@osborne.com.br",
         "antonio.macedo@osborne.com.br",
     ]
+
+    # Adicionar o e-mail do administrativo selecionado
+    adm_obra = st.session_state.get("adm_obra", "")
+    email_adm = ADM_EMAILS.get(adm_obra)
+
+    if email_adm and email_adm not in destinatarios:
+        destinatarios.append(email_adm)
     
     codigo_obra = str(obra).split(" - ")[0].strip()
 
@@ -649,7 +656,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
                 disabled=True,
             )
 
-        opcoes_adm = [""] + list(ADM_EMAILS.keys())
+        opcoes_adm = ["", "Maria Eduarda", "Joice"]
         st.selectbox("Administrativo da Obra", opcoes_adm, index=0, key="adm_obra")
 
         col1, col2 = st.columns(2)
