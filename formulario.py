@@ -905,7 +905,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
             )
 
         if not st.session_state.get(
-            "adm",
+            "adm_obra",
             "",
         ).strip():
             erros.append(
