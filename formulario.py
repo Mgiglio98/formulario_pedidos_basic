@@ -649,6 +649,14 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
                 disabled=True,
             )
 
+        col1 = st.columns(1)
+
+        with col1:
+            st.text_input(
+                "Administrativo da Obra",
+                key="adm",
+            )
+
         col1, col2 = st.columns(2)
 
         with col1:
@@ -892,6 +900,14 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
         ).strip():
             erros.append(
                 "Informe o solicitante."
+            )
+
+        if not st.session_state.get(
+            "adm",
+            "",
+        ).strip():
+            erros.append(
+                "Informe o Administrativo da Obra."
             )
 
         if not st.session_state.get(
