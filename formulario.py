@@ -649,7 +649,7 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
                 disabled=True,
             )
 
-        col1 = st.columns(1)
+        col1 = st.column(1)
 
         with col1:
             st.text_input(
