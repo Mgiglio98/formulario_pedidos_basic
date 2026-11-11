@@ -649,10 +649,8 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
                 disabled=True,
             )
 
-        st.text_input(
-            "Administrativo da Obra",
-            key="adm",
-        )
+        opcoes_adm = [""] + list(ADM_EMAILS.keys())
+        st.selectbox("Administrativo da Obra", opcoes_adm, index=0, key="adm_obra")
 
         col1, col2 = st.columns(2)
 
