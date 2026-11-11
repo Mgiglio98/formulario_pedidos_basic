@@ -649,13 +649,10 @@ if tipo_processo == TIPO_MANIFESTO_RJ:
                 disabled=True,
             )
 
-        col1 = st.column(1)
-
-        with col1:
-            st.text_input(
-                "Administrativo da Obra",
-                key="adm",
-            )
+        st.text_input(
+            "Administrativo da Obra",
+            key="adm",
+        )
 
         col1, col2 = st.columns(2)
 
